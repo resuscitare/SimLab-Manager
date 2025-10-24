@@ -52,15 +52,19 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        sidebar: {
-          DEFAULT: "hsl(var(--sidebar-background))",
-          foreground: "hsl(var(--sidebar-foreground))",
-          primary: "hsl(var(--sidebar-primary))",
-          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
-          accent: "hsl(var(--sidebar-accent))",
-          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
-          border: "hsl(var(--sidebar-border))",
-          ring: "hsl(var(--sidebar-ring))",
+        // Green scale for medical theme
+        green: {
+          50: "hsl(var(--color-green-50))",
+          100: "hsl(var(--color-green-100))",
+          200: "hsl(var(--color-green-200))",
+          300: "hsl(var(--color-green-300))",
+          400: "hsl(var(--color-green-400))",
+          500: "hsl(var(--color-green-500))",
+          600: "hsl(var(--color-green-600))",
+          700: "hsl(var(--color-green-700))",
+          800: "hsl(var(--color-green-800))",
+          900: "hsl(var(--color-green-900))",
+          950: "hsl(var(--color-green-950))",
         },
       },
       borderRadius: {

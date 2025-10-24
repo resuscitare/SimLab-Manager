@@ -7,6 +7,10 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Agendamentos from "./pages/Agendamentos";
 import NovoAgendamento from "./pages/NovoAgendamento";
+import Cenarios from "./pages/Cenarios";
+import NovoCenario from "./pages/NovoCenario";
+import Checklists from "./pages/Checklists";
+import AssistenteIA from "./pages/AssistenteIA";
 import Equipamentos from "./pages/Equipamentos";
 import Instrutores from "./pages/Instrutores";
 import NotFound from "./pages/NotFound";
@@ -24,6 +28,11 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/agendamentos" element={<Agendamentos />} />
             <Route path="/agendamentos/novo" element={<NovoAgendamento />} />
+            <Route path="/cenarios" element={<Cenarios />} />
+            <Route path="/cenarios/novo" element={<NovoCenario />} />
+            <Route path="/cenarios/ia" element={<AssistenteIA />} />
+            <Route path="/checklists" element={<Checklists />} />
+            <Route path="/ia" element={<AssistenteIA />} />
             <Route path="/equipamentos" element={<Equipamentos />} />
             <Route path="/instrutores" element={<Instrutores />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
