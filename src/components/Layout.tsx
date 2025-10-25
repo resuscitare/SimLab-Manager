@@ -95,7 +95,7 @@ const SidebarContent = () => {
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         <div className="flex items-center space-x-2">
-          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
             <Activity className="h-4 w-4" />
           </div>
           <div>
@@ -116,8 +116,8 @@ const SidebarContent = () => {
                   className={cn(
                     "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     location.pathname === item.href
-                      ? "bg-primary text-primary-foreground"
-                      : "text-sidebar-foreground hover:bg-accent hover:text-accent-foreground"
+                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                   )}
                 >
                   <item.icon className="h-4 w-4" />
