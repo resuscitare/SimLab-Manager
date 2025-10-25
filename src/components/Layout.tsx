@@ -120,10 +120,9 @@ const SidebarContent = () => {
                       // Base styles
                       "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
                       
-                      // Active state - destaque forte
+                      // Active state - fundo preto, sem borda, texto contrastante
                       isActive && [
-                        "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm",
-                        "border-l-4 border-sidebar-primary-border",
+                        "bg-black text-white",
                         "font-semibold"
                       ],
                       
@@ -139,14 +138,14 @@ const SidebarContent = () => {
                   >
                     <item.icon className={cn(
                       "h-4 w-4 transition-colors duration-200",
-                      isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground"
+                      isActive ? "text-white" : "text-sidebar-foreground"
                     )} />
                     <span className="transition-colors duration-200">{item.title}</span>
                     
                     {/* Indicador visual adicional quando ativo */}
                     {isActive && (
                       <div className="ml-auto">
-                        <div className="w-2 h-2 rounded-full bg-sidebar-primary-foreground animate-pulse" />
+                        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                       </div>
                     )}
                   </Link>
