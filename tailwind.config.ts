@@ -52,20 +52,21 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Green scale for medical theme
-        green: {
-          50: "hsl(var(--color-green-50))",
-          100: "hsl(var(--color-green-100))",
-          200: "hsl(var(--color-green-200))",
-          300: "hsl(var(--color-green-300))",
-          400: "hsl(var(--color-green-400))",
-          500: "hsl(var(--color-green-500))",
-          600: "hsl(var(--color-green-600))",
-          700: "hsl(var(--color-green-700))",
-          800: "hsl(var(--color-green-800))",
-          900: "hsl(var(--color-green-900))",
-          950: "hsl(var(--color-green-950))",
+        // Resuscitare brand colors
+        success: {
+          DEFAULT: "hsl(var(--success))",
         },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+        },
+        danger: {
+          DEFAULT: "hsl(var(--danger))",
+        },
+        // Status colors
+        "status-online": "rgb(var(--status-online))",
+        "status-away": "rgb(var(--status-away))",
+        "status-busy": "rgb(var(--status-busy))",
+        "status-offline": "rgb(var(--status-offline))",
       },
       borderRadius: {
         lg: "var(--radius)",

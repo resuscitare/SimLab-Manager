@@ -5,14 +5,14 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Building, Calendar, Users, Activity, BarChart3, FileText, CheckSquare, Sparkles } from "lucide-react";
+import { Menu, Activity, Calendar, Users, FileText, CheckSquare, Sparkles, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const sidebarItems = [
   {
     title: "Dashboard",
     href: "/",
-    icon: BarChart3
+    icon: Activity
   },
   {
     title: "Agendamentos",
@@ -37,7 +37,7 @@ const sidebarItems = [
   {
     title: "Equipamentos",
     href: "/equipamentos",
-    icon: Activity
+    icon: Package
   },
   {
     title: "Instrutores",
@@ -55,7 +55,7 @@ const Layout = ({ children }: LayoutProps) => {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Mobile Sidebar */}
       <Sheet open={isOpen} onOpenChange={setIsOpen}>
         <SheetTrigger asChild>
@@ -91,14 +91,16 @@ const SidebarContent = () => {
   const location = useLocation();
 
   return (
-    <div className="flex flex-col h-full bg-white border-r">
+    <div className="flex flex-col h-full bg-sidebar border-r border-sidebar-border">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         <div className="flex items-center space-x-2">
-          <Building className="h-8 w-8 text-blue-600" />
+          <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary text-primary-foreground">
+            <Activity className="h-4 w-4" />
+          </div>
           <div>
-            <h1 className="text-lg font-bold">Resuscitare</h1>
-            <p className="text-xs text-gray-500">SimLab Manager</p>
+            <h1 className="text-lg font-bold text-sidebar-foreground">Resuscitare</h1>
+            <p className="text-xs text-muted-foreground">SimLab Manager</p>
           </div>
         </div>
       </div>
@@ -114,8 +116,8 @@ const SidebarContent = () => {
                   className={cn(
                     "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                     location.pathname === item.href
-                      ? "bg-blue-100 text-blue-900"
-                      : "text-gray-700 hover:bg-gray-100"
+                      ? "bg-primary text-primary-foreground"
+                      : "text-sidebar-foreground hover:bg-accent hover:text-accent-foreground"
                   )}
                 >
                   <item.icon className="h-4 w-4" />
@@ -128,8 +130,8 @@ const SidebarContent = () => {
       </ScrollArea>
 
       {/* Footer */}
-      <div className="p-4 border-t">
-        <div className="text-xs text-gray-500">
+      <div className="p-4 border-t border-sidebar-border">
+        <div className="text-xs text-muted-foreground">
           <div>Resuscitare Serviços Médicos</div>
           <div>v1.0.0</div>
         </div>

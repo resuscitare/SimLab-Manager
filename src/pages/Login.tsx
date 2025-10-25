@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Building, Eye, EyeOff } from "lucide-react";
+import { Activity, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -40,15 +40,17 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sidebar to-accent px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <div className="flex items-center space-x-2">
-              <Building className="h-8 w-8 text-green-600" />
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary text-primary-foreground">
+                <Activity className="h-5 w-5" />
+              </div>
               <div>
-                <h2 className="text-lg font-bold">Resuscitare</h2>
-                <p className="text-xs text-gray-500">SimLab Manager</p>
+                <h2 className="text-lg font-bold text-foreground">Resuscitare</h2>
+                <p className="text-xs text-muted-foreground">SimLab Manager</p>
               </div>
             </div>
           </div>
@@ -93,7 +95,7 @@ const Login = () => {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-0 top-0 h-full px-3 py-2 text-gray-500"
+                  className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -113,13 +115,13 @@ const Login = () => {
               </Label>
             </div>
 
-            <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
+            <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
               Entrar
             </Button>
 
-            <div className="text-center text-sm text-gray-500">
+            <div className="text-center text-sm text-muted-foreground">
               Não tem uma conta?{' '}
-              <Button type="button" variant="link" className="p-0 text-green-600">
+              <Button type="button" variant="link" className="p-0 text-primary">
                 Solicitar acesso
               </Button>
             </div>

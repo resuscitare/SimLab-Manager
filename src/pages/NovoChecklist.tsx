@@ -8,7 +8,7 @@ import { Package, MessageSquare, ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import ChecklistEditor from "../checklist/ChecklistEditor";
+import ChecklistEditor from "@/components/checklist/ChecklistEditor";
 
 interface Checklist {
   id: string;
