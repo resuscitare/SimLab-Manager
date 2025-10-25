@@ -108,7 +108,7 @@ const SidebarContent = () => {
       {/* Navigation */}
       <ScrollArea className="flex-1">
         <nav className="p-4">
-          <ul className="space-y-1">
+          <ul className="space-y-2">
             {sidebarItems.map((item) => {
               const isActive = location.pathname === item.href;
               
@@ -120,10 +120,11 @@ const SidebarContent = () => {
                       // Base styles
                       "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
                       
-                      // Active state - fundo preto, sem borda, texto contrastante
+                      // Active state - fundo verde, cantos arredondados, bordas transparentes
                       isActive && [
-                        "bg-black text-white",
-                        "font-semibold"
+                        "bg-green-600 text-white",
+                        "font-semibold",
+                        "border border-transparent"
                       ],
                       
                       // Inactive state - mais sutil
