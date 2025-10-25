@@ -324,15 +324,15 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
     );
   };
 
-  // Configurações dos parâmetros médicos com cores da Resuscitare
+  // Configurações dos parâmetros médicos com cores do design system original
   const parametrosConfig = {
     circulacao: [
       { key: 'fc', label: 'FC', unit: 'bpm', icon: Heart, tooltip: 'Frequência Cardíaca', color: 'text-red-600' },
       { key: 'pulse', label: 'Pulso', unit: 'bpm', icon: Heart, tooltip: 'Pulso periférico', color: 'text-red-500' },
       { key: 'satO2', label: 'SatO₂', unit: '%', icon: Wind, tooltip: 'Saturação de O₂', color: 'text-blue-600' },
-      { key: 'paSistolica', label: 'PA Sist', unit: 'mmHg', icon: Gauge, tooltip: 'PA Sistólica', color: 'text-primary' },
-      { key: 'paDiastolica', label: 'PA Diast', unit: 'mmHg', icon: Gauge, tooltip: 'PA Diastólica', color: 'text-primary' },
-      { key: 'paMedia', label: 'PA Média', unit: 'mmHg', icon: Gauge, tooltip: 'PA Média', color: 'text-primary' },
+      { key: 'paSistolica', label: 'PA Sist', unit: 'mmHg', icon: Gauge, tooltip: 'PA Sistólica', color: 'text-purple-600' },
+      { key: 'paDiastolica', label: 'PA Diast', unit: 'mmHg', icon: Gauge, tooltip: 'PA Diastólica', color: 'text-purple-500' },
+      { key: 'paMedia', label: 'PA Média', unit: 'mmHg', icon: Gauge, tooltip: 'PA Média', color: 'text-purple-700' },
     ],
     invasiva: [
       { key: 'papSistolica', label: 'PAP Sist', unit: 'mmHg', icon: Gauge, tooltip: 'Pressão Arterial Pulmonar Sistólica', color: 'text-pink-600' },
@@ -375,28 +375,28 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   return (
     <TooltipProvider>
       <div className="space-y-6">
-        {/* Header com Estatísticas - Cores Resuscitare */}
-        <Card className="bg-card border-card-border">
+        {/* Header com Estatísticas - Cores do Design System Original */}
+        <Card className="bg-white border-gray-200 shadow-sm">
           <CardHeader>
             <div className="flex justify-between items-start">
               <div>
-                <CardTitle className="flex items-center gap-2 text-foreground">
-                  <Activity className="h-5 w-5 text-primary" />
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <Activity className="h-5 w-5 text-blue-600" />
                   Frames do Cenário
                 </CardTitle>
-                <CardDescription className="text-muted-foreground">
+                <CardDescription className="text-gray-600">
                   Defina a progressão fisiológica e comportamental do caso clínico
                 </CardDescription>
               </div>
               
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <Label className="text-sm text-foreground">Filtro:</Label>
+                  <Label className="text-sm text-gray-700">Filtro:</Label>
                   <Select value={filtroStatus} onValueChange={(value: 'todos' | 'completos' | 'incompletos') => setFiltroStatus(value)}>
-                    <SelectTrigger className="w-36 bg-background border-border">
+                    <SelectTrigger className="w-36 bg-white border-gray-300">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-background border-border">
+                    <SelectContent className="bg-white border-gray-300">
                       <SelectItem value="todos">Todos</SelectItem>
                       <SelectItem value="completos">Completos</SelectItem>
                       <SelectItem value="incompletos">Incompletos</SelectItem>
@@ -408,11 +408,11 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
           </CardHeader>
           
           <CardContent>
-            {/* Estatísticas com cores Resuscitare */}
+            {/* Estatísticas com cores do design system */}
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
-              <div className="text-center p-3 bg-secondary rounded-lg border border-secondary-border">
-                <div className="text-2xl font-bold text-primary">{stats.total}</div>
-                <div className="text-sm text-secondary-foreground">Total</div>
+              <div className="text-center p-3 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="text-2xl font-bold text-blue-700">{stats.total}</div>
+                <div className="text-sm text-blue-600">Total</div>
               </div>
               <div className="text-center p-3 bg-green-50 rounded-lg border border-green-200">
                 <div className="text-2xl font-bold text-green-700">{stats.completos}</div>
@@ -426,16 +426,16 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
                 <div className="text-2xl font-bold text-purple-700">{stats.duracaoTotal}min</div>
                 <div className="text-sm text-purple-600">Duração</div>
               </div>
-              <div className="text-center p-3 bg-muted rounded-lg border border-border">
-                <div className="text-2xl font-bold text-muted-foreground">{stats.percentualCompleto}%</div>
-                <div className="text-sm text-muted-foreground">Progresso</div>
+              <div className="text-center p-3 bg-gray-50 rounded-lg border border-gray-200">
+                <div className="text-2xl font-bold text-gray-700">{stats.percentualCompleto}%</div>
+                <div className="text-sm text-gray-600">Progresso</div>
               </div>
             </div>
 
             {/* Barra de Progresso com cor primária */}
-            <div className="w-full bg-muted rounded-full h-2 mb-4">
+            <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
               <div 
-                className="bg-primary h-2 rounded-full transition-all duration-300"
+                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${stats.percentualCompleto}%` }}
               />
             </div>
@@ -443,17 +443,17 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
             {/* Controles */}
             <div className="flex justify-between items-center">
               <div className="flex items-center gap-2">
-                <Badge variant={frames.length >= 3 ? "default" : "destructive"} className="bg-primary text-primary-foreground">
+                <Badge variant={frames.length >= 3 ? "default" : "destructive"} className="bg-blue-600 text-white">
                   {frames.length} frames
                 </Badge>
                 {frames.length < 3 && (
-                  <Badge variant="outline" className="text-warning border-warning bg-yellow-50">
+                  <Badge variant="outline" className="text-yellow-600 border-yellow-600 bg-yellow-50">
                     Mínimo: 3 frames
                   </Badge>
                 )}
               </div>
               
-              <Button onClick={adicionarFrame} disabled={frames.length >= 10} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              <Button onClick={adicionarFrame} disabled={frames.length >= 10} className="bg-blue-600 hover:bg-blue-700 text-white">
                 <Plus className="w-4 h-4 mr-2" />
                 Adicionar Frame
               </Button>
@@ -464,10 +464,10 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
         {/* Lista de Frames */}
         <div className="space-y-4">
           {framesFiltrados.length === 0 ? (
-            <Card className="bg-card border-card-border">
+            <Card className="bg-white border-gray-200 shadow-sm">
               <CardContent className="text-center py-8">
-                <Activity className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <p className="text-muted-foreground">
+                <Activity className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">
                   {filtroStatus === 'todos' 
                     ? "Nenhum frame criado ainda. Clique em 'Adicionar Frame' para começar."
                     : `Nenhum frame ${filtroStatus === 'completos' ? 'completo' : 'incompleto'} encontrado.`
@@ -494,7 +494,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
           )}
         </div>
 
-        {/* Validação Geral com cores Resuscitare */}
+        {/* Validação Geral */}
         {frames.length > 0 && (
           <Card className={cn(
             "border-2",
@@ -510,13 +510,13 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
                   <AlertCircle className="h-5 w-5 text-yellow-700 mt-0.5" />
                 )}
                 <div>
-                  <h4 className="font-medium text-foreground">
+                  <h4 className="font-medium text-gray-900">
                     {frames.length >= 3 && stats.completos >= 3 
                       ? "Frames configurados corretamente!" 
                       : "Atenção necessária"
                     }
                   </h4>
-                  <div className="text-sm text-muted-foreground mt-1">
+                  <div className="text-sm text-gray-600 mt-1">
                     {frames.length < 3 && (
                       <p>• É necessário ter pelo menos 3 frames para o cenário</p>
                     )}
@@ -537,7 +537,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   );
 };
 
-// Componente individual de Frame otimizado com cores Resuscitare
+// Componente individual de Frame com cores do design system original
 interface FrameCardProps {
   frame: Frame;
   index: number;
@@ -577,16 +577,16 @@ const FrameCard = ({
 
     return (
       <div key={param.key} className="space-y-2">
-        <Label htmlFor={`${param.key}-${frame.id}`} className="flex items-center gap-1 text-foreground">
+        <Label htmlFor={`${param.key}-${frame.id}`} className="flex items-center gap-1 text-gray-700">
           <IconComponent className={cn("h-3 w-3", param.color)} />
           {param.label}
           {tooltipValue && (
             <Tooltip>
               <TooltipTrigger>
-                <Info className="h-3 w-3 text-muted-foreground" />
+                <Info className="h-3 w-3 text-gray-400" />
               </TooltipTrigger>
-              <TooltipContent className="bg-background border-border">
-                <p className="text-foreground">{tooltipValue as string}</p>
+              <TooltipContent className="bg-white border-gray-300">
+                <p className="text-gray-900">{tooltipValue as string}</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -600,10 +600,10 @@ const FrameCard = ({
             step={param.key === 'ph' ? 0.01 : undefined}
             value={String(value || '')}
             onChange={(e) => onUpdate(param.key, e.target.value)}
-            className="pr-12 bg-background border-border text-foreground"
+            className="pr-12 bg-white border-gray-300 text-gray-900"
           />
           {param.unit && (
-            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
               {param.unit}
             </span>
           )}
@@ -614,19 +614,19 @@ const FrameCard = ({
 
   return (
     <Card className={cn(
-      "transition-all duration-200 bg-card border-card-border",
-      frame.isCompleto ? "border-green-300 shadow-sm" : "border-yellow-300",
+      "transition-all duration-200 bg-white border-gray-200 shadow-sm",
+      frame.isCompleto ? "border-green-300" : "border-yellow-300",
       isExpanded && "shadow-lg"
     )}>
-      {/* Cabeçalho do Frame com cores Resuscitare */}
-      <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-secondary to-background">
+      {/* Cabeçalho do Frame com cores do design system */}
+      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex items-center space-x-3">
           <Tooltip>
             <TooltipTrigger>
-              <GripVertical className="h-4 w-4 text-muted-foreground cursor-move hover:text-foreground" />
+              <GripVertical className="h-4 w-4 text-gray-400 cursor-move hover:text-gray-600" />
             </TooltipTrigger>
-            <TooltipContent className="bg-background border-border">
-              <p className="text-foreground">Arrastar para reordenar</p>
+            <TooltipContent className="bg-white border-gray-300">
+              <p className="text-gray-900">Arrastar para reordenar</p>
             </TooltipContent>
           </Tooltip>
             
@@ -642,18 +642,18 @@ const FrameCard = ({
             value={frame.nomeEtapa}
             onChange={(e) => onUpdate('nomeEtapa', e.target.value)}
             placeholder="Nome da etapa (ex: Estado Inicial)"
-            className="w-64 font-medium bg-background border-border text-foreground"
+            className="w-64 font-medium bg-white border-gray-300 text-gray-900"
           />
           
           <Input
             value={frame.frameIdentifier || ''}
             onChange={(e) => onUpdate('frameIdentifier', e.target.value)}
             placeholder="ID (ex: 1, 2A, Piora)"
-            className="w-24 bg-background border-border text-foreground"
+            className="w-24 bg-white border-gray-300 text-gray-900"
           />
           
           {frame.durationEstimateMin && (
-            <Badge variant="outline" className="text-xs bg-accent text-accent-foreground border-border">
+            <Badge variant="outline" className="text-xs bg-gray-100 text-gray-700 border-gray-300">
               {frame.durationEstimateMin}min
             </Badge>
           )}
@@ -662,15 +662,15 @@ const FrameCard = ({
         <div className="flex items-center space-x-2">
           {/* Sugestão de IA */}
           <Select onValueChange={onIASuggest} disabled={frame.loadingIA}>
-            <SelectTrigger className="w-48 bg-background border-border">
+            <SelectTrigger className="w-48 bg-white border-gray-300">
               <SelectValue placeholder={frame.loadingIA ? "Gerando..." : "Sugerir com IA"} />
             </SelectTrigger>
-            <SelectContent className="bg-background border-border">
+            <SelectContent className="bg-white border-gray-300">
               {contextosIA.map(contexto => (
                 <SelectItem key={contexto.value} value={contexto.value}>
                   <div className="flex items-center gap-2">
                     <span>{contexto.icon}</span>
-                    <Sparkles className="h-3 w-3 text-primary" />
+                    <Sparkles className="h-3 w-3 text-blue-600" />
                     {contexto.label}
                   </div>
                 </SelectItem>
@@ -679,18 +679,18 @@ const FrameCard = ({
           </Select>
           
           {frame.loadingIA && (
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
+            <Loader2 className="h-4 w-4 animate-spin text-blue-600" />
           )}
           
           {/* Ações */}
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={onDuplicate} className="hover:bg-accent">
-                <Copy className="h-4 w-4 text-muted-foreground" />
+              <Button variant="ghost" size="icon" onClick={onDuplicate} className="hover:bg-gray-100">
+                <Copy className="h-4 w-4 text-gray-600" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent className="bg-background border-border">
-              <p className="text-foreground">Duplicar frame</p>
+            <TooltipContent className="bg-white border-gray-300">
+              <p className="text-gray-900">Duplicar frame</p>
             </TooltipContent>
           </Tooltip>
           
@@ -698,9 +698,9 @@ const FrameCard = ({
             variant="ghost"
             size="icon"
             onClick={onToggleExpand}
-            className="hover:bg-accent"
+            className="hover:bg-gray-100"
           >
-            {isExpanded ? <ChevronUp className="h-4 w-4 text-muted-foreground" /> : <ChevronDown className="h-4 w-4 text-muted-foreground" />}
+            {isExpanded ? <ChevronUp className="h-4 w-4 text-gray-600" /> : <ChevronDown className="h-4 w-4 text-gray-600" />}
           </Button>
           
           <Tooltip>
@@ -715,8 +715,8 @@ const FrameCard = ({
                 <Trash2 className="h-4 w-4" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent className="bg-background border-border">
-              <p className="text-foreground">Remover frame</p>
+            <TooltipContent className="bg-white border-gray-300">
+              <p className="text-gray-900">Remover frame</p>
             </TooltipContent>
           </Tooltip>
         </div>
@@ -724,11 +724,11 @@ const FrameCard = ({
 
       {/* Conteúdo Expandido */}
       {isExpanded && (
-        <div className="p-6 space-y-6 bg-background">
+        <div className="p-6 space-y-6 bg-white">
           {/* Configurações Básicas */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label htmlFor={`duracao-${frame.id}`} className="text-foreground">Duração Estimada (minutos)</Label>
+              <Label htmlFor={`duracao-${frame.id}`} className="text-gray-700">Duração Estimada (minutos)</Label>
               <Input
                 id={`duracao-${frame.id}`}
                 type="number"
@@ -737,17 +737,17 @@ const FrameCard = ({
                 value={frame.durationEstimateMin || ''}
                 onChange={(e) => onUpdate('durationEstimateMin', parseInt(e.target.value) || undefined)}
                 placeholder="5"
-                className="bg-background border-border text-foreground"
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
             
             <div className="space-y-2">
-              <Label className="text-foreground">Tipo de Participante</Label>
+              <Label className="text-gray-700">Tipo de Participante</Label>
               <Select value={frame.participantType} onValueChange={(value) => onUpdate('participantType', value)}>
-                <SelectTrigger className="bg-background border-border">
+                <SelectTrigger className="bg-white border-gray-300">
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-background border-border">
+                <SelectContent className="bg-white border-gray-300">
                   <SelectItem value="Simulador">🤖 Simulador</SelectItem>
                   <SelectItem value="Paciente Padronizado">👤 Paciente Padronizado</SelectItem>
                   <SelectItem value="Staff">👥 Staff</SelectItem>
@@ -756,9 +756,9 @@ const FrameCard = ({
             </div>
           </div>
 
-          <Separator className="bg-border" />
+          <Separator className="bg-gray-200" />
 
-          {/* Parâmetros Fisiológicos - Organizados por Sistema */}
+          {/* Parâmetros Fisiológicos - Organizados por Sistema com cores do design system */}
           <div className="space-y-6">
             {/* Circulação */}
             <div className="p-4 bg-red-50 rounded-lg border border-red-200">
@@ -838,12 +838,12 @@ const FrameCard = ({
             </div>
           </div>
 
-          <Separator className="bg-border" />
+          <Separator className="bg-gray-200" />
 
           {/* Campos Textuais com fundo adequado */}
-          <div className="space-y-4 p-4 bg-muted rounded-lg">
+          <div className="space-y-4 p-4 bg-gray-50 rounded-lg">
             <div className="space-y-2">
-              <Label htmlFor={`ecg-${frame.id}`} className="flex items-center gap-2 text-foreground">
+              <Label htmlFor={`ecg-${frame.id}`} className="flex items-center gap-2 text-gray-700">
                 <Activity className="h-4 w-4 text-red-600" />
                 Descrição do ECG/Ritmo
               </Label>
@@ -852,13 +852,13 @@ const FrameCard = ({
                 value={frame.ecgDescription || ''}
                 onChange={(e) => onUpdate('ecgDescription', e.target.value)}
                 placeholder="Ex: Ritmo sinusal regular, taquicardia sinusal, bradicardia"
-                className="bg-background border-border text-foreground"
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`outros-${frame.id}`} className="flex items-center gap-2 text-foreground">
-                <Target className="h-4 w-4 text-primary" />
+              <Label htmlFor={`outros-${frame.id}`} className="flex items-center gap-2 text-gray-700">
+                <Target className="h-4 w-4 text-gray-600" />
                 Outros Achados Clínicos
               </Label>
               <Textarea
@@ -867,12 +867,12 @@ const FrameCard = ({
                 onChange={(e) => onUpdate('otherFindings', e.target.value)}
                 placeholder="Ex: Ausculta pulmonar normal, pele pálida e úmida, pupilas isocóricas..."
                 rows={3}
-                className="bg-background border-border text-foreground"
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`operador-${frame.id}`} className="flex items-center gap-2 text-foreground">
+              <Label htmlFor={`operador-${frame.id}`} className="flex items-center gap-2 text-gray-700">
                 <Play className="h-4 w-4 text-blue-600" />
                 Instruções para Operador
               </Label>
@@ -882,12 +882,12 @@ const FrameCard = ({
                 onChange={(e) => onUpdate('operatorInstructions', e.target.value)}
                 placeholder="Instruções específicas para o operador do simulador..."
                 rows={3}
-                className="bg-background border-border text-foreground"
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`acoes-${frame.id}`} className="flex items-center gap-2 text-foreground">
+              <Label htmlFor={`acoes-${frame.id}`} className="flex items-center gap-2 text-gray-700">
                 <Target className="h-4 w-4 text-green-600" />
                 Ações Esperadas do Participante
               </Label>
@@ -897,12 +897,12 @@ const FrameCard = ({
                 onChange={(e) => onUpdate('expectedParticipantActions', e.target.value)}
                 placeholder="Ações esperadas ou possíveis dos participantes neste frame..."
                 rows={3}
-                className="bg-background border-border text-foreground"
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`dinamica-${frame.id}`} className="flex items-center gap-2 text-foreground">
+              <Label htmlFor={`dinamica-${frame.id}`} className="flex items-center gap-2 text-gray-700">
                 <Activity className="h-4 w-4 text-purple-600" />
                 Descrição da Dinâmica
               </Label>
@@ -912,19 +912,19 @@ const FrameCard = ({
                 onChange={(e) => onUpdate('dynamicDescription', e.target.value)}
                 placeholder="Como os parâmetros devem mudar *dentro* deste frame ou *para* o próximo (ex: 'Aumentar FR linearmente para 25rpm em 3 min', 'Iniciar Trend 'Febre.tnd')"
                 rows={2}
-                className="bg-background border-border text-foreground"
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`outros-parametros-${frame.id}`} className="text-foreground">Outros Parâmetros</Label>
+              <Label htmlFor={`outros-parametros-${frame.id}`} className="text-gray-700">Outros Parâmetros</Label>
               <Textarea
                 id={`outros-parametros-${frame.id}`}
                 value={frame.otherParametersText || ''}
                 onChange={(e) => onUpdate('otherParametersText', e.target.value)}
                 placeholder="Outros parâmetros menos comuns em formato livre..."
                 rows={2}
-                className="bg-background border-border text-foreground"
+                className="bg-white border-gray-300 text-gray-900"
               />
             </div>
           </div>
