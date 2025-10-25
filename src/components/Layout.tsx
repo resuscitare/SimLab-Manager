@@ -109,22 +109,50 @@ const SidebarContent = () => {
       <ScrollArea className="flex-1">
         <nav className="p-4">
           <ul className="space-y-1">
-            {sidebarItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  to={item.href}
-                  className={cn(
-                    "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                    location.pathname === item.href
-                      ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                  )}
-                >
-                  <item.icon className="h-4 w-4" />
-                  <span>{item.title}</span>
-                </Link>
-              </li>
-            ))}
+            {sidebarItems.map((item) => {
+              const isActive = location.pathname === item.href;
+              
+              return (
+                <li key={item.href}>
+                  <Link
+                    to={item.href}
+                    className={cn(
+                      // Base styles
+                      "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                      
+                      // Active state - destaque forte
+                      isActive && [
+                        "bg-sidebar-primary text-sidebar-primary-foreground shadow-sm",
+                        "border-l-4 border-sidebar-primary-border",
+                        "font-semibold"
+                      ],
+                      
+                      // Inactive state - mais sutil
+                      !isActive && [
+                        "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                        "hover:translate-x-1"
+                      ],
+                      
+                      // Focus states para acessibilidade
+                      "focus:outline-none focus:ring-2 focus:ring-sidebar-ring focus:ring-offset-2 focus:ring-offset-sidebar"
+                    )}
+                  >
+                    <item.icon className={cn(
+                      "h-4 w-4 transition-colors duration-200",
+                      isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground"
+                    )} />
+                    <span className="transition-colors duration-200">{item.title}</span>
+                    
+                    {/* Indicador visual adicional quando ativo */}
+                    {isActive && (
+                      <div className="ml-auto">
+                        <div className="w-2 h-2 rounded-full bg-sidebar-primary-foreground animate-pulse" />
+                      </div>
+                    )}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </ScrollArea>
