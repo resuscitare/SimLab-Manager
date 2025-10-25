@@ -25,7 +25,15 @@ import {
   Thermometer,
   Wind,
   Gauge,
-  Loader2
+  Loader2,
+  Info,
+  Zap,
+  Brain,
+  Droplets,
+  Eye,
+  Target,
+  Play,
+  Pause
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -34,19 +42,97 @@ interface Frame {
   id: string;
   ordem: number;
   nomeEtapa: string;
+  frameIdentifier: string;
+  durationEstimateMin?: number;
+  participantType?: string;
+  
+  // Parâmetros fisiológicos principais
   fc?: number;
-  sato2?: number;
+  fc_tooltip?: string;
+  ecgDescription?: string;
+  ecgDescription_tooltip?: string;
+  pulse?: number;
+  pulse_tooltip?: string;
+  satO2?: number;
+  satO2_tooltip?: string;
   paSistolica?: number;
+  paSistolica_tooltip?: string;
   paDiastolica?: number;
+  paDiastolica_tooltip?: string;
+  paMedia?: number;
+  paMedia_tooltip?: string;
+  papSistolica?: number;
+  papSistolica_tooltip?: string;
+  papDiastolica?: number;
+  papDiastolica_tooltip?: string;
+  papMedia?: number;
+  papMedia_tooltip?: string;
+  wpMedia?: number;
+  wpMedia_tooltip?: string;
+  cvpMedia?: number;
+  cvpMedia_tooltip?: string;
+  co?: number;
+  co_tooltip?: string;
+  
+  // Parâmetros respiratórios
   fr?: number;
-  temperatura?: number;
-  outrosParametros?: string;
-  infoSimulador: string;
-  infoFacilitador: string;
-  observacoes: string;
-  tipoParticipante: "simulador" | "paciente" | "staff";
-  duracao?: number;
-  gatilhos?: string;
+  fr_tooltip?: string;
+  etCO2?: number;
+  etCO2_tooltip?: string;
+  iCO2?: number;
+  iCO2_tooltip?: string;
+  inO2?: number;
+  inO2_tooltip?: string;
+  etO2?: number;
+  etO2_tooltip?: string;
+  
+  // Temperatura
+  temp?: number;
+  temp_tooltip?: string;
+  tblood?: number;
+  tblood_tooltip?: string;
+  
+  // Neurológicos e outros
+  icpMedia?: number;
+  icpMedia_tooltip?: string;
+  glicemia?: number;
+  glicemia_tooltip?: string;
+  pupilas?: string;
+  pupilas_tooltip?: string;
+  ph?: number;
+  ph_tooltip?: string;
+  inN2O?: number;
+  inN2O_tooltip?: string;
+  etN2O?: number;
+  etN2O_tooltip?: string;
+  anestheticAgent?: string;
+  anestheticAgent_tooltip?: string;
+  inAGT?: number;
+  inAGT_tooltip?: string;
+  etAGT?: number;
+  etAGT_tooltip?: string;
+  tofCount?: number;
+  tofCount_tooltip?: string;
+  tofRatio?: number;
+  tofRatio_tooltip?: string;
+  ptc?: number;
+  ptc_tooltip?: string;
+  
+  // PANI
+  paniSistolica?: number;
+  paniSistolica_tooltip?: string;
+  paniDiastolica?: number;
+  paniDiastolica_tooltip?: string;
+  paniMedia?: number;
+  paniMedia_tooltip?: string;
+  
+  // Campos textuais
+  otherFindings?: string;
+  operatorInstructions?: string;
+  expectedParticipantActions?: string;
+  dynamicDescription?: string;
+  otherParametersText?: string;
+  
   isCompleto?: boolean;
   loadingIA?: boolean;
 }
@@ -64,7 +150,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   const stats = useMemo(() => {
     const completos = frames.filter(f => f.isCompleto).length;
     const incompletos = frames.length - completos;
-    const duracaoTotal = frames.reduce((acc, f) => acc + (f.duracao || 0), 0);
+    const duracaoTotal = frames.reduce((acc, f) => acc + (f.durationEstimateMin || 0), 0);
     
     return {
       total: frames.length,
@@ -88,12 +174,10 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
     const novoFrame: Frame = {
       id: Date.now().toString(),
       ordem: frames.length + 1,
-      nomeEtapa: `Etapa ${frames.length + 1}`,
-      infoSimulador: "",
-      infoFacilitador: "",
-      observacoes: "",
-      tipoParticipante: "simulador",
-      duracao: 5,
+      nomeEtapa: `Frame ${frames.length + 1}`,
+      frameIdentifier: (frames.length + 1).toString(),
+      durationEstimateMin: 5,
+      participantType: "Simulador",
       isCompleto: false
     };
     
@@ -122,6 +206,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
       id: Date.now().toString(),
       ordem: frames.length + 1,
       nomeEtapa: `${frameOriginal.nomeEtapa} (Cópia)`,
+      frameIdentifier: (frames.length + 1).toString(),
       isCompleto: false
     };
     
@@ -163,28 +248,36 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
       // Mock de sugestões para evitar erro da API
       const sugestoes = {
         inicial: { 
-          fc: 80, sato2: 98, paSistolica: 120, paDiastolica: 80, fr: 16, temperatura: 36.5,
-          infoSimulador: "Paciente consciente, orientado, sem sinais de desconforto aparente. Responde adequadamente às perguntas.",
-          infoFacilitador: "Observar avaliação primária da equipe. Permitir que realizem anamnese completa.",
-          duracao: 5
+          fc: 80, satO2: 98, paSistolica: 120, paDiastolica: 80, fr: 16, temp: 36.5,
+          ecgDescription: "Ritmo sinusal regular",
+          otherFindings: "Paciente consciente, orientado, sem sinais de desconforto aparente. Responde adequadamente às perguntas.",
+          operatorInstructions: "Manter paciente em estado basal. Aguardar avaliação primária da equipe. Permitir que realizem anamnese completa.",
+          expectedParticipantActions: "Realizar avaliação ABCDE. Verificar sinais vitais. Obter histórico médico.",
+          durationEstimateMin: 5
         },
         deterioracao: { 
-          fc: 120, sato2: 88, paSistolica: 90, paDiastolica: 60, fr: 24, temperatura: 37.8,
-          infoSimulador: "Paciente apresenta dispneia, sudorese, ansiedade. Queixa-se de dor precordial.",
-          infoFacilitador: "Aguardar reconhecimento dos sinais de deterioração. Intervir se não identificarem em 3 minutos.",
-          duracao: 8
+          fc: 120, satO2: 88, paSistolica: 90, paDiastolica: 60, fr: 24, temp: 37.8,
+          ecgDescription: "Taquicardia sinusal com ectopias ventriculares ocasionais",
+          otherFindings: "Paciente apresenta dispneia, sudorese, ansiedade. Queixa-se de dor precordial. Pele pálida e úmida.",
+          operatorInstructions: "Iniciar sinais de desconforto respiratório. Adicionar sons respiratórios reduzidos. Preparar para deterioração hemodinâmica.",
+          expectedParticipantActions: "Reconhecer sinais de deterioração. Iniciar oxigenoterapia. Preparar para suporte avançado de vida.",
+          durationEstimateMin: 8
         },
         critico: { 
-          fc: 40, sato2: 70, paSistolica: 60, paDiastolica: 40, fr: 8, temperatura: 35.2,
-          infoSimulador: "Paciente inconsciente, cianótico, pulso fraco e irregular. Não responde a estímulos verbais.",
-          infoFacilitador: "Situação crítica. Observar se equipe inicia RCP. Estar pronto para orientar se necessário.",
-          duracao: 10
+          fc: 40, satO2: 70, paSistolica: 60, paDiastolica: 40, fr: 8, temp: 35.2,
+          ecgDescription: "Bradicardia sinusal com bloqueio AV de primeiro grau",
+          otherFindings: "Paciente inconsciente, cianótico, pulso fraco e irregular. Não responde a estímulos verbais. Pupilas midriáticas e não reagentes.",
+          operatorInstructions: "Ativar parada cardiorrespiratória. Manter sinais de ausência de pulso e respiração. Preparar para RCP.",
+          expectedParticipantActions: "Iniciar RCP imediatamente. Chamar ajuda. Preparar DEA. Verificar via aérea.",
+          durationEstimateMin: 10
         },
         recuperacao: { 
-          fc: 100, sato2: 94, paSistolica: 110, paDiastolica: 70, fr: 18, temperatura: 36.8,
-          infoSimulador: "Paciente retorna à consciência gradualmente. Ainda apresenta certa confusão mental.",
-          infoFacilitador: "Fase de estabilização. Observar cuidados pós-emergência e comunicação com paciente.",
-          duracao: 7
+          fc: 100, satO2: 94, paSistolica: 110, paDiastolica: 70, fr: 18, temp: 36.8,
+          ecgDescription: "Ritmo sinusal regular com frequência normal",
+          otherFindings: "Paciente retorna à consciência gradualmente. Ainda apresenta certa confusão mental. Melhora da coloração da pele.",
+          operatorInstructions: "Restaurar sinais vitais estáveis. Manter paciente consciente mas sonolento. Responder a estímulos verbais.",
+          expectedParticipantActions: "Monitorar sinais vitais. Avaliar nível de consciência. Preparar para transporte. Documentar eventos.",
+          durationEstimateMin: 7
         }
       };
 
@@ -201,14 +294,16 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
       // Fallback com valores padrão
       const fallbackSugestao = {
         fc: 80,
-        sato2: 98,
+        satO2: 98,
         paSistolica: 120,
         paDiastolica: 80,
         fr: 16,
-        temperatura: 36.5,
-        infoSimulador: "Paciente em estado estável. Aguardar avaliação da equipe.",
-        infoFacilitador: "Observar procedimentos padrão da equipe.",
-        duracao: 5
+        temp: 36.5,
+        ecgDescription: "Ritmo sinusal regular",
+        otherFindings: "Paciente em estado estável. Aguardar avaliação da equipe.",
+        operatorInstructions: "Observar procedimentos padrão da equipe.",
+        expectedParticipantActions: "Realizar avaliação inicial.",
+        durationEstimateMin: 5
       };
 
       Object.entries(fallbackSugestao).forEach(([campo, valor]) => {
@@ -224,10 +319,57 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   const validarCompletudeFrame = (frame: Frame): boolean => {
     return !!(
       frame.nomeEtapa?.trim() &&
-      frame.infoSimulador?.trim() &&
-      frame.infoFacilitador?.trim() &&
-      (frame.fc || frame.sato2 || frame.paSistolica)
+      frame.frameIdentifier?.trim() &&
+      (frame.fc || frame.satO2 || frame.paSistolica)
     );
+  };
+
+  // Configurações dos parâmetros médicos
+  const parametrosConfig = {
+    circulacao: [
+      { key: 'fc', label: 'FC', unit: 'bpm', icon: Heart, tooltip: 'Frequência Cardíaca', color: 'text-red-500' },
+      { key: 'pulse', label: 'Pulso', unit: 'bpm', icon: Heart, tooltip: 'Pulso periférico', color: 'text-red-400' },
+      { key: 'satO2', label: 'SatO₂', unit: '%', icon: Wind, tooltip: 'Saturação de O₂', color: 'text-blue-500' },
+      { key: 'paSistolica', label: 'PA Sist', unit: 'mmHg', icon: Gauge, tooltip: 'PA Sistólica', color: 'text-purple-500' },
+      { key: 'paDiastolica', label: 'PA Diast', unit: 'mmHg', icon: Gauge, tooltip: 'PA Diastólica', color: 'text-purple-400' },
+      { key: 'paMedia', label: 'PA Média', unit: 'mmHg', icon: Gauge, tooltip: 'PA Média', color: 'text-purple-600' },
+    ],
+    invasiva: [
+      { key: 'papSistolica', label: 'PAP Sist', unit: 'mmHg', icon: Gauge, tooltip: 'Pressão Arterial Pulmonar Sistólica', color: 'text-pink-500' },
+      { key: 'papDiastolica', label: 'PAP Diast', unit: 'mmHg', icon: Gauge, tooltip: 'Pressão Arterial Pulmonar Diastólica', color: 'text-pink-400' },
+      { key: 'papMedia', label: 'PAP Média', unit: 'mmHg', icon: Gauge, tooltip: 'Pressão Arterial Pulmonar Média', color: 'text-pink-600' },
+      { key: 'wpMedia', label: 'PCP', unit: 'mmHg', icon: Droplets, tooltip: 'Pressão Capilar Pulmonar', color: 'text-cyan-500' },
+      { key: 'cvpMedia', label: 'PVC', unit: 'mmHg', icon: Activity, tooltip: 'Pressão Venosa Central', color: 'text-indigo-500' },
+      { key: 'co', label: 'DC', unit: 'L/min', icon: Heart, tooltip: 'Débito Cardíaco', color: 'text-red-600' },
+    ],
+    respiratoria: [
+      { key: 'fr', label: 'FR', unit: 'rpm', icon: Wind, tooltip: 'Frequência Respiratória', color: 'text-green-500' },
+      { key: 'etCO2', label: 'etCO₂', unit: 'mmHg', icon: Wind, tooltip: 'CO₂ Expirado Final', color: 'text-teal-500' },
+      { key: 'iCO2', label: 'FiCO₂', unit: '%', icon: Wind, tooltip: 'Fração Inspirada de CO₂', color: 'text-gray-500' },
+      { key: 'inO2', label: 'FiO₂', unit: '%', icon: Wind, tooltip: 'Fração Inspirada de O₂', color: 'text-blue-400' },
+    ],
+    temperatura: [
+      { key: 'temp', label: 'Temp', unit: '°C', icon: Thermometer, tooltip: 'Temperatura Periférica', color: 'text-orange-500' },
+      { key: 'tblood', label: 'T Sang', unit: '°C', icon: Thermometer, tooltip: 'Temperatura Sanguínea', color: 'text-red-500' },
+    ],
+    neurologia: [
+      { key: 'icpMedia', label: 'PIC', unit: 'mmHg', icon: Brain, tooltip: 'Pressão Intracraniana', color: 'text-purple-700' },
+      { key: 'glicemia', label: 'Glicemia', unit: 'mg/dL', icon: Droplets, tooltip: 'Glicemia Capilar', color: 'text-yellow-600' },
+      { key: 'pupilas', label: 'Pupilas', unit: '', icon: Eye, tooltip: 'Estado das Pupilas', color: 'text-gray-600' },
+    ],
+    gases: [
+      { key: 'ph', label: 'pH', unit: '', icon: Activity, tooltip: 'pH Arterial', color: 'text-green-600' },
+      { key: 'inN2O', label: 'FiN₂O', unit: '%', icon: Wind, tooltip: 'Fração Inspirada de N₂O', color: 'text-purple-400' },
+      { key: 'anestheticAgent', label: 'Agente', unit: '', icon: Zap, tooltip: 'Agente Anestésico', color: 'text-indigo-400' },
+      { key: 'inAGT', label: 'FiAGT', unit: '%', icon: Droplets, tooltip: 'Fração Inspirada de Agente', color: 'text-blue-600' },
+      { key: 'tofCount', label: 'TOF', unit: '/4', icon: Zap, tooltip: 'Train-of-Four Count', color: 'text-yellow-500' },
+      { key: 'tofRatio', label: 'TOF%', unit: '%', icon: Zap, tooltip: 'Train-of-Four Ratio', color: 'text-orange-600' },
+    ],
+    pani: [
+      { key: 'paniSistolica', label: 'PANI Sist', unit: 'mmHg', icon: Gauge, tooltip: 'PA Não Invasiva Sistólica', color: 'text-blue-600' },
+      { key: 'paniDiastolica', label: 'PANI Diast', unit: 'mmHg', icon: Gauge, tooltip: 'PA Não Invasiva Diastólica', color: 'text-blue-500' },
+      { key: 'paniMedia', label: 'PANI Média', unit: 'mmHg', icon: Gauge, tooltip: 'PA Não Invasiva Média', color: 'text-blue-700' },
+    ]
   };
 
   return (
@@ -239,7 +381,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
             <div className="flex justify-between items-start">
               <div>
                 <CardTitle className="flex items-center gap-2">
-                  <Activity className="h-5 w-5 text-green-600" />
+                  <Activity className="h-5 w-5 text-primary" />
                   Frames do Cenário
                 </CardTitle>
                 <CardDescription>
@@ -250,7 +392,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
                   <Label className="text-sm">Filtro:</Label>
-                  <Select value={filtroStatus} onValueChange={(value: typeof filtroStatus) => setFiltroStatus(value)}>
+                  <Select value={filtroStatus} onValueChange={(value: 'todos' | 'completos' | 'incompletos') => setFiltroStatus(value)}>
                     <SelectTrigger className="w-36">
                       <SelectValue />
                     </SelectTrigger>
@@ -293,7 +435,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
             {/* Barra de Progresso */}
             <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
               <div 
-                className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                className="bg-primary h-2 rounded-full transition-all duration-300"
                 style={{ width: `${stats.percentualCompleto}%` }}
               />
             </div>
@@ -346,6 +488,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
                 onRemove={() => removerFrame(frame.id)}
                 onDuplicate={() => duplicarFrame(frame)}
                 onIASuggest={(contexto) => sugerirParametrosComIA(frame.id, contexto)}
+                parametrosConfig={parametrosConfig}
               />
             ))
           )}
@@ -405,6 +548,7 @@ interface FrameCardProps {
   onRemove: () => void;
   onDuplicate: () => void;
   onIASuggest: (contexto: string) => void;
+  parametrosConfig: any;
 }
 
 const FrameCard = ({ 
@@ -416,7 +560,8 @@ const FrameCard = ({
   onUpdate, 
   onRemove, 
   onDuplicate,
-  onIASuggest 
+  onIASuggest,
+  parametrosConfig
 }: FrameCardProps) => {
   const contextosIA = [
     { value: "inicial", label: "Estado Inicial", icon: "🟢" },
@@ -425,69 +570,47 @@ const FrameCard = ({
     { value: "recuperacao", label: "Recuperação", icon: "🔵" }
   ];
 
-  const parametrosVitais = [
-    { 
-      key: 'fc', 
-      label: 'FC', 
-      unit: 'bpm', 
-      icon: Heart, 
-      placeholder: '80',
-      min: 0, 
-      max: 300,
-      color: 'text-red-500'
-    },
-    { 
-      key: 'sato2', 
-      label: 'SatO₂', 
-      unit: '%', 
-      icon: Wind, 
-      placeholder: '98',
-      min: 0, 
-      max: 100,
-      color: 'text-blue-500'
-    },
-    { 
-      key: 'paSistolica', 
-      label: 'PA Sist', 
-      unit: 'mmHg', 
-      icon: Gauge, 
-      placeholder: '120',
-      min: 0, 
-      max: 300,
-      color: 'text-purple-500'
-    },
-    { 
-      key: 'paDiastolica', 
-      label: 'PA Diast', 
-      unit: 'mmHg', 
-      icon: Gauge, 
-      placeholder: '80',
-      min: 0, 
-      max: 200,
-      color: 'text-purple-500'
-    },
-    { 
-      key: 'fr', 
-      label: 'FR', 
-      unit: 'rpm', 
-      icon: Wind, 
-      placeholder: '16',
-      min: 0, 
-      max: 60,
-      color: 'text-green-500'
-    },
-    { 
-      key: 'temperatura', 
-      label: 'Temp', 
-      unit: '°C', 
-      icon: Thermometer, 
-      placeholder: '36.5',
-      min: 30, 
-      max: 45,
-      step: 0.1,
-      color: 'text-orange-500'
-    }
-  ];
+  const renderParameterInput = (param: any, frame: Frame) => {
+    const IconComponent = param.icon;
+    const value = frame[param.key as keyof Frame];
+    const tooltipValue = frame[`${param.key}_tooltip` as keyof Frame];
+
+    return (
+      <div key={param.key} className="space-y-2">
+        <Label htmlFor={`${param.key}-${frame.id}`} className="flex items-center gap-1">
+          <IconComponent className={cn("h-3 w-3", param.color)} />
+          {param.label}
+          {tooltipValue && (
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-3 w-3 text-gray-400" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{tooltipValue as string}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </Label>
+        <div className="relative">
+          <Input
+            id={`${param.key}-${frame.id}`}
+            type={param.unit === '%' || param.key === 'ph' ? "number" : "text"}
+            min={param.unit === '%' ? 0 : undefined}
+            max={param.unit === '%' ? 100 : undefined}
+            step={param.key === 'ph' ? 0.01 : undefined}
+            value={value || ''}
+            onChange={(e) => onUpdate(param.key, e.target.value)}
+            className="pr-12"
+          />
+          {param.unit && (
+            <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
+              {param.unit}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <Card className={cn(
@@ -498,19 +621,17 @@ const FrameCard = ({
       {/* Cabeçalho do Frame */}
       <div className="flex items-center justify-between p-4 border-b bg-gradient-to-r from-gray-50 to-white">
         <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2">
-            <Tooltip>
-              <TooltipTrigger>
-                <GripVertical className="h-4 w-4 text-gray-400 cursor-move hover:text-gray-600" />
-              </TooltipTrigger>
-              <TooltipContent>Arrastar para reordenar</TooltipContent>
-            </Tooltip>
+          <Tooltip>
+            <TooltipTrigger>
+              <GripVertical className="h-4 w-4 text-gray-400 cursor-move hover:text-gray-600" />
+            </TooltipTrigger>
+            <TooltipContent>Arrastar para reordenar</TooltipContent>
+          </Tooltip>
             
-            <Badge variant={frame.isCompleto ? "default" : "secondary"} className="flex items-center gap-1">
-              {frame.isCompleto ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-              Frame {frame.ordem}
-            </Badge>
-          </div>
+          <Badge variant={frame.isCompleto ? "default" : "secondary"} className="flex items-center gap-1">
+            {frame.isCompleto ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+            Frame {frame.ordem}
+          </Badge>
           
           <Input
             value={frame.nomeEtapa}
@@ -519,9 +640,16 @@ const FrameCard = ({
             className="w-64 font-medium"
           />
           
-          {frame.duracao && (
+          <Input
+            value={frame.frameIdentifier || ''}
+            onChange={(e) => onUpdate('frameIdentifier', e.target.value)}
+            placeholder="ID (ex: 1, 2A, Piora)"
+            className="w-24"
+          />
+          
+          {frame.durationEstimateMin && (
             <Badge variant="outline" className="text-xs">
-              {frame.duracao}min
+              {frame.durationEstimateMin}min
             </Badge>
           )}
         </div>
@@ -588,7 +716,7 @@ const FrameCard = ({
       {isExpanded && (
         <div className="p-6 space-y-6">
           {/* Configurações Básicas */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor={`duracao-${frame.id}`}>Duração Estimada (minutos)</Label>
               <Input
@@ -596,22 +724,22 @@ const FrameCard = ({
                 type="number"
                 min="1"
                 max="60"
-                value={frame.duracao || ''}
-                onChange={(e) => onUpdate('duracao', parseInt(e.target.value) || undefined)}
+                value={frame.durationEstimateMin || ''}
+                onChange={(e) => onUpdate('durationEstimateMin', parseInt(e.target.value) || undefined)}
                 placeholder="5"
               />
             </div>
             
             <div className="space-y-2">
               <Label>Tipo de Participante</Label>
-              <Select value={frame.tipoParticipante} onValueChange={(value) => onUpdate('tipoParticipante', value)}>
+              <Select value={frame.participantType} onValueChange={(value) => onUpdate('participantType', value)}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="simulador">🤖 Simulador</SelectItem>
-                  <SelectItem value="paciente">👤 Paciente Padronizado</SelectItem>
-                  <SelectItem value="staff">👥 Staff</SelectItem>
+                  <SelectItem value="Simulador">🤖 Simulador</SelectItem>
+                  <SelectItem value="Paciente Padronizado">👤 Paciente Padronizado</SelectItem>
+                  <SelectItem value="Staff">👥 Staff</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -619,110 +747,166 @@ const FrameCard = ({
 
           <Separator />
 
-          {/* Parâmetros Fisiológicos */}
-          <div>
-            <h4 className="font-semibold mb-4 flex items-center gap-2">
-              <Activity className="h-4 w-4" />
-              Parâmetros Fisiológicos
-            </h4>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-              {parametrosVitais.map((param) => {
-                const IconComponent = param.icon;
-                return (
-                  <div key={param.key} className="space-y-2">
-                    <Label htmlFor={`${param.key}-${frame.id}`} className="flex items-center gap-1">
-                      <IconComponent className={cn("h-3 w-3", param.color)} />
-                      {param.label}
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id={`${param.key}-${frame.id}`}
-                        type="number"
-                        min={param.min}
-                        max={param.max}
-                        step={param.step}
-                        value={frame[param.key as keyof Frame] as number || ''}
-                        onChange={(e) => onUpdate(param.key, parseFloat(e.target.value) || undefined)}
-                        placeholder={param.placeholder}
-                        className="pr-12"
-                      />
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-500">
-                        {param.unit}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+          {/* Parâmetros Fisiológicos - Organizados por Sistema */}
+          <div className="space-y-6">
+            {/* Circulação */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <Heart className="h-4 w-4 text-red-500" />
+                Parâmetros de Circulação
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {parametrosConfig.circulacao.map(param => renderParameterInput(param, frame))}
+              </div>
             </div>
-            
-            <div className="mt-4 space-y-2">
-              <Label htmlFor={`outros-${frame.id}`}>Outros Parâmetros</Label>
-              <Input
-                id={`outros-${frame.id}`}
-                value={frame.outrosParametros || ''}
-                onChange={(e) => onUpdate('outrosParametros', e.target.value)}
-                placeholder="Ex: Glicemia 120mg/dL, ECG - ritmo sinusal, Pupilas isocóricas"
-              />
+
+            {/* Monitoração Invasiva */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <Activity className="h-4 w-4 text-purple-500" />
+                Monitoração Invasiva
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                {parametrosConfig.invasiva.map(param => renderParameterInput(param, frame))}
+              </div>
+            </div>
+
+            {/* Respiratórios */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <Wind className="h-4 w-4 text-green-500" />
+                Parâmetros Respiratórios
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {parametrosConfig.respiratoria.map(param => renderParameterInput(param, frame))}
+              </div>
+            </div>
+
+            {/* Temperatura */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <Thermometer className="h-4 w-4 text-orange-500" />
+                Temperatura
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {parametrosConfig.temperatura.map(param => renderParameterInput(param, frame))}
+              </div>
+            </div>
+
+            {/* Neurológicos */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <Brain className="h-4 w-4 text-purple-700" />
+                Parâmetros Neurológicos
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {parametrosConfig.neurologia.map(param => renderParameterInput(param, frame))}
+              </div>
+            </div>
+
+            {/* Gases e Anestesia */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <Droplets className="h-4 w-4 text-blue-600" />
+                Gases e Anestesia
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {parametrosConfig.gases.map(param => renderParameterInput(param, frame))}
+              </div>
+            </div>
+
+            {/* PANI */}
+            <div>
+              <h4 className="font-semibold mb-4 flex items-center gap-2">
+                <Gauge className="h-4 w-4 text-blue-700" />
+                PA Não Invasiva
+              </h4>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {parametrosConfig.pani.map(param => renderParameterInput(param, frame))}
+              </div>
             </div>
           </div>
 
           <Separator />
 
-          {/* Informações Detalhadas */}
+          {/* Campos Textuais */}
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor={`info-simulador-${frame.id}`} className="flex items-center gap-2">
-                🤖 Informações para Simulador/Operador *
-                <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
+              <Label htmlFor={`ecg-${frame.id}`} className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-red-600" />
+                Descrição do ECG/Ritmo
               </Label>
-              <Textarea
-                id={`info-simulador-${frame.id}`}
-                value={frame.infoSimulador}
-                onChange={(e) => onUpdate('infoSimulador', e.target.value)}
-                placeholder="Descreva as ações, falas, comportamentos e respostas do simulador/paciente padronizado nesta etapa..."
-                rows={3}
-                className={cn(
-                  "transition-colors",
-                  !frame.infoSimulador.trim() && "border-red-300 focus:border-red-500"
-                )}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor={`info-facilitador-${frame.id}`} className="flex items-center gap-2">
-                👨‍🏫 Informações para Facilitador *
-                <Badge variant="destructive" className="text-xs">Obrigatório</Badge>
-              </Label>
-              <Textarea
-                id={`info-facilitador-${frame.id}`}
-                value={frame.infoFacilitador}
-                onChange={(e) => onUpdate('infoFacilitador', e.target.value)}
-                placeholder="Orientações específicas para o facilitador: gatilhos, intervenções, pontos de atenção, quando avançar para próximo frame..."
-                rows={3}
-                className={cn(
-                  "transition-colors",
-                  !frame.infoFacilitador.trim() && "border-red-300 focus:border-red-500"
-                )}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor={`gatilhos-${frame.id}`}>Gatilhos para Próximo Frame</Label>
               <Input
-                id={`gatilhos-${frame.id}`}
-                value={frame.gatilhos || ''}
-                onChange={(e) => onUpdate('gatilhos', e.target.value)}
-                placeholder="Ex: Após administração de medicação, Quando FC < 60 bpm, Após 5 minutos"
+                id={`ecg-${frame.id}`}
+                value={frame.ecgDescription || ''}
+                onChange={(e) => onUpdate('ecgDescription', e.target.value)}
+                placeholder="Ex: Ritmo sinusal regular, taquicardia sinusal, bradicardia"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor={`observacoes-${frame.id}`}>Observações Adicionais</Label>
+              <Label htmlFor={`outros-${frame.id}`} className="flex items-center gap-2">
+                <Target className="h-4 w-4 text-gray-600" />
+                Outros Achados Clínicos
+              </Label>
               <Textarea
-                id={`observacoes-${frame.id}`}
-                value={frame.observacoes}
-                onChange={(e) => onUpdate('observacoes', e.target.value)}
-                placeholder="Observações, dicas ou informações complementares sobre esta etapa..."
+                id={`outros-${frame.id}`}
+                value={frame.otherFindings || ''}
+                onChange={(e) => onUpdate('otherFindings', e.target.value)}
+                placeholder="Ex: Ausculta pulmonar normal, pele pálida e úmida, pupilas isocóricas..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={`operador-${frame.id}`} className="flex items-center gap-2">
+                <Play className="h-4 w-4 text-blue-600" />
+                Instruções para Operador
+              </Label>
+              <Textarea
+                id={`operador-${frame.id}`}
+                value={frame.operatorInstructions || ''}
+                onChange={(e) => onUpdate('operatorInstructions', e.target.value)}
+                placeholder="Instruções específicas para o operador do simulador..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={`acoes-${frame.id}`} className="flex items-center gap-2">
+                <Target className="h-4 w-4 text-green-600" />
+                Ações Esperadas do Participante
+              </Label>
+              <Textarea
+                id={`acoes-${frame.id}`}
+                value={frame.expectedParticipantActions || ''}
+                onChange={(e) => onUpdate('expectedParticipantActions', e.target.value)}
+                placeholder="Ações esperadas ou possíveis dos participantes neste frame..."
+                rows={3}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={`dinamica-${frame.id}`} className="flex items-center gap-2">
+                <Activity className="h-4 w-4 text-purple-600" />
+                Descrição da Dinâmica
+              </Label>
+              <Textarea
+                id={`dinamica-${frame.id}`}
+                value={frame.dynamicDescription || ''}
+                onChange={(e) => onUpdate('dynamicDescription', e.target.value)}
+                placeholder="Como os parâmetros devem mudar *dentro* deste frame ou *para* o próximo (ex: 'Aumentar FR linearmente para 25rpm em 3 min', 'Iniciar Trend 'Febre.tnd')"
+                rows={2}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor={`outros-parametros-${frame.id}`}>Outros Parâmetros</Label>
+              <Textarea
+                id={`outros-parametros-${frame.id}`}
+                value={frame.otherParametersText || ''}
+                onChange={(e) => onUpdate('otherParametersText', e.target.value)}
+                placeholder="Outros parâmetros menos comuns em formato livre..."
                 rows={2}
               />
             </div>

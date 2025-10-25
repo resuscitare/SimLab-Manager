@@ -14,23 +14,102 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FramesTab from "@/components/cenario/FramesTab";
 
+// Frame interface matching FramesTab expectations
 interface Frame {
   id: string;
   ordem: number;
   nomeEtapa: string;
+  frameIdentifier: string;
+  durationEstimateMin?: number;
+  participantType?: string;
+  
+  // Parâmetros fisiológicos principais
   fc?: number;
-  sato2?: number;
+  fc_tooltip?: string;
+  ecgDescription?: string;
+  ecgDescription_tooltip?: string;
+  pulse?: number;
+  pulse_tooltip?: string;
+  satO2?: number;
+  satO2_tooltip?: string;
   paSistolica?: number;
+  paSistolica_tooltip?: string;
   paDiastolica?: number;
+  paDiastolica_tooltip?: string;
+  paMedia?: number;
+  paMedia_tooltip?: string;
+  papSistolica?: number;
+  papSistolica_tooltip?: string;
+  papDiastolica?: number;
+  papDiastolica_tooltip?: string;
+  papMedia?: number;
+  papMedia_tooltip?: string;
+  wpMedia?: number;
+  wpMedia_tooltip?: string;
+  cvpMedia?: number;
+  cvpMedia_tooltip?: string;
+  co?: number;
+  co_tooltip?: string;
+  
+  // Parâmetros respiratórios
   fr?: number;
-  temperatura?: number;
-  outrosParametros?: string;
-  infoSimulador: string;
-  infoFacilitador: string;
-  observacoes: string;
-  tipoParticipante: "simulador" | "paciente" | "staff";
-  duracao?: number;
-  gatilhos?: string;
+  fr_tooltip?: string;
+  etCO2?: number;
+  etCO2_tooltip?: string;
+  iCO2?: number;
+  iCO2_tooltip?: string;
+  inO2?: number;
+  inO2_tooltip?: string;
+  etO2?: number;
+  etO2_tooltip?: string;
+  
+  // Temperatura
+  temp?: number;
+  temp_tooltip?: string;
+  tblood?: number;
+  tblood_tooltip?: string;
+  
+  // Neurológicos e outros
+  icpMedia?: number;
+  icpMedia_tooltip?: string;
+  glicemia?: number;
+  glicemia_tooltip?: string;
+  pupilas?: string;
+  pupilas_tooltip?: string;
+  ph?: number;
+  ph_tooltip?: string;
+  inN2O?: number;
+  inN2O_tooltip?: string;
+  etN2O?: number;
+  etN2O_tooltip?: string;
+  anestheticAgent?: string;
+  anestheticAgent_tooltip?: string;
+  inAGT?: number;
+  inAGT_tooltip?: string;
+  etAGT?: number;
+  etAGT_tooltip?: string;
+  tofCount?: number;
+  tofCount_tooltip?: string;
+  tofRatio?: number;
+  tofRatio_tooltip?: string;
+  ptc?: number;
+  ptc_tooltip?: string;
+  
+  // PANI
+  paniSistolica?: number;
+  paniSistolica_tooltip?: string;
+  paniDiastolica?: number;
+  paniDiastolica_tooltip?: string;
+  paniMedia?: number;
+  paniMedia_tooltip?: string;
+  
+  // Campos textuais
+  otherFindings?: string;
+  operatorInstructions?: string;
+  expectedParticipantActions?: string;
+  dynamicDescription?: string;
+  otherParametersText?: string;
+  
   isCompleto?: boolean;
   loadingIA?: boolean;
 }
@@ -55,17 +134,15 @@ const NovoCenario = () => {
   const [palavrasChave, setPalavrasChave] = useState<string[]>([]);
   const [novaPalavra, setNovaPalavra] = useState("");
   
-  // Frames state
+  // Frames state with proper Frame interface
   const [frames, setFrames] = useState<Frame[]>([
     {
       id: "1",
       ordem: 1,
       nomeEtapa: "Estado Inicial",
-      infoSimulador: "",
-      infoFacilitador: "",
-      observacoes: "",
-      tipoParticipante: "simulador",
-      duracao: 5,
+      frameIdentifier: "1",
+      durationEstimateMin: 5,
+      participantType: "Simulador",
       isCompleto: false
     }
   ]);
@@ -525,7 +602,7 @@ const NovoCenario = () => {
 
         {/* Aba Frames */}
         <TabsContent value="frames">
-          <FramesTab frames={frames} onFramesChange={setFrames} />
+          <FramesTab frames={frames} onFramesChange={(newFrames) => setFrames(newFrames)} />
         </TabsContent>
 
         {/* Aba Materiais */}
