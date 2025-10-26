@@ -1,10 +1,10 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import Layout from "./components/Layout";
-import Dashboard from "./pages/Dashboard";
+import Index from "./pages/Index";
 import Agendamentos from "./pages/Agendamentos";
 import NovoAgendamento from "./pages/NovoAgendamento";
 import Cenarios from "./pages/Cenarios";
@@ -29,7 +29,7 @@ const App = () => (
       <BrowserRouter>
         <Layout>
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<Index />} />
             <Route path="/agendamentos" element={<Agendamentos />} />
             <Route path="/agendamentos/novo" element={<NovoAgendamento />} />
             <Route path="/cenarios" element={<Cenarios />} />
@@ -42,7 +42,8 @@ const App = () => (
             <Route path="/instrutores" element={<Instrutores />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/login" element={<Login />} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/404" element={<NotFound />} />
+            <Route path="*" element={<Navigate to="/404" replace />} />
           </Routes>
         </Layout>
       </BrowserRouter>
