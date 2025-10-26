@@ -1,26 +1,44 @@
-import * as React from "react";
-import * as ProgressPrimitive from "@radix-ui/react-progress";
+"use client";
 
+import * as React from "react";
 import { cn } from "@/lib/utils";
 
-const Progress = React.forwardRef<
-  React.ElementRef<typeof ProgressPrimitive.Root>,
-  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
->(({ className, value, ...props }, ref) => (
-  <ProgressPrimitive.Root
-    ref={ref}
-    className={cn(
-      "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
-      className,
-    )}
-    {...props}
-  >
-    <ProgressPrimitive.Indicator
-      className="h-full w-full flex-1 bg-primary transition-all"
-      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
-    />
-  </ProgressPrimitive.Root>
-));
-Progress.displayName = ProgressPrimitive.Root.displayName;
+interface ProgressProps {
+  value: number;
+  max?: number;
+  className?: string;
+  showLabel?: boolean;
+}
+
+const Progress = React.forwardRef<HTMLDivElement, ProgressProps>(
+  ({ value, max = 100, className, showLabel = true, ...props }, ref) => {
+    const percentage = Math.min(Math.max((value / max) * 100, 0), 100);
+    
+    return (
+      <div className={cn("w-full", className)} ref={ref} {...props}>
+        <div className="flex justify-between items-center mb-2">
+          {showLabel && (
+            <>
+              <span className="text-sm font-medium text-foreground">
+                Progresso do Cenário
+              </span>
+              <span className="text-sm font-medium text-foreground">
+                {Math.round(percentage)}%
+              </span>
+            </>
+          )}
+        </div>
+        <div className="w-full bg-muted rounded-full h-2">
+          <div
+            className="bg-primary h-2 rounded-full transition-all duration-300 ease-in-out"
+            style={{ width: `${percentage}%` }}
+          />
+        </div>
+      </div>
+    );
+  }
+);
+
+Progress.displayName = "Progress";
 
 export { Progress };

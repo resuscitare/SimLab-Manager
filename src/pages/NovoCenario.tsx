@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, CheckCircle, Eye, Save } from "lucide-react";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FramesTab from "@/components/cenario/FramesTab";
@@ -11,126 +9,43 @@ import ObjetivosTab from "@/components/cenario/ObjetivosTab";
 import PacienteTab from "@/components/cenario/PacienteTab";
 import ChecklistTab from "@/components/cenario/ChecklistTab";
 import RevisaoTab from "@/components/cenario/RevisaoTab";
-
-interface Frame {
-  id: string;
-  ordem: number;
-  nomeEtapa: string;
-  frameIdentifier: string;
-  durationEstimateMin: number;
-  participantType: string;
-  isCompleto: boolean;
-  fc?: number;
-  satO2?: number;
-  paSistolica?: number;
-  paDiastolica?: number;
-  fr?: number;
-  temp?: number;
-  otherFindings?: string;
-  operatorInstructions?: string;
-  expectedParticipantActions?: string;
-  loadingIA?: boolean;
-}
+import TabNavigation from "@/components/cenario/TabNavigation";
+import ScenarioHeader from "@/components/cenario/ScenarioHeader";
+import { useScenarioForm } from "@/hooks/useScenarioForm";
+import { validateCompleteScenario } from "@/utils/scenarioValidation";
+import { showSuccess, showError } from "@/utils/toast";
 
 const NovoCenario = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("identificacao");
-  const [palavrasChave, setPalavrasChave] = useState<string[]>([]);
-  const [novaPalavra, setNovaPalavra] = useState("");
   
-  // Frames state
-  const [frames, setFrames] = useState<Frame[]>([
-    {
-      id: "1",
-      ordem: 1,
-      nomeEtapa: "Estado Inicial",
-      frameIdentifier: "1",
-      durationEstimateMin: 5,
-      participantType: "Simulador",
-      isCompleto: false
-    }
-  ]);
+  const {
+    // State
+    activeTab,
+    palavrasChave,
+    novaPalavra,
+    frames,
+    checklists,
+    formData,
+    
+    // Setters
+    setActiveTab,
+    
+    // Handlers
+    handleFormDataChange,
+    handlePalavrasChaveChange,
+    handleNovaPalavraChange,
+    handleChecklistChange,
+    handleFramesChange,
+    
+    // Validations
+    validarAba,
+    getTabsConfig
+  } = useScenarioForm();
 
-  // Checklists state
-  const [checklists, setChecklists] = useState({
-    debriefing: null,
-    materiais: null
-  });
-
-  // Estado do formulário
-  const [formData, setFormData] = useState({
-    nome: "",
-    publicoAlvo: "",
-    tempoExecucao: "",
-    tipoSimulacao: "",
-    descricao: "",
-    objetivosTecnicos: "",
-    objetivosNaoTecnicos: "",
-    nomePaciente: "",
-    idade: "",
-    sexo: "",
-    historicoMedico: "",
-    comoInicia: "",
-    localSimulacao: "",
-    voluntarios: "",
-    tempoDebriefing: "",
-    falasDirecionadoras: "",
-    metasSeguranca: "",
-    dominiosDesempenho: "",
-    protocolosEspecificos: "",
-    exemplosFrases: ""
-  });
-
-  const handleFormDataChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handlePalavrasChaveChange = (palavras: string[]) => {
-    setPalavrasChave(palavras);
-  };
-
-  const handleNovaPalavraChange = (palavra: string) => {
-    setNovaPalavra(palavra);
-  };
-
-  const handleChecklistChange = (tipo: 'materiais' | 'debriefing', checklist: any) => {
-    setChecklists(prev => ({ ...prev, [tipo]: checklist }));
-  };
-
-  const handleAISuggestion = (campo: string) => {
-    // Simulação de sugestão de IA
-    console.log(`Solicitando sugestão de IA para: ${campo}`);
-    // Aqui seria a integração real com a API de IA
-  };
-
-  const validarAba = (aba: string) => {
-    switch (aba) {
-      case "identificacao":
-        return !!(formData.nome && formData.publicoAlvo && formData.tempoExecucao && formData.tipoSimulacao);
-      case "objetivos":
-        return !!(formData.objetivosTecnicos && formData.objetivosNaoTecnicos);
-      case "paciente":
-        return !!(formData.nomePaciente && formData.idade && formData.sexo);
-      case "frames":
-        return frames.length >= 3 && frames.filter(f => f.isCompleto).length >= 3;
-      case "materiais":
-        return !!checklists.materiais;
-      case "debriefing":
-        return !!checklists.debriefing;
-      default:
-        return true;
-    }
-  };
-
-  const getTabStatus = (aba: string) => {
-    if (validarAba(aba)) {
-      return "completo";
-    } else if (aba === activeTab) {
-      return "ativo";
-    } else {
-      return "incompleto";
-    }
-  };
+  const tabs = getTabsConfig();
+  const currentIndex = tabs.findIndex(tab => tab.value === activeTab);
+  const canGoPrevious = currentIndex > 0;
+  const canGoNext = currentIndex < tabs.length - 1;
 
   const salvarRascunho = () => {
     const cenarioData = {
@@ -144,19 +59,14 @@ const NovoCenario = () => {
     
     // Salvar no localStorage (mock)
     localStorage.setItem("cenario_rascunho", JSON.stringify(cenarioData));
-    console.log("Rascunho salvo:", cenarioData);
-    
-    // Mostrar feedback
-    alert("Rascunho salvo com sucesso!");
+    showSuccess("Rascunho salvo com sucesso!");
   };
 
   const publicarCenario = () => {
-    // Validar se todas as abas estão completas
-    const abasObrigatorias = ["identificacao", "objetivos", "paciente", "frames", "materiais", "debriefing"];
-    const abasIncompletas = abasObrigatorias.filter(aba => !validarAba(aba));
+    const validation = validateCompleteScenario(formData, frames, checklists);
     
-    if (abasIncompletas.length > 0) {
-      alert(`Complete as seguintes abas antes de publicar: ${abasIncompletas.join(", ")}`);
+    if (!validation.isValid) {
+      showError(`Erros de validação: ${validation.errors.join(', ')}`);
       return;
     }
     
@@ -169,79 +79,62 @@ const NovoCenario = () => {
       dataCriacao: new Date().toISOString()
     };
     
+    // Simular salvamento
     console.log("Publicando cenário:", cenarioData);
+    showSuccess("Cenário publicado com sucesso!");
     navigate("/cenarios");
+  };
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
+  const handlePrevious = () => {
+    if (canGoPrevious) {
+      const previousTab = tabs[currentIndex - 1].value;
+      setActiveTab(previousTab);
+    }
+  };
+
+  const handleNext = () => {
+    if (canGoNext) {
+      const nextTab = tabs[currentIndex + 1].value;
+      
+      // Validar aba atual antes de avançar
+      if (!validarAba(activeTab)) {
+        showError(`Complete a aba atual antes de avançar`);
+        return;
+      }
+      
+      setActiveTab(nextTab);
+    }
+  };
+
+  const handleAISuggestion = (campo: string) => {
+    // Simulação de sugestão de IA
+    console.log(`Solicitando sugestão de IA para: ${campo}`);
+    showSuccess("Sugestão gerada com IA!");
   };
 
   return (
     <div className="p-6 space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Novo Cenário</h1>
-          <p className="text-gray-600">Crie um novo cenário de simulação realística</p>
-        </div>
-        <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => navigate("/cenarios")}>
-            Cancelar
-          </Button>
-          <Button variant="outline" onClick={salvarRascunho}>
-            <Save className="w-4 h-4 mr-2" />
-            Salvar Rascunho
-          </Button>
-        </div>
-      </div>
+      <ScenarioHeader
+        title="Novo Cenário"
+        description="Crie um novo cenário de simulação realística"
+        onCancel={() => navigate("/cenarios")}
+        onSaveDraft={salvarRascunho}
+      />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="identificacao" className="relative">
-            <div className="flex items-center gap-2">
-              {getTabStatus("identificacao") === "completo" && <CheckCircle className="h-3 w-3" />}
-              {getTabStatus("identificacao") === "incompleto" && <AlertCircle className="h-3 w-3" />}
-              Identificação
-            </div>
-          </TabsTrigger>
-          <TabsTrigger value="objetivos" className="relative">
-            <div className="flex items-center gap-2">
-              {getTabStatus("objetivos") === "completo" && <CheckCircle className="h-3 w-3" />}
-              {getTabStatus("objetivos") === "incompleto" && <AlertCircle className="h-3 w-3" />}
-              Objetivos
-            </div>
-          </TabsTrigger>
-          <TabsTrigger value="paciente" className="relative">
-            <div className="flex items-center gap-2">
-              {getTabStatus("paciente") === "completo" && <CheckCircle className="h-3 w-3" />}
-              {getTabStatus("paciente") === "incompleto" && <AlertCircle className="h-3 w-3" />}
-              Paciente
-            </div>
-          </TabsTrigger>
-          <TabsTrigger value="frames" className="relative">
-            <div className="flex items-center gap-2">
-              {getTabStatus("frames") === "completo" && <CheckCircle className="h-3 w-3" />}
-              {getTabStatus("frames") === "incompleto" && <AlertCircle className="h-3 w-3" />}
-              Frames
-            </div>
-          </TabsTrigger>
-          <TabsTrigger value="materiais" className="relative">
-            <div className="flex items-center gap-2">
-              {getTabStatus("materiais") === "completo" && <CheckCircle className="h-3 w-3" />}
-              {getTabStatus("materiais") === "incompleto" && <AlertCircle className="h-3 w-3" />}
-              Materiais
-            </div>
-          </TabsTrigger>
-          <TabsTrigger value="debriefing" className="relative">
-            <div className="flex items-center gap-2">
-              {getTabStatus("debriefing") === "completo" && <CheckCircle className="h-3 w-3" />}
-              {getTabStatus("debriefing") === "incompleto" && <AlertCircle className="h-3 w-3" />}
-              Debriefing
-            </div>
-          </TabsTrigger>
-          <TabsTrigger value="revisao">
-            <div className="flex items-center gap-2">
-              <Eye className="h-3 w-3" />
-              Revisão
-            </div>
-          </TabsTrigger>
-        </TabsList>
+      <Tabs value={activeTab} className="space-y-6">
+        <TabNavigation
+          activeTab={activeTab}
+          tabs={tabs}
+          onTabChange={handleTabChange}
+          onPrevious={handlePrevious}
+          onNext={handleNext}
+          canGoPrevious={canGoPrevious}
+          canGoNext={canGoNext}
+        />
 
         {/* Aba Identificação */}
         <TabsContent value="identificacao">
@@ -275,7 +168,10 @@ const NovoCenario = () => {
 
         {/* Aba Frames */}
         <TabsContent value="frames">
-          <FramesTab frames={frames} onFramesChange={(newFrames) => setFrames(newFrames)} />
+          <FramesTab 
+            frames={frames} 
+            onFramesChange={handleFramesChange} 
+          />
         </TabsContent>
 
         {/* Aba Materiais */}
@@ -308,36 +204,6 @@ const NovoCenario = () => {
             onPublicarCenario={publicarCenario}
           />
         </TabsContent>
-
-        {/* Navegação entre abas */}
-        <div className="flex justify-between">
-          <Button 
-            variant="outline" 
-            onClick={() => {
-              const tabs = ["identificacao", "objetivos", "paciente", "frames", "materiais", "debriefing", "revisao"];
-              const currentIndex = tabs.indexOf(activeTab);
-              if (currentIndex > 0) {
-                setActiveTab(tabs[currentIndex - 1]);
-              }
-            }}
-            disabled={activeTab === "identificacao"}
-          >
-            Anterior
-          </Button>
-          
-          <Button 
-            onClick={() => {
-              const tabs = ["identificacao", "objetivos", "paciente", "frames", "materiais", "debriefing", "revisao"];
-              const currentIndex = tabs.indexOf(activeTab);
-              if (currentIndex < tabs.length - 1) {
-                setActiveTab(tabs[currentIndex + 1]);
-              }
-            }}
-            disabled={activeTab === "revisao"}
-          >
-            Próximo
-          </Button>
-        </div>
       </Tabs>
     </div>
   );
