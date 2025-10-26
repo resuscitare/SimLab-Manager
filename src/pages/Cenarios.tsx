@@ -70,7 +70,7 @@ const Cenarios = () => {
           <p className="text-gray-600">Crie e gerencie cenários de simulação realística</p>
         </div>
         <div className="flex space-x-2">
-          <Button variant="outline" onClick={() => navigate("/cenarios/ia")}>
+          <Button variant="outline" onClick={() => navigate("/ia")}>
             <Sparkles className="w-4 h-4 mr-2" />
             Assistente IA
           </Button>

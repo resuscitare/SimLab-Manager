@@ -115,7 +115,7 @@ Estes objetivos são mensuráveis e alinhados com as diretrizes atuais de reanim
               disabled={carregando || !prompt.trim()}
               className="w-full"
             >
-              <Sparkles className="w-4 h-4 mr-2" />
+              <Sparkles className="w-4 w-4 mr-2" />
               {carregando ? "Gerando sugestão..." : "Gerar Sugestão com IA"}
             </Button>
           </CardContent>

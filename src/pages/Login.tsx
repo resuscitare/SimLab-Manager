@@ -8,27 +8,37 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Activity, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     remember: false
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulação de login bem-sucedido
-    localStorage.setItem('user', JSON.stringify({
-      id: 1,
-      nome: "Dra. Mariana Silva",
-      email: formData.email,
-      role: "facilitador",
-      avatar: "MS"
-    }));
-    navigate("/");
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const success = await login(formData.email, formData.password);
+      if (success) {
+        navigate("/");
+      } else {
+        setError("E-mail ou senha incorretos");
+      }
+    } catch (err) {
+      setError("Erro ao fazer login. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,6 +71,12 @@ const Login = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            {error && (
+              <div className="p-3 text-sm text-destructive bg-destructive/10 border border-destructive/20 rounded-md">
+                {error}
+              </div>
+            )}
+            
             <div className="space-y-2">
               <Label htmlFor="email">E-mail</Label>
               <Input
@@ -71,6 +87,7 @@ const Login = () => {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                disabled={isLoading}
               />
             </div>
             
@@ -90,6 +107,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
+                  disabled={isLoading}
                 />
                 <Button
                   type="button"
@@ -97,6 +115,7 @@ const Login = () => {
                   size="icon"
                   className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground"
                   onClick={() => setShowPassword(!showPassword)}
+                  disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
@@ -109,14 +128,15 @@ const Login = () => {
                 name="remember"
                 checked={formData.remember}
                 onCheckedChange={(checked) => setFormData(prev => ({ ...prev, remember: Boolean(checked) }))}
+                disabled={isLoading}
               />
               <Label htmlFor="remember" className="text-sm">
                 Manter-me conectado
               </Label>
             </div>
 
-            <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-              Entrar
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Entrando..." : "Entrar"}
             </Button>
 
             <div className="text-center text-sm text-muted-foreground">
@@ -126,6 +146,15 @@ const Login = () => {
               </Button>
             </div>
           </form>
+
+          {/* Demo Credentials */}
+          <div className="mt-6 p-4 bg-muted rounded-lg">
+            <h4 className="text-sm font-medium mb-2">Credenciais de Demonstração:</h4>
+            <div className="space-y-1 text-xs text-muted-foreground">
+              <p><strong>Admin:</strong> admin@resuscitare.com / admin123</p>
+              <p><strong>Facilitador:</strong> mariana@resuscitare.com / user123</p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>
