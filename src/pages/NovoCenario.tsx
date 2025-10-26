@@ -14,15 +14,16 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FramesTab from "@/components/cenario/FramesTab";
 
-// Fix: Define Frame type with required properties to match FramesTab component
+// Fix: Use the same Frame type as FramesTab component by importing it
+// Since we can't import types from components, let's define it inline to match
 interface Frame {
   id: string;
   ordem: number;
   nomeEtapa: string;
   frameIdentifier: string;
-  durationEstimateMin: number; // Changed from optional to required
-  participantType: string; // Changed from optional to required
-  isCompleto: boolean; // Changed from optional to required
+  durationEstimateMin: number;
+  participantType: string;
+  isCompleto: boolean;
   fc?: number;
   satO2?: number;
   paSistolica?: number;
@@ -48,9 +49,9 @@ const NovoCenario = () => {
       ordem: 1,
       nomeEtapa: "Estado Inicial",
       frameIdentifier: "1",
-      durationEstimateMin: 5, // Now required
-      participantType: "Simulador", // Now required
-      isCompleto: false // Now required
+      durationEstimateMin: 5,
+      participantType: "Simulador",
+      isCompleto: false
     }
   ]);
 

@@ -19,7 +19,13 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  Activity
+  Activity,
+  Heart,
+  Thermometer,
+  Gauge,
+  Eye,
+  MessageSquare,
+  User
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -29,8 +35,8 @@ interface Frame {
   ordem: number;
   nomeEtapa: string;
   frameIdentifier: string;
-  durationEstimateMin?: number;
-  participantType?: string;
+  durationEstimateMin: number;
+  participantType: string;
   fc?: number;
   satO2?: number;
   paSistolica?: number;
@@ -144,9 +150,34 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
     return !!(
       frame.nomeEtapa?.trim() &&
       frame.frameIdentifier?.trim() &&
-      (frame.fc || frame.satO2 || frame.paSistolica)
+      frame.durationEstimateMin > 0 &&
+      frame.participantType?.trim() &&
+      (frame.fc !== undefined || frame.satO2 !== undefined || frame.paSistolica !== undefined)
     );
   };
+
+  const gerarSugestaoSinaisVitais = useCallback((frameId: string) => {
+    atualizarFrame(frameId, 'loadingIA', true);
+    
+    // Simulação de chamada à IA
+    setTimeout(() => {
+      const sugestao = {
+        fc: 120,
+        satO2: 92,
+        paSistolica: 80,
+        paDiastolica: 50,
+        fr: 28,
+        temp: 38.2,
+        otherFindings: "Pele pálida e úmida, taquipneia, taquicardia"
+      };
+      
+      Object.entries(sugestao).forEach(([campo, valor]) => {
+        atualizarFrame(frameId, campo, valor);
+      });
+      
+      atualizarFrame(frameId, 'loadingIA', false);
+    }, 1500);
+  }, [atualizarFrame]);
 
   return (
     <div className="space-y-6">
@@ -279,6 +310,16 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
                 </div>
                 
                 <div className="flex items-center space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => gerarSugestaoSinaisVitais(frame.id)}
+                    disabled={frame.loadingIA}
+                  >
+                    <Sparkles className="h-4 w-4 mr-1" />
+                    {frame.loadingIA ? "Gerando..." : "IA"}
+                  </Button>
+                  
                   <Button variant="ghost" size="icon" onClick={() => duplicarFrame(frame)}>
                     <Copy className="h-4 w-4" />
                   </Button>
@@ -314,7 +355,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
                         min="1"
                         max="60"
                         value={frame.durationEstimateMin || ''}
-                        onChange={(e) => atualizarFrame(frame.id, 'durationEstimateMin', parseInt(e.target.value) || undefined)}
+                        onChange={(e) => atualizarFrame(frame.id, 'durationEstimateMin', parseInt(e.target.value) || 5)}
                         placeholder="5"
                       />
                     </div>
@@ -336,98 +377,157 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
 
                   <Separator />
 
+                  {/* Sinais Vitais - RESTAURADOS */}
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Heart className="h-4 w-4 text-red-500" />
+                        Sinais Vitais
+                      </h4>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => gerarSugestaoSinaisVitais(frame.id)}
+                        disabled={frame.loadingIA}
+                      >
+                        <Sparkles className="h-3 w-3 mr-1" />
+                        {frame.loadingIA ? "Gerando..." : "Sugerir com IA"}
+                      </Button>
+                    </div>
+                    
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-1 text-sm">
+                          <Heart className="h-3 w-3 text-red-500" />
+                          FC (bpm)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={frame.fc || ''}
+                          onChange={(e) => atualizarFrame(frame.id, 'fc', parseInt(e.target.value) || undefined)}
+                          placeholder="80"
+                          className="text-sm"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-1 text-sm">
+                          <Eye className="h-3 w-3 text-blue-500" />
+                          SatO₂ (%)
+                        </Label>
+                        <Input
+                          type="number"
+                          min="0"
+                          max="100"
+                          value={frame.satO2 || ''}
+                          onChange={(e) => atualizarFrame(frame.id, 'satO2', parseInt(e.target.value) || undefined)}
+                          placeholder="98"
+                          className="text-sm"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-1 text-sm">
+                          <Gauge className="h-3 w-3 text-green-500" />
+                          PA Sistólica
+                        </Label>
+                        <Input
+                          type="number"
+                          value={frame.paSistolica || ''}
+                          onChange={(e) => atualizarFrame(frame.id, 'paSistolica', parseInt(e.target.value) || undefined)}
+                          placeholder="120"
+                          className="text-sm"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-1 text-sm">
+                          <Gauge className="h-3 w-3 text-green-500" />
+                          PA Diastólica
+                        </Label>
+                        <Input
+                          type="number"
+                          value={frame.paDiastolica || ''}
+                          onChange={(e) => atualizarFrame(frame.id, 'paDiastolica', parseInt(e.target.value) || undefined)}
+                          placeholder="80"
+                          className="text-sm"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-1 text-sm">
+                          <User className="h-3 w-3 text-purple-500" />
+                          FR (rpm)
+                        </Label>
+                        <Input
+                          type="number"
+                          value={frame.fr || ''}
+                          onChange={(e) => atualizarFrame(frame.id, 'fr', parseInt(e.target.value) || undefined)}
+                          placeholder="16"
+                          className="text-sm"
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-1 text-sm">
+                          <Thermometer className="h-3 w-3 text-orange-500" />
+                          Temp (°C)
+                        </Label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          value={frame.temp || ''}
+                          onChange={(e) => atualizarFrame(frame.id, 'temp', parseFloat(e.target.value) || undefined)}
+                          placeholder="36.5"
+                          className="text-sm"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
-                      <h4 className="font-medium">Parâmetros Fisiológicos</h4>
-                      <div className="grid grid-cols-2 gap-4">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <MessageSquare className="h-4 w-4 text-blue-500" />
+                        Descrições Clínicas
+                      </h4>
+                      <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label>FC (bpm)</Label>
-                          <Input
-                            type="number"
-                            value={frame.fc || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'fc', parseInt(e.target.value) || undefined)}
-                            placeholder="80"
+                          <Label>Achados Clínicos Adicionais</Label>
+                          <Textarea
+                            value={frame.otherFindings || ''}
+                            onChange={(e) => atualizarFrame(frame.id, 'otherFindings', e.target.value)}
+                            placeholder="Ex: Ausculta pulmonar normal, pele pálida e úmida, sudorese profusa..."
+                            rows={3}
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label>SatO₂ (%)</Label>
-                          <Input
-                            type="number"
-                            min="0"
-                            max="100"
-                            value={frame.satO2 || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'satO2', parseInt(e.target.value) || undefined)}
-                            placeholder="98"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>PA Sistólica</Label>
-                          <Input
-                            type="number"
-                            value={frame.paSistolica || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'paSistolica', parseInt(e.target.value) || undefined)}
-                            placeholder="120"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>PA Diastólica</Label>
-                          <Input
-                            type="number"
-                            value={frame.paDiastolica || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'paDiastolica', parseInt(e.target.value) || undefined)}
-                            placeholder="80"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>FR (rpm)</Label>
-                          <Input
-                            type="number"
-                            value={frame.fr || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'fr', parseInt(e.target.value) || undefined)}
-                            placeholder="16"
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Temp (°C)</Label>
-                          <Input
-                            type="number"
-                            step="0.1"
-                            value={frame.temp || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'temp', parseFloat(e.target.value) || undefined)}
-                            placeholder="36.5"
+                          <Label>Instruções para Operador do Simulador</Label>
+                          <Textarea
+                            value={frame.operatorInstructions || ''}
+                            onChange={(e) => atualizarFrame(frame.id, 'operatorInstructions', e.target.value)}
+                            placeholder="Instruções específicas para o operador do simulador neste frame..."
+                            rows={2}
                           />
                         </div>
                       </div>
                     </div>
 
                     <div className="space-y-4">
-                      <h4 className="font-medium">Descrições</h4>
+                      <h4 className="font-medium flex items-center gap-2">
+                        <User className="h-4 w-4 text-green-500" />
+                        Comportamento Esperado
+                      </h4>
                       <div className="space-y-4">
                         <div className="space-y-2">
-                          <Label>Achados Clínicos</Label>
-                          <Textarea
-                            value={frame.otherFindings || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'otherFindings', e.target.value)}
-                            placeholder="Ex: Ausculta pulmonar normal, pele pálida e úmida..."
-                            rows={3}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Instruções para Operador</Label>
-                          <Textarea
-                            value={frame.operatorInstructions || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'operatorInstructions', e.target.value)}
-                            placeholder="Instruções específicas para o operador do simulador..."
-                            rows={2}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Ações Esperadas</Label>
+                          <Label>Ações Esperadas dos Participantes</Label>
                           <Textarea
                             value={frame.expectedParticipantActions || ''}
                             onChange={(e) => atualizarFrame(frame.id, 'expectedParticipantActions', e.target.value)}
-                            placeholder="Ações esperadas dos participantes neste frame..."
-                            rows={2}
+                            placeholder="Ações esperadas dos participantes neste frame. Ex: Realizar avaliação primária ABCDE, solicitar exames complementares..."
+                            rows={3}
                           />
                         </div>
                       </div>
