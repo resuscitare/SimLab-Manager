@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScenarioFormData } from "@/types/prisma";
+import { Plus } from "lucide-react";
 
 interface PearlsFormProps {
   scenarioData: ScenarioFormData;
@@ -116,11 +117,46 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
         </CardHeader>
         <CardContent className="space-y-4">
           <Label>Selecione a Abordagem de Análise Principal</Label>
-          <RadioGroup value={analysisApproach} onValueChange={setAnalysisApproach}>
-            <div className="flex items-center space-x-2"><RadioGroupItem value="plus-delta" id="plus-delta" /><Label htmlFor="plus-delta">Plus-Delta</Label></div>
-            <div className="flex items-center space-x-2"><RadioGroupItem value="advocacy-inquiry" id="advocacy-inquiry" /><Label htmlFor="advocacy-inquiry">Advocacy-Inquiry</Label></div>
-            <div className="flex items-center space-x-2"><RadioGroupItem value="feedback-diretivo" id="feedback-diretivo" /><Label htmlFor="feedback-diretivo">Feedback Diretivo</Label></div>
+          <RadioGroup value={analysisApproach} onValueChange={setAnalysisApproach} className="space-y-3">
+            <div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="plus-delta" id="plus-delta" />
+                <Label htmlFor="plus-delta">Plus-Delta (Autoavaliação do Aprendiz)</Label>
+              </div>
+              <p className="text-sm text-muted-foreground ml-6">Use quando: tempo limitado, aprendizes geram os objetivos.</p>
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="advocacy-inquiry" id="advocacy-inquiry" />
+                <Label htmlFor="advocacy-inquiry">Advocacy-Inquiry (Facilitação Focada)</Label>
+              </div>
+              <p className="text-sm text-muted-foreground ml-6">Use quando: justificativa para ação não é clara, tempo para explorar performance.</p>
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="feedback-diretivo" id="feedback-diretivo" />
+                <Label htmlFor="feedback-diretivo">Feedback Diretivo (Ensino Direto)</Label>
+              </div>
+              <p className="text-sm text-muted-foreground ml-6">Use quando: prazos menores, lacunas técnicas/cognitivas claras.</p>
+            </div>
           </RadioGroup>
+
+          {analysisApproach === 'plus-delta' && (
+            <div className="p-4 border rounded-md mt-4 space-y-4">
+              <h4 className="font-semibold">Plus-Delta</h4>
+              <div className="space-y-2">
+                <Label>Perguntas Plus (Positivo)</Label>
+                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">Quais aspectos do caso vocês acham que gerenciaram bem?</Label></div>
+                <div className="flex items-center space-x-2"><Checkbox /><Label className="font-normal">O que funcionou bem na equipe?</Label></div>
+              </div>
+              <div className="space-y-2">
+                <Label>Perguntas Delta (Mudança)</Label>
+                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">Quais aspectos vocês gostariam de mudar?</Label></div>
+                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">Por quê?</Label></div>
+                <div className="flex items-center space-x-2"><Checkbox /><Label className="font-normal">O que fariam diferente na próxima vez?</Label></div>
+              </div>
+            </div>
+          )}
 
           {analysisApproach === 'advocacy-inquiry' && (
             <div className="p-4 border rounded-md mt-4 space-y-4">
@@ -136,6 +172,24 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
                 </div>
               ))}
             </div>
+          )}
+
+          {analysisApproach === 'feedback-diretivo' && (
+             <div className="p-4 border rounded-md mt-4 space-y-4">
+                <h4 className="font-semibold">Feedback Diretivo</h4>
+                <p className="text-sm text-muted-foreground">Para cada lacuna de performance antecipada, prepare o feedback.</p>
+                <div className="p-3 border bg-background rounded-lg space-y-2">
+                    <Label>Lacuna de Performance 1</Label>
+                    <Input placeholder="Descrição da lacuna de performance" />
+                    <Label>Observação Direta</Label>
+                    <Input placeholder="Eu notei que [lacuna específica]..." />
+                    <Label>Estratégia Corretiva</Label>
+                    <Input placeholder="Na próxima vez, você pode querer..." />
+                    <Label>Justificativa (evidência/protocolo)</Label>
+                    <Input placeholder="...porque [fornecer justificativa baseada em evidência]" />
+                </div>
+                <Button variant="outline" size="sm"><Plus className="h-4 w-4 mr-2" />Adicionar Lacuna</Button>
+             </div>
           )}
         </CardContent>
       </Card>
