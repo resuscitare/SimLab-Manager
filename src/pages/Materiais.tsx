@@ -5,8 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, Upload, Download, Save, AlertTriangle } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
+import { Plus, Trash2, Upload, Download, Save } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import Papa from "papaparse";
 
@@ -22,7 +21,6 @@ interface MaterialItem {
 }
 
 const Materiais = () => {
-  const { user } = useAuth();
   const [materiais, setMateriais] = useState<MaterialItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -101,24 +99,6 @@ const Materiais = () => {
       });
     }
   };
-
-  if (user?.role !== 'admin') {
-    return (
-      <div className="p-6 flex items-center justify-center h-[calc(100vh-4rem)]">
-        <Card className="w-full max-w-md">
-          <CardHeader className="text-center">
-            <AlertTriangle className="mx-auto h-12 w-12 text-destructive" />
-            <CardTitle className="mt-4">Acesso Negado</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-center text-muted-foreground">
-              Você não tem permissão para acessar esta página. Apenas gestores responsáveis podem gerenciar o inventário de materiais.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   if (loading) return <p>Carregando...</p>;
 

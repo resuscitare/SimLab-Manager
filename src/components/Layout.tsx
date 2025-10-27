@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -71,6 +71,11 @@ const sidebarItems = [
     title: "Instrutores",
     href: "/instrutores",
     icon: Users
+  },
+  {
+    title: "Painel Admin",
+    href: "/admin",
+    icon: Settings
   }
 ];
 
@@ -171,7 +176,6 @@ interface SidebarContentProps {
 
 const SidebarContent = ({ onClose }: SidebarContentProps) => {
   const location = useLocation();
-  const { user } = useAuth();
 
   const handleNavigation = () => {
     if (onClose) {
@@ -242,32 +246,6 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
                 </li>
               );
             })}
-
-            {/* Admin Section */}
-            {user?.role === 'admin' && (
-              <>
-                <li className="pt-4 mt-4 border-t border-sidebar-border">
-                  <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                    Administração
-                  </div>
-                </li>
-                <li>
-                  <Link
-                    to="/admin"
-                    onClick={handleNavigation}
-                    className={cn(
-                      "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium",
-                      location.pathname === '/admin' 
-                        ? "bg-green-600 text-white font-semibold" 
-                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground hover:translate-x-1"
-                    )}
-                  >
-                    <Users className="h-4 w-4" />
-                    <span>Painel Admin</span>
-                  </Link>
-                </li>
-              </>
-            )}
           </ul>
         </nav>
       </ScrollArea>
