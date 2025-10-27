@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Heart, Trash2 } from "lucide-react";
 import { EquipmentItem, ScenarioFormData } from "@/types/prisma";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface MateriaisTabProps {
   scenarioData: ScenarioFormData;
@@ -42,31 +41,24 @@ const MateriaisTab = ({ scenarioData, addEquipmentItem, updateEquipmentItem, rem
               {scenarioData.equipmentList.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>
-                    <Select
+                    <Input
                       value={item.type}
-                      onValueChange={(value) => updateEquipmentItem(item.id, 'type', value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Selecione" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="material">Material</SelectItem>
-                        <SelectItem value="equipamento">Equipamento</SelectItem>
-                      </SelectContent>
-                    </Select>
+                      onChange={(e) => updateEquipmentItem(item.id, 'type', e.target.value)}
+                      placeholder="Ex: Manequim adulto de alta fidelidade"
+                    />
                   </TableCell>
                   <TableCell>
                     <Input
                       value={item.modelName}
                       onChange={(e) => updateEquipmentItem(item.id, 'modelName', e.target.value)}
-                      placeholder="Ex: Desfibrilador"
+                      placeholder="Ex: SimMan 3G"
                     />
                   </TableCell>
                   <TableCell>
                     <Input
                       value={item.brand}
                       onChange={(e) => updateEquipmentItem(item.id, 'brand', e.target.value)}
-                      placeholder="Ex: Philips"
+                      placeholder="Ex: Laerdal"
                     />
                   </TableCell>
                   <TableCell>

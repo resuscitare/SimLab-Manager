@@ -115,7 +115,7 @@ export const useScenarioForm = () => {
   const addEquipmentItem = useCallback(() => {
     const newItem: EquipmentItem = {
       id: Date.now().toString(),
-      type: 'equipamento',
+      type: '',
       modelName: '',
       brand: '',
       quantity: '1',
