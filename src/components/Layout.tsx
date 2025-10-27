@@ -61,7 +61,7 @@ const sidebarItems = [
     icon: Sparkles
   },
   {
-    title: "GESTÃO",
+    title: "Gestão",
     icon: Briefcase,
     subItems: [
       {
