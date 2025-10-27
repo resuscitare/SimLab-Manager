@@ -37,6 +37,7 @@ const Locais = () => {
           { id: '1', laboratorio: 'Laboratório Térreo', sala: 'Sala 1', armario: 'Armário de Vias Aéreas', gaveta: 'Gaveta 1', descricao: 'Máscaras Laringeas' },
           { id: '2', laboratorio: 'Laboratório Térreo', sala: 'Sala 1', armario: 'Armário de Vias Aéreas', gaveta: 'Gaveta 2', descricao: 'Tubos Endotraqueais' },
           { id: '3', laboratorio: 'Laboratório 2º Andar', sala: 'Sala 3', armario: 'Estante de Medicamentos', gaveta: 'Prateleira A', descricao: 'Ampolas de Adrenalina' },
+          { id: '4', laboratorio: 'Laboratório Térreo', sala: 'Sala 1', armario: 'Carrinho de Emergência 1', gaveta: 'Gaveta de Vias Aéreas', descricao: 'Laringoscópios e tubos' },
         ];
         setLocais(mockLocais);
         localStorage.setItem('simlab_locais', JSON.stringify(mockLocais));
