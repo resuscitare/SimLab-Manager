@@ -29,7 +29,9 @@ import {
   User,
   Wind,
   Brain,
-  Droplet
+  Droplet,
+  TrendingUp,
+  Zap
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
@@ -171,7 +173,9 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
       // Parâmetros Respiratórios
       FR: 18,
       etCO2: 35,
+      iCO2: 0,
       inO2: 21,
+      etO2: 17,
       
       // Temperatura
       Temp: 36.8,
@@ -190,37 +194,101 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
 
   const getParametroIcon = (parametro: string) => {
     const iconMap: Record<string, any> = {
+      // Circulatórios
       FC: Heart,
       Pulse: Heart,
       SatO2: Eye,
       PASist: Gauge,
       PADiast: Gauge,
       PAMean: Gauge,
+      
+      // Respiratórios
       FR: Wind,
       etCO2: Droplet,
+      iCO2: Droplet,
+      inO2: Activity,
+      etO2: Eye,
+      
+      // Temperatura
       Temp: Thermometer,
+      
+      // Outros
       Glicemia: Brain,
-      Pupilas: Eye
+      Pupilas: Eye,
+      pH: Activity,
+      inN2O: Zap,
+      etN2O: Zap,
+      anestheticAgent: Droplet,
+      inAGT: Droplet,
+      etAGT: Droplet,
+      TOFCount: TrendingUp,
+      TOFRatio: TrendingUp,
+      PTC: Activity
     };
     return iconMap[parametro] || Activity;
   };
 
   const getParametroLabel = (parametro: string) => {
     const labelMap: Record<string, string> = {
+      // Circulatórios
       FC: "FC (bpm)",
       Pulse: "Pulso (bpm)",
       SatO2: "SatO₂ (%)",
       PASist: "PA Sistólica",
       PADiast: "PA Diastólica",
       PAMean: "PA Média",
+      
+      // Respiratórios
       FR: "FR (rpm)",
       etCO2: "etCO₂ (mmHg)",
+      iCO2: "iCO₂ (mmHg)",
       inO2: "FiO₂ (%)",
+      etO2: "etO₂ (%)",
+      
+      // Temperatura
       Temp: "Temp (°C)",
+      
+      // Outros
       Glicemia: "Glicemia (mg/dL)",
-      Pupilas: "Pupilas"
+      Pupilas: "Pupilas",
+      pH: "pH Arterial",
+      inN2O: "N₂O Inspirado (%)",
+      etN2O: "N₂O Expirado (%)",
+      anestheticAgent: "Agente Anestésico",
+      inAGT: "Agente Inspirado (%)",
+      etAGT: "Agente Expirado (%)",
+      TOFCount: "TOF Contagem",
+      TOFRatio: "TOF Razão (%)",
+      PTC: "PTC Contagem"
     };
     return labelMap[parametro] || parametro;
+  };
+
+  const getParametroUnit = (parametro: string) => {
+    const unitMap: Record<string, string> = {
+      FC: "bpm",
+      Pulse: "bpm",
+      SatO2: "%",
+      PASist: "mmHg",
+      PADiast: "mmHg",
+      PAMean: "mmHg",
+      FR: "rpm",
+      etCO2: "mmHg",
+      iCO2: "mmHg",
+      inO2: "%",
+      etO2: "%",
+      Temp: "°C",
+      Glicemia: "mg/dL",
+      pH: "",
+      inN2O: "%",
+      etN2O: "%",
+      inAGT: "%",
+      etAGT: "%",
+      TOFCount: "",
+      TOFRatio: "%",
+      PTC: ""
+    };
+    return unitMap[parametro] || "";
   };
 
   return (
@@ -432,11 +500,11 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
 
                   {/* Parâmetros Fisiológicos - Organizados por Categoria */}
                   <Tabs defaultValue="circulatorio" className="w-full">
-                    <TabsList className="grid w-full grid-cols-4">
+                    <TabsList className="grid w-full grid-cols-5">
                       <TabsTrigger value="circulatorio">Circulatório</TabsTrigger>
                       <TabsTrigger value="respiratorio">Respiratório</TabsTrigger>
+                      <TabsTrigger value="temperatura">Temperatura</TabsTrigger>
                       <TabsTrigger value="outros">Outros</TabsTrigger>
-                      <TabsTrigger value="instrucoes">Instruções</TabsTrigger>
                     </TabsList>
 
                     {/* Parâmetros Circulatórios */}
@@ -458,23 +526,26 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                       
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {[
-                          { field: 'FC' as keyof ParameterSet, icon: Heart, color: 'text-red-500' },
-                          { field: 'Pulse' as keyof ParameterSet, icon: Heart, color: 'text-red-400' },
-                          { field: 'SatO2' as keyof ParameterSet, icon: Eye, color: 'text-blue-500' },
-                          { field: 'PASist' as keyof ParameterSet, icon: Gauge, color: 'text-green-500' },
-                          { field: 'PADiast' as keyof ParameterSet, icon: Gauge, color: 'text-green-400' },
-                          { field: 'PAMean' as keyof ParameterSet, icon: Gauge, color: 'text-green-600' },
-                          { field: 'CO' as keyof ParameterSet, icon: Activity, color: 'text-purple-500' }
+                          { field: 'FC', icon: Heart, color: 'text-red-500' },
+                          { field: 'Pulse', icon: Heart, color: 'text-red-400' },
+                          { field: 'SatO2', icon: Eye, color: 'text-blue-500' },
+                          { field: 'PASist', icon: Gauge, color: 'text-green-500' },
+                          { field: 'PADiast', icon: Gauge, color: 'text-green-400' },
+                          { field: 'PAMean', icon: Gauge, color: 'text-green-600' },
+                          { field: 'CO', icon: Activity, color: 'text-purple-500' }
                         ].map(({ field, icon: Icon, color }) => (
                           <div key={field} className="space-y-2">
                             <Label className="flex items-center gap-1 text-sm">
                               <Icon className={`h-3 w-3 ${color}`} />
                               {getParametroLabel(field)}
+                              <span className="text-xs text-gray-500 ml-1">
+                                {getParametroUnit(field)}
+                              </span>
                             </Label>
                             <Input
                               type="number"
-                              value={frame.parameterSet?.[field] || ''}
-                              onChange={(e) => atualizarParametro(frame.id, field, e.target.value ? parseFloat(e.target.value) : undefined)}
+                              value={frame.parameterSet?.[field as keyof ParameterSet] as number || ''}
+                              onChange={(e) => atualizarParametro(frame.id, field as keyof ParameterSet, e.target.value ? parseFloat(e.target.value) : undefined)}
                               placeholder="---"
                               className="text-sm"
                             />
@@ -492,19 +563,51 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                       
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {[
-                          { field: 'FR' as keyof ParameterSet, icon: Wind, color: 'text-blue-500' },
-                          { field: 'etCO2' as keyof ParameterSet, icon: Droplet, color: 'text-cyan-500' },
-                          { field: 'inO2' as keyof ParameterSet, icon: Activity, color: 'text-orange-500' }
+                          { field: 'FR', icon: Wind, color: 'text-blue-500' },
+                          { field: 'etCO2', icon: Droplet, color: 'text-cyan-500' },
+                          { field: 'iCO2', icon: Droplet, color: 'text-cyan-400' },
+                          { field: 'inO2', icon: Activity, color: 'text-orange-500' },
+                          { field: 'etO2', icon: Eye, color: 'text-blue-400' }
                         ].map(({ field, icon: Icon, color }) => (
                           <div key={field} className="space-y-2">
                             <Label className="flex items-center gap-1 text-sm">
                               <Icon className={`h-3 w-3 ${color}`} />
                               {getParametroLabel(field)}
+                              <span className="text-xs text-gray-500 ml-1">
+                                {getParametroUnit(field)}
+                              </span>
                             </Label>
                             <Input
                               type="number"
-                              value={frame.parameterSet?.[field] || ''}
-                              onChange={(e) => atualizarParametro(frame.id, field, e.target.value ? parseFloat(e.target.value) : undefined)}
+                              value={frame.parameterSet?.[field as keyof ParameterSet] as number || ''}
+                              onChange={(e) => atualizarParametro(frame.id, field as keyof ParameterSet, e.target.value ? parseFloat(e.target.value) : undefined)}
+                              placeholder="---"
+                              className="text-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </TabsContent>
+
+                    {/* Parâmetros de Temperatura */}
+                    <TabsContent value="temperatura" className="space-y-4">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Thermometer className="h-4 w-4 text-orange-500" />
+                        Temperatura
+                      </h4>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          { field: 'Temp', label: 'Temp Periférica (°C)' },
+                          { field: 'Tblood', label: 'Temp Sanguínea (°C)' }
+                        ].map(({ field, label }) => (
+                          <div key={field} className="space-y-2">
+                            <Label className="text-sm">{label}</Label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              value={frame.parameterSet?.[field as keyof ParameterSet] as number || ''}
+                              onChange={(e) => atualizarParametro(frame.id, field as keyof ParameterSet, e.target.value ? parseFloat(e.target.value) : undefined)}
                               placeholder="---"
                               className="text-sm"
                             />
@@ -524,16 +627,17 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             {[
-                              { field: 'Temp' as keyof ParameterSet, label: 'Temp (°C)' },
-                              { field: 'Glicemia' as keyof ParameterSet, label: 'Glicemia (mg/dL)' }
+                              { field: 'ICPMean', label: 'PIC Média (mmHg)' },
+                              { field: 'Glicemia', label: 'Glicemia (mg/dL)' },
+                              { field: 'pH', label: 'pH Arterial' }
                             ].map(({ field, label }) => (
                               <div key={field} className="space-y-2">
                                 <Label className="text-sm">{label}</Label>
                                 <Input
                                   type="number"
                                   step="0.1"
-                                  value={frame.parameterSet?.[field] || ''}
-                                  onChange={(e) => atualizarParametro(frame.id, field, e.target.value ? parseFloat(e.target.value) : undefined)}
+                                  value={frame.parameterSet?.[field as keyof ParameterSet] as number || ''}
+                                  onChange={(e) => atualizarParametro(frame.id, field as keyof ParameterSet, e.target.value ? parseFloat(e.target.value) : undefined)}
                                   placeholder="---"
                                   className="text-sm"
                                 />
@@ -553,51 +657,12 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                         </div>
                         
                         <div className="space-y-4">
-                          <div className="space-y-2">
-                            <Label className="text-sm">Achados Clínicos Adicionais</Label>
-                            <Textarea
-                              value={frame.otherFindings || ''}
-                              onChange={(e) => atualizarFrame(frame.id, 'otherFindings', e.target.value)}
-                              placeholder="Ex: Ausculta pulmonar normal, pele pálida e úmida..."
-                              rows={3}
-                            />
-                          </div>
-                          
-                          <div className="space-y-2">
-                            <Label className="text-sm">Descrição Dinâmica</Label>
-                            <Textarea
-                              value={frame.parameterSet?.dynamicDescription || ''}
-                              onChange={(e) => atualizarParametro(frame.id, 'dynamicDescription', e.target.value)}
-                              placeholder="Como os parâmetros devem mudar neste frame..."
-                              rows={2}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </TabsContent>
-
-                    {/* Instruções e Ações Esperadas */}
-                    <TabsContent value="instrucoes" className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-4">
-                          <h4 className="font-medium flex items-center gap-2">
-                            <MessageSquare className="h-4 w-4 text-blue-500" />
-                            Instruções para Operador
-                          </h4>
+                          <Label className="text-sm">Achados Clínicos Adicionais</Label>
                           <Textarea
-                            placeholder="Instruções específicas para o operador do simulador..."
-                            rows={4}
-                          />
-                        </div>
-                        
-                        <div className="space-y-4">
-                          <h4 className="font-medium flex items-center gap-2">
-                            <User className="h-4 w-4 text-green-500" />
-                            Ações Esperadas dos Participantes
-                          </h4>
-                          <Textarea
-                            placeholder="Ações esperadas dos participantes neste frame..."
-                            rows={4}
+                            value={frame.otherFindings || ''}
+                            onChange={(e) => atualizarFrame(frame.id, 'otherFindings', e.target.value)}
+                            placeholder="Ex: Ausculta pulmonar normal, pele pálida e úmida..."
+                            rows={3}
                           />
                         </div>
                       </div>

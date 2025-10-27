@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -22,6 +23,8 @@ interface Cenario {
 
 const Cenarios = () => {
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filtroTipo, setFiltroTipo] = useState<"todos" | "Prisma" | "Tradicional">("todos");
 
   const cenarios: Cenario[] = [
     {
@@ -67,8 +70,42 @@ const Cenarios = () => {
       palavrasChave: ["Trauma", "Emergência", "ATLS"],
       usouIA: true,
       tipo: "Tradicional"
+    },
+    {
+      id: 5,
+      nome: "PCR Avançada com Suporte Avançado de Vida",
+      autor: "Dr. Carlos Silva",
+      dataCriacao: "2024-01-02",
+      status: "Publicado",
+      publicoAlvo: "Médicos Intensivistas",
+      palavrasChave: ["PCR", "SAV", "Intensiva"],
+      usouIA: true,
+      tipo: "Prisma"
+    },
+    {
+      id: 6,
+      nome: "Desfibrilação e RCP Básica",
+      autor: "Dra. Ana Costa",
+      dataCriacao: "2024-01-01",
+      status: "Publicado",
+      publicoAlvo: "Equipe Multiprofissional",
+      palavrasChave: ["DEA", "RCP", "Equipe"],
+      usouIA: true,
+      tipo: "Prisma"
     }
   ];
+
+  // Filtrar cenários com base no termo de busca
+  const cenariosFiltrados = cenarios.filter(cenario => {
+    const matchesSearch = searchTerm === "" || 
+      scenario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      scenario.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      scenario.palavrasChave.some(palavra => palavra.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesTipo = filtroTipo === "todos" || scenario.tipo === filtroTipo;
+    
+    return matchesSearch && matchesTipo;
+  });
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -84,6 +121,14 @@ const Cenarios = () => {
       "Tradicional": "bg-purple-100 text-purple-800"
     };
     return variants[tipo as keyof typeof variants] || "bg-gray-100 text-gray-800";
+  };
+
+  const handleVisualizar = (id: number) => {
+    navigate(`/cenarios/${id}`);
+  };
+
+  const handleEditar = (id: number) => {
+    navigate(`/cenarios/${id}/editar`);
   };
 
   return (
@@ -164,12 +209,19 @@ const Cenarios = () => {
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
-              <Input placeholder="Buscar por nome, palavras-chave ou autor..." className="pl-10" />
+              <Input 
+                placeholder="Buscar por nome, palavras-chave ou autor..." 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10" 
+              />
             </div>
-            <Button variant="outline">
-              <Filter className="w-4 h-4 mr-2" />
-              Filtrar
-            </Button>
+            <div className="flex space-x-2">
+              <Button variant="outline">
+                <Filter className="w-4 h-4 mr-2" />
+                Filtrar
+              </Button>
+            </div>
           </div>
 
           <Table>
@@ -178,26 +230,26 @@ const Cenarios = () => {
                 <TableHead>Nome do Cenário</TableHead>
                 <TableHead>Autor</TableHead>
                 <TableHead>Data</TableHead>
-                <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Tipo</TableHead>
                 <TableHead>IA</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {cenarios.map((cenario) => (
+              {cenariosFiltrados.map((cenario) => (
                 <TableRow key={scenario.id}>
                   <TableCell className="font-medium">{scenario.nome}</TableCell>
                   <TableCell>{scenario.autor}</TableCell>
                   <TableCell>{scenario.dataCriacao}</TableCell>
                   <TableCell>
-                    <Badge className={getTipoBadge(scenario.tipo)}>
-                      {scenario.tipo}
+                    <Badge className={getStatusBadge(scenario.status)}>
+                      {scenario.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge className={getStatusBadge(scenario.status)}>
-                      {scenario.status}
+                    <Badge className={getTipoBadge(scenario.tipo)}>
+                      {scenario.tipo}
                     </Badge>
                   </TableCell>
                   <TableCell>
@@ -209,8 +261,12 @@ const Cenarios = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">Visualizar</Button>
-                      <Button variant="outline" size="sm">Editar</Button>
+                      <Button variant="outline" size="sm" onClick={() => handleVisualizar(scenario.id)}>
+                        Visualizar
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={() => handleEditar(scenario.id)}>
+                        Editar
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>

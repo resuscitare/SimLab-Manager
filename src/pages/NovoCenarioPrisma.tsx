@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, X, ArrowLeft, Save, Eye, Heart, User, Activity } from "lucide-react";
+import { Plus, X, ArrowLeft, Save, Eye, Heart, User, Activity, CheckCircle, AlertCircle } from "lucide-react";
 import { usePrismaScenarioForm } from "@/hooks/usePrismaScenarioForm";
 import PrismaFramesTab from "@/components/cenario/PrismaFramesTab";
 import TabNavigation from "@/components/cenario/TabNavigation";
@@ -258,7 +258,7 @@ const NovoCenarioPrisma = () => {
                     id="patientAge"
                     value={scenarioData.patientAge}
                     onChange={(e) => handleScenarioDataChange('patientAge', e.target.value)}
-                    placeholder="Ex: 45 anos"
+                    placeholder="Ex: 45"
                   />
                 </div>
 
@@ -274,26 +274,6 @@ const NovoCenarioPrisma = () => {
                       <SelectItem value="Outro">Outro</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="patientHeight">Altura</Label>
-                  <Input 
-                    id="patientHeight"
-                    value={scenarioData.patientHeight}
-                    onChange={(e) => handleScenarioDataChange('patientHeight', e.target.value)}
-                    placeholder="Ex: 180 cm"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="patientWeight">Peso</Label>
-                  <Input 
-                    id="patientWeight"
-                    value={scenarioData.patientWeight}
-                    onChange={(e) => handleScenarioDataChange('patientWeight', e.target.value)}
-                    placeholder="Ex: 75 kg"
-                  />
                 </div>
               </div>
             </CardContent>
