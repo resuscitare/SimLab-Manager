@@ -95,7 +95,7 @@ const ObjetivosTab = ({
                   id={field.key}
                   value={scenarioData.smartObjectives?.[field.key as keyof SmartObjectives] || ''}
                   onChange={(e) => handleSmartObjectivesChange(field.key as keyof SmartObjectives, e.target.value)}
-                  placeholder={field.description}
+                  placeholder="Descreva aqui..."
                   rows={2}
                   className="text-sm"
                 />
