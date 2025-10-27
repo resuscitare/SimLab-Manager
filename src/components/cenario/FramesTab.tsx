@@ -45,6 +45,8 @@ interface FramesTabProps {
 const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   const [frameExpandido, setFrameExpandido] = useState<string | null>(frames[0]?.id || null);
   const [filtroStatus, setFiltroStatus] = useState<'todos' | 'completos' | 'incompletos'>('todos');
+  const [draggedFrameId, setDraggedFrameId] = useState<string | null>(null);
+  const [dropTargetId, setDropTargetId] = useState<string | null>(null);
 
   // Estatísticas dos frames
   const stats = useMemo(() => {
@@ -291,6 +293,62 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
     return unitMap[parametro] || "";
   };
 
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, frameId: string) => {
+    setDraggedFrameId(frameId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', frameId);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, targetFrameId: string) => {
+      e.preventDefault();
+      if (targetFrameId !== draggedFrameId) {
+          setDropTargetId(targetFrameId);
+      }
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      setDropTargetId(null);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, targetFrameId: string) => {
+      e.preventDefault();
+      setDropTargetId(null);
+      const sourceFrameId = e.dataTransfer.getData('text/plain');
+
+      if (!sourceFrameId || sourceFrameId === targetFrameId) {
+          return;
+      }
+
+      const sourceIndex = frames.findIndex(f => f.id === sourceFrameId);
+      const targetIndex = frames.findIndex(f => f.id === targetFrameId);
+
+      if (sourceIndex === -1 || targetIndex === -1) {
+          return;
+      }
+
+      const reorderedFrames = [...frames];
+      const [draggedItem] = reorderedFrames.splice(sourceIndex, 1);
+      reorderedFrames.splice(targetIndex, 0, draggedItem);
+
+      const finalFrames = reorderedFrames.map((frame, index) => ({
+          ...frame,
+          frameIdentifier: (index + 1).toString()
+      }));
+
+      onFramesChange(finalFrames);
+  };
+
+  const handleDragEnd = () => {
+      setDraggedFrameId(null);
+      setDropTargetId(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header com Estatísticas */}
@@ -390,14 +448,26 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
           </Card>
         ) : (
           framesFiltrados.map((frame, index) => (
-            <Card key={frame.id} className={cn(
-              "transition-all duration-200",
-              frame.parameterSet ? "border-green-300" : "border-yellow-300"
-            )}>
+            <Card 
+              key={frame.id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, frame.id)}
+              onDragOver={handleDragOver}
+              onDragEnter={(e) => handleDragEnter(e, frame.id)}
+              onDragLeave={handleDragLeave}
+              onDrop={(e) => handleDrop(e, frame.id)}
+              onDragEnd={handleDragEnd}
+              className={cn(
+                "transition-all duration-200",
+                frame.parameterSet ? "border-green-300" : "border-yellow-300",
+                draggedFrameId === frame.id && "opacity-50",
+                dropTargetId === frame.id && "border-2 border-dashed border-primary"
+              )}
+            >
               {/* Cabeçalho do Frame */}
               <div className="flex items-center justify-between p-4 border-b">
                 <div className="flex items-center space-x-3">
-                  <GripVertical className="h-4 w-4 text-gray-400" />
+                  <GripVertical className="h-4 w-4 text-gray-400 cursor-grab" />
                   
                   <Badge variant={frame.parameterSet ? "default" : "secondary"} className={cn(
                     "flex items-center gap-1",
