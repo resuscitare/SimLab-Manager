@@ -21,6 +21,7 @@ export interface SmartObjectives {
 
 export interface EquipmentItem {
   id: string;
+  type: string;
   modelName: string;
   brand: string;
   quantity: string;

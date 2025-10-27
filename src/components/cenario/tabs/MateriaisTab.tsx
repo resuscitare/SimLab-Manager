@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Plus, Heart, Trash2 } from "lucide-react";
 import { EquipmentItem, ScenarioFormData } from "@/types/prisma";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface MateriaisTabProps {
   scenarioData: ScenarioFormData;
@@ -29,9 +30,10 @@ const MateriaisTab = ({ scenarioData, addEquipmentItem, updateEquipmentItem, rem
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-[30%]">Nome do Modelo</TableHead>
-                <TableHead className="w-[20%]">Marca</TableHead>
-                <TableHead className="w-[15%]">Quantidade</TableHead>
+                <TableHead className="w-[20%]">Material/Equipamento</TableHead>
+                <TableHead className="w-[25%]">Nome do Modelo</TableHead>
+                <TableHead className="w-[15%]">Marca</TableHead>
+                <TableHead className="w-[10%]">Quantidade</TableHead>
                 <TableHead>Observações</TableHead>
                 <TableHead className="w-[50px]"></TableHead>
               </TableRow>
@@ -39,6 +41,20 @@ const MateriaisTab = ({ scenarioData, addEquipmentItem, updateEquipmentItem, rem
             <TableBody>
               {scenarioData.equipmentList.map((item) => (
                 <TableRow key={item.id}>
+                  <TableCell>
+                    <Select
+                      value={item.type}
+                      onValueChange={(value) => updateEquipmentItem(item.id, 'type', value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="material">Material</SelectItem>
+                        <SelectItem value="equipamento">Equipamento</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
                   <TableCell>
                     <Input
                       value={item.modelName}
