@@ -259,6 +259,8 @@ const Materiais = () => {
                 <TableRow>
                   <TableHead>Status</TableHead>
                   <TableHead>Material/Equipamento</TableHead>
+                  <TableHead>Marca</TableHead>
+                  <TableHead>Modelo</TableHead>
                   <TableHead>Local</TableHead>
                   <TableHead>Qtd. Disp.</TableHead>
                   <TableHead>Validade</TableHead>
@@ -275,8 +277,13 @@ const Materiais = () => {
                         <Badge variant="outline" className={status.className}>{status.text}</Badge>
                       </TableCell>
                       <TableCell>
-                        <div className="font-medium">{item.nome}</div>
-                        <div className="text-xs text-muted-foreground">{item.marca} - {item.modelo}</div>
+                        <Input className="h-8" value={item.nome} onChange={(e) => handleItemChange(item.id, 'nome', e.target.value)} />
+                      </TableCell>
+                      <TableCell>
+                        <Input className="h-8" value={item.marca} onChange={(e) => handleItemChange(item.id, 'marca', e.target.value)} />
+                      </TableCell>
+                      <TableCell>
+                        <Input className="h-8" value={item.modelo} onChange={(e) => handleItemChange(item.id, 'modelo', e.target.value)} />
                       </TableCell>
                       <TableCell>
                         <LocationCombobox
