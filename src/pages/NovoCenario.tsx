@@ -31,8 +31,9 @@ const NovoCenario = () => {
     removerObjetivoTecnico,
     adicionarObjetivoNaoTecnico,
     removerObjetivoNaoTecnico,
-    adicionarEquipamento,
-    removerEquipamento,
+    addEquipmentItem,
+    updateEquipmentItem,
+    removeEquipmentItem,
     salvarCenario,
     validarAba,
     getTabsConfig
@@ -151,8 +152,9 @@ const NovoCenario = () => {
         <TabsContent value="materiais">
           <MateriaisTab
             scenarioData={scenarioData}
-            adicionarEquipamento={adicionarEquipamento}
-            removerEquipamento={removerEquipamento}
+            addEquipmentItem={addEquipmentItem}
+            updateEquipmentItem={updateEquipmentItem}
+            removeEquipmentItem={removeEquipmentItem}
           />
         </TabsContent>
 

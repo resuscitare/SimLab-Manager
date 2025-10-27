@@ -1,30 +1,20 @@
 "use client";
 
-import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Plus, X, Heart } from "lucide-react";
-import { ScenarioFormData } from "@/types/prisma";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Plus, Heart, Trash2 } from "lucide-react";
+import { EquipmentItem, ScenarioFormData } from "@/types/prisma";
 
 interface MateriaisTabProps {
   scenarioData: ScenarioFormData;
-  adicionarEquipamento: (equipamento: string) => void;
-  removerEquipamento: (equipamento: string) => void;
+  addEquipmentItem: () => void;
+  updateEquipmentItem: (id: string, field: keyof EquipmentItem, value: string) => void;
+  removeEquipmentItem: (id: string) => void;
 }
 
-const MateriaisTab = ({ scenarioData, adicionarEquipamento, removerEquipamento }: MateriaisTabProps) => {
-  const [novoEquipamento, setNovoEquipamento] = useState("");
-
-  const handleAdicionarEquipamento = () => {
-    if (novoEquipamento.trim()) {
-      adicionarEquipamento(novoEquipamento);
-      setNovoEquipamento("");
-    }
-  };
-
+const MateriaisTab = ({ scenarioData, addEquipmentItem, updateEquipmentItem, removeEquipmentItem }: MateriaisTabProps) => {
   return (
     <Card>
       <CardHeader>
@@ -32,31 +22,70 @@ const MateriaisTab = ({ scenarioData, adicionarEquipamento, removerEquipamento }
           <Heart className="h-5 w-5" />
           Equipamentos e Materiais
         </CardTitle>
-        <CardDescription>Lista de equipamentos necessários</CardDescription>
+        <CardDescription>Liste todos os equipamentos e materiais necessários para o cenário.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-4">
-          <Label>Equipamentos Necessários</Label>
-          <div className="flex gap-2">
-            <Input
-              value={novoEquipamento}
-              onChange={(e) => setNovoEquipamento(e.target.value)}
-              placeholder="Digite um equipamento"
-              onKeyPress={(e) => e.key === 'Enter' && handleAdicionarEquipamento()}
-            />
-            <Button type="button" onClick={handleAdicionarEquipamento}>
-              <Plus className="w-4 h-4" />
-            </Button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {scenarioData.equipmentList.map((equipamento, index) => (
-              <Badge key={index} variant="secondary" className="flex items-center gap-1">
-                {equipamento}
-                <X className="w-3 h-3 cursor-pointer" onClick={() => removerEquipamento(equipamento)} />
-              </Badge>
-            ))}
-          </div>
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[30%]">Nome do Modelo</TableHead>
+                <TableHead className="w-[20%]">Marca</TableHead>
+                <TableHead className="w-[15%]">Quantidade</TableHead>
+                <TableHead>Observações</TableHead>
+                <TableHead className="w-[50px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {scenarioData.equipmentList.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>
+                    <Input
+                      value={item.modelName}
+                      onChange={(e) => updateEquipmentItem(item.id, 'modelName', e.target.value)}
+                      placeholder="Ex: Desfibrilador"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      value={item.brand}
+                      onChange={(e) => updateEquipmentItem(item.id, 'brand', e.target.value)}
+                      placeholder="Ex: Philips"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      value={item.quantity}
+                      onChange={(e) => updateEquipmentItem(item.id, 'quantity', e.target.value)}
+                      placeholder="Ex: 1"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Input
+                      value={item.observations}
+                      onChange={(e) => updateEquipmentItem(item.id, 'observations', e.target.value)}
+                      placeholder="Ex: Com pás adesivas"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeEquipmentItem(item.id)}
+                      className="text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
+        <Button type="button" variant="outline" onClick={addEquipmentItem}>
+          <Plus className="w-4 h-4 mr-2" />
+          Adicionar Material
+        </Button>
       </CardContent>
     </Card>
   );

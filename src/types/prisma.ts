@@ -19,6 +19,14 @@ export interface SmartObjectives {
   timeBound?: string;
 }
 
+export interface EquipmentItem {
+  id: string;
+  modelName: string;
+  brand: string;
+  quantity: string;
+  observations: string;
+}
+
 export interface Scenario {
   id: string;
   title: string;
@@ -40,7 +48,7 @@ export interface Scenario {
   smartObjectives?: string; // Stays as JSON string for the data model
   technicalLearningObjectives: string[];
   nonTechnicalLearningObjectives: string[];
-  equipmentList: string[];
+  equipmentList: EquipmentItem[];
   requiredResources: Resource[];
   initialFrameId?: string;
   initialFrame?: Frame;
@@ -270,5 +278,5 @@ export interface ScenarioFormData {
   smartObjectives?: SmartObjectives;
   technicalLearningObjectives: string[];
   nonTechnicalLearningObjectives: string[];
-  equipmentList: string[];
+  equipmentList: EquipmentItem[];
 }

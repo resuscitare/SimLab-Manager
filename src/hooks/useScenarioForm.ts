@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Scenario, Frame, ScenarioFormData, HistoricoMedico, SmartObjectives } from "@/types/prisma";
+import { Scenario, Frame, ScenarioFormData, HistoricoMedico, SmartObjectives, EquipmentItem } from "@/types/prisma";
 
 export const useScenarioForm = () => {
   const [activeTab, setActiveTab] = useState("identificacao");
@@ -110,14 +110,27 @@ export const useScenarioForm = () => {
     handleScenarioDataChange('nonTechnicalLearningObjectives', scenarioData.nonTechnicalLearningObjectives.filter(o => o !== objetivo));
   }, [scenarioData.nonTechnicalLearningObjectives, handleScenarioDataChange]);
 
-  const adicionarEquipamento = useCallback((equipamento: string) => {
-    if (equipamento.trim() && !scenarioData.equipmentList.includes(equipamento.trim())) {
-      handleScenarioDataChange('equipmentList', [...scenarioData.equipmentList, equipamento.trim()]);
-    }
+  const addEquipmentItem = useCallback(() => {
+    const newItem: EquipmentItem = {
+      id: Date.now().toString(),
+      modelName: '',
+      brand: '',
+      quantity: '1',
+      observations: ''
+    };
+    handleScenarioDataChange('equipmentList', [...scenarioData.equipmentList, newItem]);
   }, [scenarioData.equipmentList, handleScenarioDataChange]);
 
-  const removerEquipamento = useCallback((equipamento: string) => {
-    handleScenarioDataChange('equipmentList', scenarioData.equipmentList.filter(e => e !== equipamento));
+  const updateEquipmentItem = useCallback((id: string, field: keyof EquipmentItem, value: string) => {
+    const updatedList = scenarioData.equipmentList.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    );
+    handleScenarioDataChange('equipmentList', updatedList);
+  }, [scenarioData.equipmentList, handleScenarioDataChange]);
+
+  const removeEquipmentItem = useCallback((id: string) => {
+    const updatedList = scenarioData.equipmentList.filter(item => item.id !== id);
+    handleScenarioDataChange('equipmentList', updatedList);
   }, [scenarioData.equipmentList, handleScenarioDataChange]);
 
   const validarAba = useCallback((aba: string) => {
@@ -131,7 +144,7 @@ export const useScenarioForm = () => {
       case "frames":
         return frames.length >= 1 && frames.every(f => f.title && f.parameterSet);
       case "materiais":
-        return scenarioData.equipmentList.length >= 1;
+        return scenarioData.equipmentList.length >= 1 && scenarioData.equipmentList.every(item => item.modelName.trim() !== '');
       case "debriefing":
         return true;
       default:
@@ -256,8 +269,9 @@ export const useScenarioForm = () => {
     removerObjetivoTecnico,
     adicionarObjetivoNaoTecnico,
     removerObjetivoNaoTecnico,
-    adicionarEquipamento,
-    removerEquipamento,
+    addEquipmentItem,
+    updateEquipmentItem,
+    removeEquipmentItem,
     salvarCenario,
     carregarCenario,
     
