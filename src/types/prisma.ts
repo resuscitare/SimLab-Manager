@@ -11,6 +11,14 @@ export interface HistoricoMedico {
   outrosDesc?: string;
 }
 
+export interface SmartObjectives {
+  specific?: string;
+  measurable?: string;
+  achievable?: string;
+  relevant?: string;
+  timeBound?: string;
+}
+
 export interface Scenario {
   id: string;
   title: string;
@@ -29,7 +37,7 @@ export interface Scenario {
   cirurgiasAnteriores?: string;
   scenarioOutline?: string;
   learnerBrief?: string;
-  smartObjectives?: string;
+  smartObjectives?: string; // Stays as JSON string for the data model
   technicalLearningObjectives: string[];
   nonTechnicalLearningObjectives: string[];
   equipmentList: string[];
@@ -259,7 +267,7 @@ export interface ScenarioFormData {
   cirurgiasAnteriores?: string;
   scenarioOutline?: string;
   learnerBrief?: string;
-  smartObjectives?: string;
+  smartObjectives?: SmartObjectives;
   technicalLearningObjectives: string[];
   nonTechnicalLearningObjectives: string[];
   equipmentList: string[];

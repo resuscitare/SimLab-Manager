@@ -8,11 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Plus, X, Activity } from "lucide-react";
-import { ScenarioFormData } from "@/types/prisma";
+import { ScenarioFormData, SmartObjectives } from "@/types/prisma";
 
 interface ObjetivosTabProps {
   scenarioData: ScenarioFormData;
-  handleScenarioDataChange: (field: keyof ScenarioFormData, value: any) => void;
+  handleSmartObjectivesChange: (field: keyof SmartObjectives, value: string) => void;
   adicionarObjetivoTecnico: (objetivo: string) => void;
   removerObjetivoTecnico: (objetivo: string) => void;
   adicionarObjetivoNaoTecnico: (objetivo: string) => void;
@@ -21,7 +21,7 @@ interface ObjetivosTabProps {
 
 const ObjetivosTab = ({
   scenarioData,
-  handleScenarioDataChange,
+  handleSmartObjectivesChange,
   adicionarObjetivoTecnico,
   removerObjetivoTecnico,
   adicionarObjetivoNaoTecnico,
@@ -44,6 +44,34 @@ const ObjetivosTab = ({
     }
   };
 
+  const smartFields = [
+    {
+      key: 'specific',
+      label: 'S – Específico',
+      description: 'O que você quer alcançar com este cenário?',
+    },
+    {
+      key: 'measurable',
+      label: 'M – Mensurável',
+      description: 'Qual indicador será usado para medir o sucesso?',
+    },
+    {
+      key: 'achievable',
+      label: 'A – Alcançável',
+      description: 'O objetivo é realista para o tempo e recursos disponíveis?',
+    },
+    {
+      key: 'relevant',
+      label: 'R – Relevante',
+      description: 'O objetivo faz sentido para o público-alvo e o contexto?',
+    },
+    {
+      key: 'timeBound',
+      label: 'T – Temporal',
+      description: 'Em quanto tempo a meta de aprendizagem deve ser atingida?',
+    },
+  ];
+
   return (
     <Card>
       <CardHeader>
@@ -51,18 +79,30 @@ const ObjetivosTab = ({
           <Activity className="h-5 w-5" />
           Objetivos de Aprendizagem
         </CardTitle>
-        <CardDescription>Defina os objetivos técnicos e não técnicos</CardDescription>
+        <CardDescription>Defina os objetivos SMART e os objetivos técnicos e não técnicos do cenário.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="smartObjectives">Objetivos SMART do Programa</Label>
-          <Textarea
-            id="smartObjectives"
-            value={scenarioData.smartObjectives}
-            onChange={(e) => handleScenarioDataChange('smartObjectives', e.target.value)}
-            placeholder="Descreva os objetivos SMART (Específicos, Mensuráveis, Atingíveis, Relevantes, Temporais)..."
-            rows={4}
-          />
+        <div className="space-y-4 rounded-lg border p-4">
+          <h3 className="font-semibold">Objetivos SMART do Programa</h3>
+          <p className="text-sm text-muted-foreground">
+            Estruture os objetivos gerais do programa de simulação usando o método SMART para garantir clareza e foco.
+          </p>
+          <div className="space-y-4 pt-2">
+            {smartFields.map(field => (
+              <div key={field.key} className="space-y-2">
+                <Label htmlFor={field.key} className="text-base">{field.label}</Label>
+                <Textarea
+                  id={field.key}
+                  value={scenarioData.smartObjectives?.[field.key as keyof SmartObjectives] || ''}
+                  onChange={(e) => handleSmartObjectivesChange(field.key as keyof SmartObjectives, e.target.value)}
+                  placeholder={field.description}
+                  rows={2}
+                  className="text-sm"
+                />
+                <p className="text-xs text-muted-foreground">{field.description}</p>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -24,6 +24,7 @@ const NovoCenario = () => {
     setActiveTab,
     handleScenarioDataChange,
     handleHistoricoMedicoChange,
+    handleSmartObjectivesChange,
     handleFramesChange,
     adicionarObjetivoTecnico,
     removerObjetivoTecnico,
@@ -123,7 +124,7 @@ const NovoCenario = () => {
         <TabsContent value="objetivos">
           <ObjetivosTab
             scenarioData={scenarioData}
-            handleScenarioDataChange={handleScenarioDataChange}
+            handleSmartObjectivesChange={handleSmartObjectivesChange}
             adicionarObjetivoTecnico={adicionarObjetivoTecnico}
             removerObjetivoTecnico={removerObjetivoTecnico}
             adicionarObjetivoNaoTecnico={adicionarObjetivoNaoTecnico}

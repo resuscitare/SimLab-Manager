@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Scenario, Frame, ParameterSet, ScenarioFormData, HistoricoMedico } from "@/types/prisma";
+import { Scenario, Frame, ScenarioFormData, HistoricoMedico, SmartObjectives } from "@/types/prisma";
 
 export const useScenarioForm = () => {
   const [activeTab, setActiveTab] = useState("identificacao");
@@ -50,7 +50,13 @@ export const useScenarioForm = () => {
     cirurgiasAnteriores: "",
     scenarioOutline: "",
     learnerBrief: "",
-    smartObjectives: "",
+    smartObjectives: {
+      specific: "",
+      measurable: "",
+      achievable: "",
+      relevant: "",
+      timeBound: "",
+    },
     technicalLearningObjectives: [],
     nonTechnicalLearningObjectives: [],
     equipmentList: []
@@ -65,6 +71,16 @@ export const useScenarioForm = () => {
       ...prev,
       historicoMedico: {
         ...prev.historicoMedico!,
+        [field]: value,
+      }
+    }));
+  }, []);
+
+  const handleSmartObjectivesChange = useCallback((field: keyof SmartObjectives, value: string) => {
+    setScenarioData(prev => ({
+      ...prev,
+      smartObjectives: {
+        ...(prev.smartObjectives || {}),
         [field]: value,
       }
     }));
@@ -166,7 +182,7 @@ export const useScenarioForm = () => {
       cirurgiasAnteriores: scenarioData.cirurgiasAnteriores,
       scenarioOutline: scenarioData.scenarioOutline,
       learnerBrief: scenarioData.learnerBrief,
-      smartObjectives: scenarioData.smartObjectives,
+      smartObjectives: JSON.stringify(scenarioData.smartObjectives),
       technicalLearningObjectives: scenarioData.technicalLearningObjectives,
       nonTechnicalLearningObjectives: scenarioData.nonTechnicalLearningObjectives,
       equipmentList: scenarioData.equipmentList,
@@ -208,7 +224,7 @@ export const useScenarioForm = () => {
         cirurgiasAnteriores: scenario.cirurgiasAnteriores,
         scenarioOutline: scenario.scenarioOutline,
         learnerBrief: scenario.learnerBrief,
-        smartObjectives: scenario.smartObjectives,
+        smartObjectives: scenario.smartObjectives ? JSON.parse(scenario.smartObjectives) : { specific: "", measurable: "", achievable: "", relevant: "", timeBound: "" },
         technicalLearningObjectives: scenario.technicalLearningObjectives,
         nonTechnicalLearningObjectives: scenario.nonTechnicalLearningObjectives,
         equipmentList: scenario.equipmentList
@@ -231,6 +247,7 @@ export const useScenarioForm = () => {
     // Handlers
     handleScenarioDataChange,
     handleHistoricoMedicoChange,
+    handleSmartObjectivesChange,
     handleFramesChange,
     adicionarObjetivoTecnico,
     removerObjetivoTecnico,
