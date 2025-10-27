@@ -17,7 +17,9 @@ import {
   LogOut,
   User,
   Settings,
-  Database
+  Database,
+  Briefcase,
+  ChevronRight
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -30,6 +32,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const sidebarItems = [
   {
@@ -58,19 +61,25 @@ const sidebarItems = [
     icon: Sparkles
   },
   {
-    title: "Status dos Equipamentos",
-    href: "/equipamentos",
-    icon: Package
-  },
-  {
-    title: "Gestão de Materiais",
-    href: "/materiais",
-    icon: Database
-  },
-  {
-    title: "Instrutores",
-    href: "/instrutores",
-    icon: Users
+    title: "GESTÃO",
+    icon: Briefcase,
+    subItems: [
+      {
+        title: "Status dos Equipamentos",
+        href: "/equipamentos",
+        icon: Package
+      },
+      {
+        title: "Gestão de Materiais",
+        href: "/materiais",
+        icon: Database
+      },
+      {
+        title: "Instrutores",
+        href: "/instrutores",
+        icon: Users
+      },
+    ]
   },
   {
     title: "Painel Admin",
@@ -175,8 +184,6 @@ interface SidebarContentProps {
 }
 
 const SidebarContent = ({ onClose }: SidebarContentProps) => {
-  const location = useLocation();
-
   const handleNavigation = () => {
     if (onClose) {
       onClose();
@@ -200,53 +207,34 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
 
       {/* Navigation */}
       <ScrollArea className="flex-1">
-        <nav className="p-4">
-          <ul className="space-y-2">
-            {sidebarItems.map((item) => {
-              const isActive = location.pathname === item.href;
-              
-              return (
-                <li key={item.href}>
-                  <Link
-                    to={item.href}
-                    onClick={handleNavigation}
-                    className={cn(
-                      // Base styles
-                      "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
-                      
-                      // Active state - fundo verde, cantos arredondados, SEM BORDA
-                      isActive && [
-                        "bg-green-600 text-white",
-                        "font-semibold"
-                      ],
-                      
-                      // Inactive state - mais sutil
-                      !isActive && [
-                        "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                        "hover:translate-x-1"
-                      ],
-                      
-                      // Focus states para acessibilidade
-                      "focus:outline-none focus:ring-2 focus:ring-sidebar-ring focus:ring-offset-2 focus:ring-offset-sidebar"
-                    )}
-                  >
-                    <item.icon className={cn(
-                      "h-4 w-4 transition-colors duration-200",
-                      isActive ? "text-white" : "text-sidebar-foreground"
-                    )} />
-                    <span className="transition-colors duration-200">{item.title}</span>
-                    
-                    {/* Indicador visual adicional quando ativo */}
-                    {isActive && (
-                      <div className="ml-auto">
-                        <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                      </div>
-                    )}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
+        <nav className="p-4 space-y-1">
+          {sidebarItems.map((item) => 
+            item.subItems ? (
+              <CollapsibleItem key={item.title} item={item} onClose={onClose} />
+            ) : (
+              <Link
+                key={item.href}
+                to={item.href}
+                onClick={handleNavigation}
+                className={cn(
+                  "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+                  location.pathname === item.href
+                    ? "bg-green-600 text-white font-semibold"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  location.pathname !== item.href && "hover:translate-x-1",
+                  "focus:outline-none focus:ring-2 focus:ring-sidebar-ring focus:ring-offset-2 focus:ring-offset-sidebar"
+                )}
+              >
+                <item.icon className="h-4 w-4" />
+                <span>{item.title}</span>
+                {location.pathname === item.href && (
+                  <div className="ml-auto">
+                    <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  </div>
+                )}
+              </Link>
+            )
+          )}
         </nav>
       </ScrollArea>
 
@@ -258,6 +246,58 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
         </div>
       </div>
     </div>
+  );
+};
+
+const CollapsibleItem = ({ item, onClose }: { item: any, onClose?: () => void }) => {
+  const location = useLocation();
+  const isGroupActive = item.subItems.some((sub: any) => location.pathname.startsWith(sub.href));
+  const [isOpen, setIsOpen] = useState(isGroupActive);
+
+  const handleNavigation = () => {
+    if (onClose) {
+      onClose();
+    }
+  };
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger className={cn(
+        "flex items-center justify-between w-full space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
+        isGroupActive
+          ? "bg-sidebar-accent text-sidebar-accent-foreground"
+          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+        "hover:no-underline"
+      )}>
+        <div className="flex items-center space-x-3">
+          <item.icon className="h-4 w-4" />
+          <span>{item.title}</span>
+        </div>
+        <ChevronRight className={cn("h-4 w-4 transition-transform", isOpen && "rotate-90")} />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="pl-7 pt-1 space-y-1">
+        {item.subItems.map((subItem: any) => {
+          const isSubActive = location.pathname === subItem.href;
+          return (
+            <Link
+              key={subItem.href}
+              to={subItem.href}
+              onClick={handleNavigation}
+              className={cn(
+                "flex items-center space-x-3 rounded-md px-3 py-2 text-sm font-medium transition-all duration-200",
+                isSubActive
+                  ? "bg-green-600 text-white font-semibold"
+                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                !isSubActive && "hover:translate-x-1"
+              )}
+            >
+              <subItem.icon className="h-4 w-4" />
+              <span>{subItem.title}</span>
+            </Link>
+          );
+        })}
+      </CollapsibleContent>
+    </Collapsible>
   );
 };
 
