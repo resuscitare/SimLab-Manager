@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { ArrowLeft, Save } from "lucide-react";
 import { useScenarioForm } from "@/hooks/useScenarioForm";
-import FramesTab from "@/components/cenario/FramesTab";
-import TabNavigation from "@/components/cenario/TabNavigation";
+import FramesTab from "../components/cenario/FramesTab";
+import TabNavigation from "../components/cenario/TabNavigation";
 import { showSuccess, showError } from "@/utils/toast";
-import IdentificacaoTab from "@/components/cenario/IdentificacaoTab";
-import ObjetivosTab from "@/components/cenario/ObjetivosTab";
-import PacienteTab from "@/components/cenario/PacienteTab";
-import MateriaisTab from "@/components/cenario/MateriaisTab";
-import RevisaoTab from "@/components/cenario/RevisaoTab";
+import IdentificacaoTab from "../components/cenario/tabs/IdentificacaoTab";
+import ObjetivosTab from "../components/cenario/tabs/ObjetivosTab";
+import PacienteTab from "../components/cenario/tabs/PacienteTab";
+import MateriaisTab from "../components/cenario/tabs/MateriaisTab";
+import RevisaoTab from "../components/cenario/tabs/RevisaoTab";
 
 const NovoCenario = () => {
   const navigate = useNavigate();
