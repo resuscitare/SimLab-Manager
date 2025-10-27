@@ -8,10 +8,22 @@ import { Plus, Search, Filter, FileText, Sparkles, Database } from "lucide-react
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 
+interface Cenario {
+  id: number;
+  nome: string;
+  autor: string;
+  dataCriacao: string;
+  status: "Publicado" | "Rascunho";
+  publicoAlvo: string;
+  palavrasChave: string[];
+  usouIA: boolean;
+  tipo: "Prisma" | "Tradicional";
+}
+
 const Cenarios = () => {
   const navigate = useNavigate();
 
-  const cenarios = [
+  const cenarios: Cenario[] = [
     {
       id: 1,
       nome: "Parada Cardiorrespiratória em AESP",

@@ -27,13 +27,13 @@ import {
   Eye,
   MessageSquare,
   User,
-  Lungs,
+  Wind,
   Brain,
   Droplet
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
-import { Frame, ParameterSet, FrameFormData } from "@/types/prisma";
+import { Frame, ParameterSet } from "@/types/prisma";
 
 interface PrismaFramesTabProps {
   frames: Frame[];
@@ -132,7 +132,7 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
     onFramesChange(novosFrames);
   }, [frames, onFramesChange]);
 
-  const atualizarParametro = useCallback((frameId: string, campo: string, valor: any) => {
+  const atualizarParametro = useCallback((frameId: string, campo: keyof ParameterSet, valor: any) => {
     const novosFrames = frames.map(frame => {
       if (frame.id === frameId) {
         const parametrosAtuais = frame.parameterSet || {
@@ -159,7 +159,7 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
 
   const gerarSugestaoSinaisVitais = useCallback((frameId: string) => {
     // Simulação de sugestão de IA baseada no tipo de cenário
-    const sugestoes = {
+    const sugestoes: Partial<ParameterSet> = {
       // Parâmetros Circulatórios
       FC: 85,
       Pulse: 85,
@@ -182,7 +182,9 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
     };
     
     Object.entries(sugestoes).forEach(([campo, valor]) => {
-      atualizarParametro(frameId, campo, valor);
+      if (campo !== undefined && valor !== undefined) {
+        atualizarParametro(frameId, campo as keyof ParameterSet, valor);
+      }
     });
   }, [atualizarParametro]);
 
@@ -194,7 +196,7 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
       PASist: Gauge,
       PADiast: Gauge,
       PAMean: Gauge,
-      FR: Lungs,
+      FR: Wind,
       etCO2: Droplet,
       Temp: Thermometer,
       Glicemia: Brain,
@@ -456,13 +458,13 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                       
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {[
-                          { field: 'FC', icon: Heart, color: 'text-red-500' },
-                          { field: 'Pulse', icon: Heart, color: 'text-red-400' },
-                          { field: 'SatO2', icon: Eye, color: 'text-blue-500' },
-                          { field: 'PASist', icon: Gauge, color: 'text-green-500' },
-                          { field: 'PADiast', icon: Gauge, color: 'text-green-400' },
-                          { field: 'PAMean', icon: Gauge, color: 'text-green-600' },
-                          { field: 'CO', icon: Activity, color: 'text-purple-500' }
+                          { field: 'FC' as keyof ParameterSet, icon: Heart, color: 'text-red-500' },
+                          { field: 'Pulse' as keyof ParameterSet, icon: Heart, color: 'text-red-400' },
+                          { field: 'SatO2' as keyof ParameterSet, icon: Eye, color: 'text-blue-500' },
+                          { field: 'PASist' as keyof ParameterSet, icon: Gauge, color: 'text-green-500' },
+                          { field: 'PADiast' as keyof ParameterSet, icon: Gauge, color: 'text-green-400' },
+                          { field: 'PAMean' as keyof ParameterSet, icon: Gauge, color: 'text-green-600' },
+                          { field: 'CO' as keyof ParameterSet, icon: Activity, color: 'text-purple-500' }
                         ].map(({ field, icon: Icon, color }) => (
                           <div key={field} className="space-y-2">
                             <Label className="flex items-center gap-1 text-sm">
@@ -471,7 +473,7 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                             </Label>
                             <Input
                               type="number"
-                              value={frame.parameterSet?.[field as keyof ParameterSet] || ''}
+                              value={frame.parameterSet?.[field] || ''}
                               onChange={(e) => atualizarParametro(frame.id, field, e.target.value ? parseFloat(e.target.value) : undefined)}
                               placeholder="---"
                               className="text-sm"
@@ -484,15 +486,15 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                     {/* Parâmetros Respiratórios */}
                     <TabsContent value="respiratorio" className="space-y-4">
                       <h4 className="font-medium flex items-center gap-2">
-                        <Lungs className="h-4 w-4 text-blue-500" />
+                        <Wind className="h-4 w-4 text-blue-500" />
                         Parâmetros Respiratórios
                       </h4>
                       
                       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                         {[
-                          { field: 'FR', icon: Lungs, color: 'text-blue-500' },
-                          { field: 'etCO2', icon: Droplet, color: 'text-cyan-500' },
-                          { field: 'inO2', icon: Activity, color: 'text-orange-500' }
+                          { field: 'FR' as keyof ParameterSet, icon: Wind, color: 'text-blue-500' },
+                          { field: 'etCO2' as keyof ParameterSet, icon: Droplet, color: 'text-cyan-500' },
+                          { field: 'inO2' as keyof ParameterSet, icon: Activity, color: 'text-orange-500' }
                         ].map(({ field, icon: Icon, color }) => (
                           <div key={field} className="space-y-2">
                             <Label className="flex items-center gap-1 text-sm">
@@ -501,7 +503,7 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                             </Label>
                             <Input
                               type="number"
-                              value={frame.parameterSet?.[field as keyof ParameterSet] || ''}
+                              value={frame.parameterSet?.[field] || ''}
                               onChange={(e) => atualizarParametro(frame.id, field, e.target.value ? parseFloat(e.target.value) : undefined)}
                               placeholder="---"
                               className="text-sm"
@@ -522,15 +524,15 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                         <div className="space-y-4">
                           <div className="grid grid-cols-2 gap-4">
                             {[
-                              { field: 'Temp', label: 'Temp (°C)' },
-                              { field: 'Glicemia', label: 'Glicemia (mg/dL)' }
+                              { field: 'Temp' as keyof ParameterSet, label: 'Temp (°C)' },
+                              { field: 'Glicemia' as keyof ParameterSet, label: 'Glicemia (mg/dL)' }
                             ].map(({ field, label }) => (
                               <div key={field} className="space-y-2">
                                 <Label className="text-sm">{label}</Label>
                                 <Input
                                   type="number"
                                   step="0.1"
-                                  value={frame.parameterSet?.[field as keyof ParameterSet] || ''}
+                                  value={frame.parameterSet?.[field] || ''}
                                   onChange={(e) => atualizarParametro(frame.id, field, e.target.value ? parseFloat(e.target.value) : undefined)}
                                   placeholder="---"
                                   className="text-sm"
@@ -552,7 +554,7 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                         
                         <div className="space-y-4">
                           <div className="space-y-2">
-                            <Label>Achados Clínicos Adicionais</Label>
+                            <Label className="text-sm">Achados Clínicos Adicionais</Label>
                             <Textarea
                               value={frame.otherFindings || ''}
                               onChange={(e) => atualizarFrame(frame.id, 'otherFindings', e.target.value)}
@@ -562,7 +564,7 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
                           </div>
                           
                           <div className="space-y-2">
-                            <Label>Descrição Dinâmica</Label>
+                            <Label className="text-sm">Descrição Dinâmica</Label>
                             <Textarea
                               value={frame.parameterSet?.dynamicDescription || ''}
                               onChange={(e) => atualizarParametro(frame.id, 'dynamicDescription', e.target.value)}
