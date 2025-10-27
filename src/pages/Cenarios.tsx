@@ -18,13 +18,11 @@ interface Cenario {
   publicoAlvo: string;
   palavrasChave: string[];
   usouIA: boolean;
-  tipo: "Prisma" | "Tradicional";
 }
 
 const Cenarios = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filtroTipo, setFiltroTipo] = useState<"todos" | "Prisma" | "Tradicional">("todos");
 
   const cenarios: Cenario[] = [
     {
@@ -36,7 +34,6 @@ const Cenarios = () => {
       publicoAlvo: "Residentes de Medicina",
       palavrasChave: ["RCP", "Emergência", "Cardiologia"],
       usouIA: true,
-      tipo: "Prisma"
     },
     {
       id: 2,
@@ -47,7 +44,6 @@ const Cenarios = () => {
       publicoAlvo: "Enfermeiros",
       palavrasChave: ["IAM", "Cardiologia", "ECG"],
       usouIA: true,
-      tipo: "Tradicional"
     },
     {
       id: 3,
@@ -58,7 +54,6 @@ const Cenarios = () => {
       publicoAlvo: "Pediatras",
       palavrasChave: ["Sepse", "Pediatria", "Antibioticoterapia"],
       usouIA: false,
-      tipo: "Prisma"
     },
     {
       id: 4,
@@ -69,42 +64,14 @@ const Cenarios = () => {
       publicoAlvo: "Médicos Emergencistas",
       palavrasChave: ["Trauma", "Emergência", "ATLS"],
       usouIA: true,
-      tipo: "Tradicional"
-    },
-    {
-      id: 5,
-      nome: "PCR Avançada com Suporte Avançado de Vida",
-      autor: "Dr. Carlos Silva",
-      dataCriacao: "02/01/2024",
-      status: "Publicado",
-      publicoAlvo: "Médicos Intensivistas",
-      palavrasChave: ["PCR", "SAV", "Intensiva"],
-      usouIA: true,
-      tipo: "Prisma"
-    },
-    {
-      id: 6,
-      nome: "Desfibrilação e RCP Básica",
-      autor: "Dra. Ana Costa",
-      dataCriacao: "01/01/2024",
-      status: "Publicado",
-      publicoAlvo: "Equipe Multiprofissional",
-      palavrasChave: ["DEA", "RCP", "Equipe"],
-      usouIA: true,
-      tipo: "Prisma"
     }
   ];
 
-  // Filtrar cenários com base no termo de busca
   const cenariosFiltrados = cenarios.filter(cenario => {
-    const matchesSearch = searchTerm === "" || 
+    return searchTerm === "" || 
       cenario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cenario.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
       cenario.palavrasChave.some(palavra => palavra.toLowerCase().includes(searchTerm.toLowerCase()));
-    
-    const matchesTipo = filtroTipo === "todos" || cenario.tipo === filtroTipo;
-    
-    return matchesSearch && matchesTipo;
   });
 
   const getStatusBadge = (status: string) => {
@@ -113,14 +80,6 @@ const Cenarios = () => {
       "Rascunho": "bg-yellow-100 text-yellow-800"
     };
     return variants[status as keyof typeof variants] || "bg-gray-100 text-gray-800";
-  };
-
-  const getTipoBadge = (tipo: string) => {
-    const variants = {
-      "Prisma": "bg-blue-100 text-blue-800",
-      "Tradicional": "bg-purple-100 text-purple-800"
-    };
-    return variants[tipo as keyof typeof variants] || "bg-gray-100 text-gray-800";
   };
 
   const handleVisualizar = (id: number) => {
@@ -143,10 +102,6 @@ const Cenarios = () => {
             <Sparkles className="w-4 h-4 mr-2" />
             Assistente IA
           </Button>
-          <Button onClick={() => navigate("/cenarios/novo-prisma")}>
-            <Database className="w-4 h-4 mr-2" />
-            Novo Cenário Prisma
-          </Button>
           <Button onClick={() => navigate("/cenarios/novo")}>
             <Plus className="w-4 h-4 mr-2" />
             Novo Cenário
@@ -154,15 +109,15 @@ const Cenarios = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Cenários</CardTitle>
             <FileText className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-gray-500">+3 este mês</p>
+            <div className="text-2xl font-bold">{cenarios.length}</div>
+            <p className="text-xs text-gray-500">+2 este mês</p>
           </CardContent>
         </Card>
 
@@ -172,8 +127,8 @@ const Cenarios = () => {
             <FileText className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18</div>
-            <p className="text-xs text-gray-500">6 em rascunho</p>
+            <div className="text-2xl font-bold">{cenarios.filter(c => c.status === 'Publicado').length}</div>
+            <p className="text-xs text-gray-500">{cenarios.filter(c => c.status === 'Rascunho').length} em rascunho</p>
           </CardContent>
         </Card>
 
@@ -183,19 +138,8 @@ const Cenarios = () => {
             <Sparkles className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">87%</div>
+            <div className="text-2xl font-bold">{Math.round((cenarios.filter(c => c.usouIA).length / cenarios.length) * 100)}%</div>
             <p className="text-xs text-gray-500">Dos cenários usam IA</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cenários Prisma</CardTitle>
-            <Database className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-gray-500">Com schema completo</p>
           </CardContent>
         </Card>
       </div>
@@ -231,7 +175,6 @@ const Cenarios = () => {
                 <TableHead>Autor</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead>Tipo</TableHead>
                 <TableHead>IA</TableHead>
                 <TableHead>Ações</TableHead>
               </TableRow>
@@ -245,11 +188,6 @@ const Cenarios = () => {
                   <TableCell>
                     <Badge className={getStatusBadge(cenario.status)}>
                       {cenario.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge className={getTipoBadge(cenario.tipo)}>
-                      {cenario.tipo}
                     </Badge>
                   </TableCell>
                   <TableCell>

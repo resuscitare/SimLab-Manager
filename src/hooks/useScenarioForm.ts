@@ -1,262 +1,84 @@
 "use client";
 
 import { useState, useCallback } from "react";
-
-interface Frame {
-  id: string;
-  ordem: number;
-  nomeEtapa: string;
-  frameIdentifier: string;
-  durationEstimateMin: number;
-  participantType: string;
-  isCompleto: boolean;
-  fc?: number;
-  satO2?: number;
-  paSistolica?: number;
-  paDiastolica?: number;
-  fr?: number;
-  temp?: number;
-  otherFindings?: string;
-  operatorInstructions?: string;
-  expectedParticipantActions?: string;
-  loadingIA?: boolean;
-}
-
-interface FormData {
-  // Programa (Seções 1-3)
-  nomePrograma: string;
-  objetivosPrograma: string;
-  publicoAlvo: string;
-  datasCurso: string;
-  horariosCurso: string;
-  facilitadores: string;
-  conteudoPrevio: string;
-  avaliacaoAprendizagem: string;
-  tarefasFacilitador: string;
-  
-  // Cenário (Seções 4-5)
-  nomeCenario: string;
-  localCenario: string;
-  tempoCenario: string;
-  tempoDebriefing: string;
-  voluntarios: string;
-  tipoSimulacao: string;
-  descricaoCenario: string;
-  inicioCenario: string;
-  objetivosTecnicos: string;
-  objetivosNaoTecnicos: string;
-  escritoPor: string;
-  atualizadoPor: string;
-  validadoPor: string;
-  produzidoEm: string;
-  atualizadoEm: string;
-  
-  // Paciente (Seção 6)
-  nomePaciente: string;
-  idade: string;
-  sexo: string;
-  peso: string;
-  altura: string;
-  perfilFisico: string;
-  perfilPsicologico: string;
-  perfilTecnico: string;
-  historicoMedico: string;
-  dm: boolean;
-  has: boolean;
-  asma: boolean;
-  alergias: string;
-  etilismo: boolean;
-  tabagismo: boolean;
-  outros: string;
-  acompanhamentoMedico: string;
-  medicacoesUso: string;
-  cirurgiasInternacoes: string;
-  
-  // Materiais e Debriefing (Seções 9-10)
-  materiaisEquipamentos: string;
-  impressosNecessarios: string;
-  preparoMontagem: string;
-  falasDirecionadoras: string;
-  metasSeguranca: {
-    meta1: boolean;
-    meta2: boolean;
-    meta3: boolean;
-    meta4: boolean;
-    meta5: boolean;
-    meta6: boolean;
-  };
-  dominiosDesempenho: {
-    tomadaDecisao: boolean;
-    habilidadeTecnica: boolean;
-    comunicacao: boolean;
-    utilizacaoRecursos: boolean;
-    liderancaTrabalhoEquipe: boolean;
-    conscienciaSituacional: boolean;
-  };
-  protocolosEspecificos: string;
-  exemplosFrases: string;
-}
+import { Scenario, Frame, ParameterSet, ScenarioFormData } from "@/types/prisma";
 
 export const useScenarioForm = () => {
-  const [activeTab, setActiveTab] = useState("programa");
-  const [palavrasChave, setPalavrasChave] = useState<string[]>([]);
-  const [novaPalavra, setNovaPalavra] = useState("");
-  
+  const [activeTab, setActiveTab] = useState("identificacao");
   const [frames, setFrames] = useState<Frame[]>([
     {
       id: "1",
-      ordem: 1,
-      nomeEtapa: "Estado Inicial",
+      scenarioId: "temp",
       frameIdentifier: "1",
+      title: "Estado Inicial",
       durationEstimateMin: 5,
       participantType: "Simulador",
-      isCompleto: false
+      operatorInstructions: [],
+      expectedParticipantActions: [],
+      sourceTransitions: [],
+      targetTransitions: [],
+      createdAt: new Date(),
+      updatedAt: new Date()
     }
   ]);
 
-  const [checklists, setChecklists] = useState({
-    debriefing: null,
-    materiais: null
+  const [scenarioData, setScenarioData] = useState<ScenarioFormData>({
+    title: "",
+    patientName: "",
+    patientAge: "",
+    patientGender: "",
+    patientHeight: "",
+    patientWeight: "",
+    scenarioOutline: "",
+    learnerBrief: "",
+    learningObjectives: [],
+    equipmentList: []
   });
 
-  const [formData, setFormData] = useState<FormData>({
-    // Programa
-    nomePrograma: "",
-    objetivosPrograma: "",
-    publicoAlvo: "",
-    datasCurso: "",
-    horariosCurso: "",
-    facilitadores: "",
-    conteudoPrevio: "",
-    avaliacaoAprendizagem: "",
-    tarefasFacilitador: "",
-    
-    // Cenário
-    nomeCenario: "",
-    localCenario: "",
-    tempoCenario: "",
-    tempoDebriefing: "",
-    voluntarios: "",
-    tipoSimulacao: "",
-    descricaoCenario: "",
-    inicioCenario: "",
-    objetivosTecnicos: "",
-    objetivosNaoTecnicos: "",
-    escritoPor: "",
-    atualizadoPor: "",
-    validadoPor: "",
-    produzidoEm: "",
-    atualizadoEm: "",
-    
-    // Paciente
-    nomePaciente: "",
-    idade: "",
-    sexo: "",
-    peso: "",
-    altura: "",
-    perfilFisico: "",
-    perfilPsicologico: "",
-    perfilTecnico: "",
-    historicoMedico: "",
-    dm: false,
-    has: false,
-    asma: false,
-    alergias: "",
-    etilismo: false,
-    tabagismo: false,
-    outros: "",
-    acompanhamentoMedico: "",
-    medicacoesUso: "",
-    cirurgiasInternacoes: "",
-    
-    // Materiais e Debriefing
-    materiaisEquipamentos: "",
-    impressosNecessarios: "",
-    preparoMontagem: "",
-    falasDirecionadoras: "",
-    metasSeguranca: {
-      meta1: false,
-      meta2: false,
-      meta3: false,
-      meta4: false,
-      meta5: false,
-      meta6: false
-    },
-    dominiosDesempenho: {
-      tomadaDecisao: false,
-      habilidadeTecnica: false,
-      comunicacao: false,
-      utilizacaoRecursos: false,
-      liderancaTrabalhoEquipe: false,
-      conscienciaSituacional: false
-    },
-    protocolosEspecificos: "",
-    exemplosFrases: ""
-  });
-
-  const handleFormDataChange = useCallback((field: string, value: any) => {
-    // Handle nested objects (e.g., metasSeguranca.meta1)
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setFormData(prev => {
-        const parentValue = prev[parent as keyof FormData];
-        
-        // Ensure parent value is an object before spreading
-        if (typeof parentValue === 'object' && parentValue !== null) {
-          return {
-            ...prev,
-            [parent]: {
-              ...parentValue,
-              [child]: value
-            }
-          };
-        }
-        
-        // If parent is not an object, create a new object
-        return {
-          ...prev,
-          [parent]: { [child]: value }
-        };
-      });
-    } else {
-      setFormData(prev => ({ ...prev, [field]: value }));
-    }
-  }, []);
-
-  const handlePalavrasChaveChange = useCallback((palavras: string[]) => {
-    setPalavrasChave(palavras);
-  }, []);
-
-  const handleNovaPalavraChange = useCallback((palavra: string) => {
-    setNovaPalavra(palavra);
-  }, []);
-
-  const handleChecklistChange = useCallback((tipo: 'materiais' | 'debriefing', checklist: any) => {
-    setChecklists(prev => ({ ...prev, [tipo]: checklist }));
+  const handleScenarioDataChange = useCallback((field: string, value: any) => {
+    setScenarioData(prev => ({ ...prev, [field]: value }));
   }, []);
 
   const handleFramesChange = useCallback((newFrames: Frame[]) => {
     setFrames(newFrames);
   }, []);
 
+  const adicionarObjetivoAprendizagem = useCallback((objetivo: string) => {
+    if (objetivo.trim() && !scenarioData.learningObjectives.includes(objetivo.trim())) {
+      handleScenarioDataChange('learningObjectives', [...scenarioData.learningObjectives, objetivo.trim()]);
+    }
+  }, [scenarioData.learningObjectives, handleScenarioDataChange]);
+
+  const removerObjetivoAprendizagem = useCallback((objetivo: string) => {
+    handleScenarioDataChange('learningObjectives', scenarioData.learningObjectives.filter(o => o !== objetivo));
+  }, [scenarioData.learningObjectives, handleScenarioDataChange]);
+
+  const adicionarEquipamento = useCallback((equipamento: string) => {
+    if (equipamento.trim() && !scenarioData.equipmentList.includes(equipamento.trim())) {
+      handleScenarioDataChange('equipmentList', [...scenarioData.equipmentList, equipamento.trim()]);
+    }
+  }, [scenarioData.equipmentList, handleScenarioDataChange]);
+
+  const removerEquipamento = useCallback((equipamento: string) => {
+    handleScenarioDataChange('equipmentList', scenarioData.equipmentList.filter(e => e !== equipamento));
+  }, [scenarioData.equipmentList, handleScenarioDataChange]);
+
   const validarAba = useCallback((aba: string) => {
     switch (aba) {
-      case "programa":
-        return !!(formData.nomePrograma && formData.objetivosPrograma && formData.publicoAlvo);
-      case "cenario":
-        return !!(formData.nomeCenario && formData.objetivosTecnicos && formData.objetivosNaoTecnicos);
+      case "identificacao":
+        return !!(scenarioData.title && scenarioData.patientName && scenarioData.patientAge);
+      case "objetivos":
+        return scenarioData.learningObjectives.length >= 2;
       case "paciente":
-        return !!(formData.nomePaciente && formData.idade && formData.sexo);
+        return !!(scenarioData.patientName && scenarioData.patientAge && scenarioData.patientGender);
       case "frames":
-        return frames.length >= 3 && frames.filter(f => f.isCompleto).length >= 3;
+        return frames.length >= 3 && frames.filter(f => f.parameterSet).length >= 3;
       case "materiais":
-        return !!formData.materiaisEquipamentos;
-      case "debriefing":
-        return !!formData.protocolosEspecificos;
+        return scenarioData.equipmentList.length >= 3;
       default:
         return true;
     }
-  }, [formData, frames]);
+  }, [scenarioData, frames]);
 
   const getTabStatus = useCallback((aba: string): "completo" | "ativo" | "incompleto" => {
     if (validarAba(aba)) {
@@ -270,12 +92,11 @@ export const useScenarioForm = () => {
 
   const getTabsConfig = useCallback(() => {
     const tabs = [
-      { value: "programa", label: "Programa" },
-      { value: "cenario", label: "Cenário" },
+      { value: "identificacao", label: "Identificação" },
+      { value: "objetivos", label: "Objetivos" },
       { value: "paciente", label: "Paciente" },
       { value: "frames", label: "Frames" },
       { value: "materiais", label: "Materiais" },
-      { value: "debriefing", label: "Debriefing" },
       { value: "revisao", label: "Revisão" }
     ];
 
@@ -285,29 +106,76 @@ export const useScenarioForm = () => {
     }));
   }, [getTabStatus]);
 
+  const salvarCenario = useCallback(() => {
+    const scenarioCompleto: Scenario = {
+      id: Date.now().toString(),
+      title: scenarioData.title,
+      patientName: scenarioData.patientName,
+      patientAge: scenarioData.patientAge,
+      patientGender: scenarioData.patientGender,
+      patientHeight: scenarioData.patientHeight,
+      patientWeight: scenarioData.patientWeight,
+      scenarioOutline: scenarioData.scenarioOutline,
+      learnerBrief: scenarioData.learnerBrief,
+      learningObjectives: scenarioData.learningObjectives,
+      equipmentList: scenarioData.equipmentList,
+      requiredResources: [],
+      initialFrameId: frames[0]?.id,
+      initialFrame: frames[0],
+      frames: frames,
+      checklist: undefined,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    // Salvar no localStorage (mock)
+    localStorage.setItem("scenario_prisma", JSON.stringify(scenarioCompleto));
+    console.log("Scenario salvo:", scenarioCompleto);
+    
+    return scenarioCompleto;
+  }, [scenarioData, frames]);
+
+  const carregarCenario = useCallback((scenarioId: string) => {
+    // Carregar do localStorage (mock)
+    const salvo = localStorage.getItem(`scenario_${scenarioId}`);
+    if (salvo) {
+      const scenario: Scenario = JSON.parse(salvo);
+      setScenarioData({
+        title: scenario.title,
+        patientName: scenario.patientName,
+        patientAge: scenario.patientAge,
+        patientGender: scenario.patientGender,
+        patientHeight: scenario.patientHeight,
+        patientWeight: scenario.patientWeight,
+        scenarioOutline: scenario.scenarioOutline,
+        learnerBrief: scenario.learnerBrief,
+        learningObjectives: scenario.learningObjectives,
+        equipmentList: scenario.equipmentList
+      });
+      setFrames(scenario.frames);
+    }
+  }, []);
+
   return {
     // State
     activeTab,
-    palavrasChave,
-    novaPalavra,
     frames,
-    checklists,
-    formData,
+    scenarioData,
     
     // Setters
     setActiveTab,
-    setPalavrasChave,
-    setNovaPalavra,
+    setScenarioData,
     setFrames,
-    setChecklists,
-    setFormData,
     
     // Handlers
-    handleFormDataChange,
-    handlePalavrasChaveChange,
-    handleNovaPalavraChange,
-    handleChecklistChange,
+    handleScenarioDataChange,
     handleFramesChange,
+    adicionarObjetivoAprendizagem,
+    removerObjetivoAprendizagem,
+    adicionarEquipamento,
+    removerEquipamento,
+    salvarCenario,
+    carregarCenario,
     
     // Validations
     validarAba,

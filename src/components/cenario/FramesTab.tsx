@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Plus, 
   Trash2, 
@@ -25,43 +26,29 @@ import {
   Gauge,
   Eye,
   MessageSquare,
-  User
+  User,
+  Wind,
+  Brain,
+  Droplet,
+  TrendingUp,
+  Zap
 } from "lucide-react";
 import { useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { Frame, ParameterSet } from "@/types/prisma";
 
-interface Frame {
-  id: string;
-  ordem: number;
-  nomeEtapa: string;
-  frameIdentifier: string;
-  durationEstimateMin: number;
-  participantType: string;
-  fc?: number;
-  satO2?: number;
-  paSistolica?: number;
-  paDiastolica?: number;
-  fr?: number;
-  temp?: number;
-  otherFindings?: string;
-  operatorInstructions?: string;
-  expectedParticipantActions?: string;
-  isCompleto?: boolean;
-  loadingIA?: boolean;
-}
-
-interface FramesTabProps {
+interface PrismaFramesTabProps {
   frames: Frame[];
   onFramesChange: (frames: Frame[]) => void;
 }
 
-const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
+const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
   const [frameExpandido, setFrameExpandido] = useState<string | null>(frames[0]?.id || null);
   const [filtroStatus, setFiltroStatus] = useState<'todos' | 'completos' | 'incompletos'>('todos');
 
   // Estatísticas dos frames
   const stats = useMemo(() => {
-    const completos = frames.filter(f => f.isCompleto).length;
+    const completos = frames.filter(f => f.parameterSet).length;
     const incompletos = frames.length - completos;
     const duracaoTotal = frames.reduce((acc, f) => acc + (f.durationEstimateMin || 0), 0);
     
@@ -77,8 +64,8 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   // Frames filtrados
   const framesFiltrados = useMemo(() => {
     return frames.filter(frame => {
-      if (filtroStatus === 'completos') return frame.isCompleto;
-      if (filtroStatus === 'incompletos') return !frame.isCompleto;
+      if (filtroStatus === 'completos') return !!frame.parameterSet;
+      if (filtroStatus === 'incompletos') return !frame.parameterSet;
       return true;
     });
   }, [frames, filtroStatus]);
@@ -86,12 +73,17 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   const adicionarFrame = useCallback(() => {
     const novoFrame: Frame = {
       id: Date.now().toString(),
-      ordem: frames.length + 1,
-      nomeEtapa: `Frame ${frames.length + 1}`,
+      scenarioId: "temp", // Will be set when saving
       frameIdentifier: (frames.length + 1).toString(),
+      title: `Frame ${frames.length + 1}`,
       durationEstimateMin: 5,
       participantType: "Simulador",
-      isCompleto: false
+      operatorInstructions: [],
+      expectedParticipantActions: [],
+      sourceTransitions: [],
+      targetTransitions: [],
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     
     const novosFrames = [...frames, novoFrame];
@@ -104,7 +96,10 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
     
     const novosFrames = frames
       .filter(frame => frame.id !== id)
-      .map((frame, index) => ({ ...frame, ordem: index + 1 }));
+      .map((frame, index) => ({ 
+        ...frame, 
+        frameIdentifier: (index + 1).toString() 
+      }));
     
     onFramesChange(novosFrames);
     
@@ -117,10 +112,10 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
     const novoFrame: Frame = {
       ...frameOriginal,
       id: Date.now().toString(),
-      ordem: frames.length + 1,
-      nomeEtapa: `${frameOriginal.nomeEtapa} (Cópia)`,
       frameIdentifier: (frames.length + 1).toString(),
-      isCompleto: false
+      title: `${frameOriginal.title} (Cópia)`,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
     
     const novosFrames = [...frames, novoFrame];
@@ -131,14 +126,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   const atualizarFrame = useCallback((id: string, campo: string, valor: any) => {
     const novosFrames = frames.map(frame => {
       if (frame.id === id) {
-        const frameAtualizado = { ...frame, [campo]: valor };
-        
-        // Auto-validação de completude
-        if (campo !== 'loadingIA') {
-          frameAtualizado.isCompleto = validarCompletudeFrame(frameAtualizado);
-        }
-        
-        return frameAtualizado;
+        return { ...frame, [campo]: valor, updatedAt: new Date() };
       }
       return frame;
     });
@@ -146,38 +134,162 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
     onFramesChange(novosFrames);
   }, [frames, onFramesChange]);
 
-  const validarCompletudeFrame = (frame: Frame): boolean => {
-    return !!(
-      frame.nomeEtapa?.trim() &&
-      frame.frameIdentifier?.trim() &&
-      frame.durationEstimateMin > 0 &&
-      frame.participantType?.trim() &&
-      (frame.fc !== undefined || frame.satO2 !== undefined || frame.paSistolica !== undefined)
-    );
-  };
+  const atualizarParametro = useCallback((frameId: string, campo: keyof ParameterSet, valor: any) => {
+    const novosFrames = frames.map(frame => {
+      if (frame.id === frameId) {
+        const parametrosAtuais = frame.parameterSet || {
+          id: Date.now().toString(),
+          frameId: frameId
+        };
+        
+        const parametrosAtualizados = {
+          ...parametrosAtuais,
+          [campo]: valor
+        };
+        
+        return { 
+          ...frame, 
+          parameterSet: parametrosAtualizados,
+          updatedAt: new Date()
+        };
+      }
+      return frame;
+    });
+    
+    onFramesChange(novosFrames);
+  }, [frames, onFramesChange]);
 
   const gerarSugestaoSinaisVitais = useCallback((frameId: string) => {
-    atualizarFrame(frameId, 'loadingIA', true);
+    // Simulação de sugestão de IA baseada no tipo de cenário
+    const sugestoes: Partial<ParameterSet> = {
+      // Parâmetros Circulatórios
+      FC: 85,
+      Pulse: 85,
+      SatO2: 94,
+      PASist: 120,
+      PADiast: 80,
+      PAMean: 93,
+      
+      // Parâmetros Respiratórios
+      FR: 18,
+      etCO2: 35,
+      iCO2: 0,
+      inO2: 21,
+      etO2: 17,
+      
+      // Temperatura
+      Temp: 36.8,
+      
+      // Outros
+      Glicemia: 95,
+      Pupilas: "Isocóricas fotorreagentes"
+    };
     
-    // Simulação de chamada à IA
-    setTimeout(() => {
-      const sugestao = {
-        fc: 120,
-        satO2: 92,
-        paSistolica: 80,
-        paDiastolica: 50,
-        fr: 28,
-        temp: 38.2,
-        otherFindings: "Pele pálida e úmida, taquipneia, taquicardia"
-      };
+    Object.entries(sugestoes).forEach(([campo, valor]) => {
+      if (campo !== undefined && valor !== undefined) {
+        atualizarParametro(frameId, campo as keyof ParameterSet, valor);
+      }
+    });
+  }, [atualizarParametro]);
+
+  const getParametroIcon = (parametro: string) => {
+    const iconMap: Record<string, any> = {
+      // Circulatórios
+      FC: Heart,
+      Pulse: Heart,
+      SatO2: Eye,
+      PASist: Gauge,
+      PADiast: Gauge,
+      PAMean: Gauge,
       
-      Object.entries(sugestao).forEach(([campo, valor]) => {
-        atualizarFrame(frameId, campo, valor);
-      });
+      // Respiratórios
+      FR: Wind,
+      etCO2: Droplet,
+      iCO2: Droplet,
+      inO2: Activity,
+      etO2: Eye,
       
-      atualizarFrame(frameId, 'loadingIA', false);
-    }, 1500);
-  }, [atualizarFrame]);
+      // Temperatura
+      Temp: Thermometer,
+      
+      // Outros
+      Glicemia: Brain,
+      Pupilas: Eye,
+      pH: Activity,
+      inN2O: Zap,
+      etN2O: Zap,
+      anestheticAgent: Droplet,
+      inAGT: Droplet,
+      etAGT: Droplet,
+      TOFCount: TrendingUp,
+      TOFRatio: TrendingUp,
+      PTC: Activity
+    };
+    return iconMap[parametro] || Activity;
+  };
+
+  const getParametroLabel = (parametro: string) => {
+    const labelMap: Record<string, string> = {
+      // Circulatórios
+      FC: "FC (bpm)",
+      Pulse: "Pulso (bpm)",
+      SatO2: "SatO₂ (%)",
+      PASist: "PA Sistólica",
+      PADiast: "PA Diastólica",
+      PAMean: "PA Média",
+      
+      // Respiratórios
+      FR: "FR (rpm)",
+      etCO2: "etCO₂ (mmHg)",
+      iCO2: "iCO₂ (mmHg)",
+      inO2: "FiO₂ (%)",
+      etO2: "etO₂ (%)",
+      
+      // Temperatura
+      Temp: "Temp (°C)",
+      
+      // Outros
+      Glicemia: "Glicemia (mg/dL)",
+      Pupilas: "Pupilas",
+      pH: "pH Arterial",
+      inN2O: "N₂O Inspirado (%)",
+      etN2O: "N₂O Expirado (%)",
+      anestheticAgent: "Agente Anestésico",
+      inAGT: "Agente Inspirado (%)",
+      etAGT: "Agente Expirado (%)",
+      TOFCount: "TOF Contagem",
+      TOFRatio: "TOF Razão (%)",
+      PTC: "PTC Contagem"
+    };
+    return labelMap[parametro] || parametro;
+  };
+
+  const getParametroUnit = (parametro: string) => {
+    const unitMap: Record<string, string> = {
+      FC: "bpm",
+      Pulse: "bpm",
+      SatO2: "%",
+      PASist: "mmHg",
+      PADiast: "mmHg",
+      PAMean: "mmHg",
+      FR: "rpm",
+      etCO2: "mmHg",
+      iCO2: "mmHg",
+      inO2: "%",
+      etO2: "%",
+      Temp: "°C",
+      Glicemia: "mg/dL",
+      pH: "",
+      inN2O: "%",
+      etN2O: "%",
+      inAGT: "%",
+      etAGT: "%",
+      TOFCount: "",
+      TOFRatio: "%",
+      PTC: ""
+    };
+    return unitMap[parametro] || "";
+  };
 
   return (
     <div className="space-y-6">
@@ -280,24 +392,24 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
           framesFiltrados.map((frame, index) => (
             <Card key={frame.id} className={cn(
               "transition-all duration-200",
-              frame.isCompleto ? "border-green-300" : "border-yellow-300"
+              frame.parameterSet ? "border-green-300" : "border-yellow-300"
             )}>
               {/* Cabeçalho do Frame */}
               <div className="flex items-center justify-between p-4 border-b">
                 <div className="flex items-center space-x-3">
                   <GripVertical className="h-4 w-4 text-gray-400" />
                   
-                  <Badge variant={frame.isCompleto ? "default" : "secondary"} className={cn(
+                  <Badge variant={frame.parameterSet ? "default" : "secondary"} className={cn(
                     "flex items-center gap-1",
-                    frame.isCompleto ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                    frame.parameterSet ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
                   )}>
-                    {frame.isCompleto ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
-                    Frame {frame.ordem}
+                    {frame.parameterSet ? <CheckCircle className="h-3 w-3" /> : <Clock className="h-3 w-3" />}
+                    Frame {frame.frameIdentifier}
                   </Badge>
                   
                   <Input
-                    value={frame.nomeEtapa}
-                    onChange={(e) => atualizarFrame(frame.id, 'nomeEtapa', e.target.value)}
+                    value={frame.title}
+                    onChange={(e) => atualizarFrame(frame.id, 'title', e.target.value)}
                     placeholder="Nome da etapa"
                     className="w-64 font-medium"
                   />
@@ -314,10 +426,9 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
                     variant="outline" 
                     size="sm"
                     onClick={() => gerarSugestaoSinaisVitais(frame.id)}
-                    disabled={frame.loadingIA}
                   >
                     <Sparkles className="h-4 w-4 mr-1" />
-                    {frame.loadingIA ? "Gerando..." : "IA"}
+                    IA
                   </Button>
                   
                   <Button variant="ghost" size="icon" onClick={() => duplicarFrame(frame)}>
@@ -347,7 +458,17 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
               {/* Conteúdo Expandido */}
               {frameExpandido === frame.id && (
                 <div className="p-6 space-y-6">
+                  {/* Informações Básicas */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Identificador do Frame</Label>
+                      <Input
+                        value={frame.frameIdentifier}
+                        onChange={(e) => atualizarFrame(frame.id, 'frameIdentifier', e.target.value)}
+                        placeholder="Ex: 1, 2A, Piora"
+                      />
+                    </div>
+                    
                     <div className="space-y-2">
                       <Label>Duração Estimada (minutos)</Label>
                       <Input
@@ -377,162 +498,176 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
 
                   <Separator />
 
-                  {/* Sinais Vitais */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <Heart className="h-4 w-4 text-red-500" />
-                        Sinais Vitais
-                      </h4>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => gerarSugestaoSinaisVitais(frame.id)}
-                        disabled={frame.loadingIA}
-                      >
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        {frame.loadingIA ? "Gerando..." : "Sugerir com IA"}
-                      </Button>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-                      <div className="space-y-2">
-                        <Label className="flex items-center gap-1 text-sm">
-                          <Heart className="h-3 w-3 text-red-500" />
-                          FC (bpm)
-                        </Label>
-                        <Input
-                          type="number"
-                          value={frame.fc || ''}
-                          onChange={(e) => atualizarFrame(frame.id, 'fc', parseInt(e.target.value) || undefined)}
-                          placeholder="80"
-                          className="text-sm"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label className="flex items-center gap-1 text-sm">
-                          <Eye className="h-3 w-3 text-blue-500" />
-                          SatO₂ (%)
-                        </Label>
-                        <Input
-                          type="number"
-                          min="0"
-                          max="100"
-                          value={frame.satO2 || ''}
-                          onChange={(e) => atualizarFrame(frame.id, 'satO2', parseInt(e.target.value) || undefined)}
-                          placeholder="98"
-                          className="text-sm"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label className="flex items-center gap-1 text-sm">
-                          <Gauge className="h-3 w-3 text-green-500" />
-                          PA Sistólica
-                        </Label>
-                        <Input
-                          type="number"
-                          value={frame.paSistolica || ''}
-                          onChange={(e) => atualizarFrame(frame.id, 'paSistolica', parseInt(e.target.value) || undefined)}
-                          placeholder="120"
-                          className="text-sm"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label className="flex items-center gap-1 text-sm">
-                          <Gauge className="h-3 w-3 text-green-500" />
-                          PA Diastólica
-                        </Label>
-                        <Input
-                          type="number"
-                          value={frame.paDiastolica || ''}
-                          onChange={(e) => atualizarFrame(frame.id, 'paDiastolica', parseInt(e.target.value) || undefined)}
-                          placeholder="80"
-                          className="text-sm"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label className="flex items-center gap-1 text-sm">
-                          <User className="h-3 w-3 text-purple-500" />
-                          FR (rpm)
-                        </Label>
-                        <Input
-                          type="number"
-                          value={frame.fr || ''}
-                          onChange={(e) => atualizarFrame(frame.id, 'fr', parseInt(e.target.value) || undefined)}
-                          placeholder="16"
-                          className="text-sm"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label className="flex items-center gap-1 text-sm">
-                          <Thermometer className="h-3 w-3 text-orange-500" />
-                          Temp (°C)
-                        </Label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          value={frame.temp || ''}
-                          onChange={(e) => atualizarFrame(frame.id, 'temp', parseFloat(e.target.value) || undefined)}
-                          placeholder="36.5"
-                          className="text-sm"
-                        />
-                      </div>
-                    </div>
-                  </div>
+                  {/* Parâmetros Fisiológicos - Organizados por Categoria */}
+                  <Tabs defaultValue="circulatorio" className="w-full">
+                    <TabsList className="grid w-full grid-cols-5">
+                      <TabsTrigger value="circulatorio">Circulatório</TabsTrigger>
+                      <TabsTrigger value="respiratorio">Respiratório</TabsTrigger>
+                      <TabsTrigger value="temperatura">Temperatura</TabsTrigger>
+                      <TabsTrigger value="outros">Outros</TabsTrigger>
+                    </TabsList>
 
-                  <Separator />
+                    {/* Parâmetros Circulatórios */}
+                    <TabsContent value="circulatorio" className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="font-medium flex items-center gap-2">
+                          <Heart className="h-4 w-4 text-red-500" />
+                          Parâmetros Circulatórios
+                        </h4>
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={() => gerarSugestaoSinaisVitais(frame.id)}
+                        >
+                          <Sparkles className="h-3 w-3 mr-1" />
+                          Sugerir com IA
+                        </Button>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {[
+                          { field: 'FC', icon: Heart, color: 'text-red-500' },
+                          { field: 'Pulse', icon: Heart, color: 'text-red-400' },
+                          { field: 'SatO2', icon: Eye, color: 'text-blue-500' },
+                          { field: 'PASist', icon: Gauge, color: 'text-green-500' },
+                          { field: 'PADiast', icon: Gauge, color: 'text-green-400' },
+                          { field: 'PAMean', icon: Gauge, color: 'text-green-600' },
+                          { field: 'CO', icon: Activity, color: 'text-purple-500' }
+                        ].map(({ field, icon: Icon, color }) => (
+                          <div key={field} className="space-y-2">
+                            <Label className="flex items-center gap-1 text-sm">
+                              <Icon className={`h-3 w-3 ${color}`} />
+                              {getParametroLabel(field)}
+                              <span className="text-xs text-gray-500 ml-1">
+                                {getParametroUnit(field)}
+                              </span>
+                            </Label>
+                            <Input
+                              type="number"
+                              value={frame.parameterSet?.[field as keyof ParameterSet] as number || ''}
+                              onChange={(e) => atualizarParametro(frame.id, field as keyof ParameterSet, e.target.value ? parseFloat(e.target.value) : undefined)}
+                              placeholder="---"
+                              className="text-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </TabsContent>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
+                    {/* Parâmetros Respiratórios */}
+                    <TabsContent value="respiratorio" className="space-y-4">
                       <h4 className="font-medium flex items-center gap-2">
-                        <MessageSquare className="h-4 w-4 text-blue-500" />
-                        Descrições Clínicas
+                        <Wind className="h-4 w-4 text-blue-500" />
+                        Parâmetros Respiratórios
                       </h4>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label>Achados Clínicos Adicionais</Label>
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {[
+                          { field: 'FR', icon: Wind, color: 'text-blue-500' },
+                          { field: 'etCO2', icon: Droplet, color: 'text-cyan-500' },
+                          { field: 'iCO2', icon: Droplet, color: 'text-cyan-400' },
+                          { field: 'inO2', icon: Activity, color: 'text-orange-500' },
+                          { field: 'etO2', icon: Eye, color: 'text-blue-400' }
+                        ].map(({ field, icon: Icon, color }) => (
+                          <div key={field} className="space-y-2">
+                            <Label className="flex items-center gap-1 text-sm">
+                              <Icon className={`h-3 w-3 ${color}`} />
+                              {getParametroLabel(field)}
+                              <span className="text-xs text-gray-500 ml-1">
+                                {getParametroUnit(field)}
+                              </span>
+                            </Label>
+                            <Input
+                              type="number"
+                              value={frame.parameterSet?.[field as keyof ParameterSet] as number || ''}
+                              onChange={(e) => atualizarParametro(frame.id, field as keyof ParameterSet, e.target.value ? parseFloat(e.target.value) : undefined)}
+                              placeholder="---"
+                              className="text-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </TabsContent>
+
+                    {/* Parâmetros de Temperatura */}
+                    <TabsContent value="temperatura" className="space-y-4">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Thermometer className="h-4 w-4 text-orange-500" />
+                        Temperatura
+                      </h4>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          { field: 'Temp', label: 'Temp Periférica (°C)' },
+                          { field: 'Tblood', label: 'Temp Sanguínea (°C)' }
+                        ].map(({ field, label }) => (
+                          <div key={field} className="space-y-2">
+                            <Label className="text-sm">{label}</Label>
+                            <Input
+                              type="number"
+                              step="0.1"
+                              value={frame.parameterSet?.[field as keyof ParameterSet] as number || ''}
+                              onChange={(e) => atualizarParametro(frame.id, field as keyof ParameterSet, e.target.value ? parseFloat(e.target.value) : undefined)}
+                              placeholder="---"
+                              className="text-sm"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </TabsContent>
+
+                    {/* Outros Parâmetros */}
+                    <TabsContent value="outros" className="space-y-4">
+                      <h4 className="font-medium flex items-center gap-2">
+                        <Brain className="h-4 w-4 text-purple-500" />
+                        Outros Parâmetros
+                      </h4>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            {[
+                              { field: 'ICPMean', label: 'PIC Média (mmHg)' },
+                              { field: 'Glicemia', label: 'Glicemia (mg/dL)' },
+                              { field: 'pH', label: 'pH Arterial' }
+                            ].map(({ field, label }) => (
+                              <div key={field} className="space-y-2">
+                                <Label className="text-sm">{label}</Label>
+                                <Input
+                                  type="number"
+                                  step="0.1"
+                                  value={frame.parameterSet?.[field as keyof ParameterSet] as number || ''}
+                                  onChange={(e) => atualizarParametro(frame.id, field as keyof ParameterSet, e.target.value ? parseFloat(e.target.value) : undefined)}
+                                  placeholder="---"
+                                  className="text-sm"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <Label className="text-sm">Pupilas</Label>
+                            <Input
+                              value={frame.parameterSet?.Pupilas || ''}
+                              onChange={(e) => atualizarParametro(frame.id, 'Pupilas', e.target.value)}
+                              placeholder="Ex: Isocóricas fotorreagentes"
+                              className="text-sm"
+                            />
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-4">
+                          <Label className="text-sm">Achados Clínicos Adicionais</Label>
                           <Textarea
                             value={frame.otherFindings || ''}
                             onChange={(e) => atualizarFrame(frame.id, 'otherFindings', e.target.value)}
-                            placeholder="Ex: Ausculta pulmonar normal, pele pálida e úmida, sudorese profusa..."
-                            rows={3}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Instruções para Operador do Simulador</Label>
-                          <Textarea
-                            value={frame.operatorInstructions || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'operatorInstructions', e.target.value)}
-                            placeholder="Instruções específicas para o operador do simulador neste frame..."
-                            rows={2}
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="space-y-4">
-                      <h4 className="font-medium flex items-center gap-2">
-                        <User className="h-4 w-4 text-green-500" />
-                        Comportamento Esperado
-                      </h4>
-                      <div className="space-y-4">
-                        <div className="space-y-2">
-                          <Label>Ações Esperadas dos Participantes</Label>
-                          <Textarea
-                            value={frame.expectedParticipantActions || ''}
-                            onChange={(e) => atualizarFrame(frame.id, 'expectedParticipantActions', e.target.value)}
-                            placeholder="Ações esperadas dos participantes neste frame. Ex: Realizar avaliação primária ABCDE, solicitar exames complementares..."
+                            placeholder="Ex: Ausculta pulmonar normal, pele pálida e úmida..."
                             rows={3}
                           />
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    </TabsContent>
+                  </Tabs>
                 </div>
               )}
             </Card>
@@ -567,7 +702,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
                     <p>• É necessário ter pelo menos 3 frames para o cenário</p>
                   )}
                   {stats.incompletos > 0 && (
-                    <p>• {stats.incompletos} frame(s) precisam ser completados</p>
+                    <p>• {stats.incompletos} frame(s) precisam ser completados com parâmetros</p>
                   )}
                   {frames.length >= 3 && stats.completos >= 3 && (
                     <p>• Todos os requisitos mínimos foram atendidos</p>
@@ -582,4 +717,4 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   );
 };
 
-export default FramesTab;
+export default PrismaFramesTab;
