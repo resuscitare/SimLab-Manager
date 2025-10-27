@@ -1,45 +1,19 @@
 "use client";
 
-import * as React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ScenarioFormData } from "@/types/prisma";
-import { Eye, Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Eye } from "lucide-react";
 
 interface IdentificacaoTabProps {
   scenarioData: ScenarioFormData;
   handleScenarioDataChange: (field: keyof ScenarioFormData, value: any) => void;
 }
 
-const cursos = [
-  { value: "acls", label: "ACLS" },
-  { value: "bls", label: "BLS" },
-  { value: "aph", label: "APH" },
-  { value: "pals", label: "PALS" },
-  { value: "outro", label: "Outro" },
-];
-
 const IdentificacaoTab = ({ scenarioData, handleScenarioDataChange }: IdentificacaoTabProps) => {
-  const [open, setOpen] = React.useState(false);
-
   return (
     <Card>
       <CardHeader>
@@ -77,65 +51,12 @@ const IdentificacaoTab = ({ scenarioData, handleScenarioDataChange }: Identifica
 
           <div className="space-y-2">
             <Label htmlFor="curso">Curso</Label>
-            <Popover open={open} onOpenChange={setOpen}>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  role="combobox"
-                  aria-expanded={open}
-                  className="w-full justify-between font-normal"
-                >
-                  {scenarioData.curso || "Selecione ou digite um curso..."}
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                <Command
-                  filter={(value, search) => {
-                    if (value.includes(search)) return 1;
-                    return 0;
-                  }}
-                >
-                  <CommandInput 
-                    placeholder="Buscar ou criar curso..."
-                    value={scenarioData.curso}
-                    onValueChange={(value) => handleScenarioDataChange('curso', value)}
-                  />
-                  <CommandList>
-                    <CommandEmpty>
-                      <CommandItem
-                        onSelect={() => {
-                          setOpen(false);
-                        }}
-                      >
-                        Criar "{scenarioData.curso}"
-                      </CommandItem>
-                    </CommandEmpty>
-                    <CommandGroup>
-                      {cursos.map((curso) => (
-                        <CommandItem
-                          key={curso.value}
-                          value={curso.value}
-                          onSelect={(currentValue) => {
-                            const newValue = currentValue === scenarioData.curso?.toLowerCase() ? "" : curso.label;
-                            handleScenarioDataChange('curso', newValue);
-                            setOpen(false);
-                          }}
-                        >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              scenarioData.curso?.toLowerCase() === curso.value ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {curso.label}
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Popover>
+            <Input
+              id="curso"
+              value={scenarioData.curso}
+              onChange={(e) => handleScenarioDataChange('curso', e.target.value)}
+              placeholder="Ex: ACLS, BLS, APH"
+            />
           </div>
 
           <div className="space-y-2">
