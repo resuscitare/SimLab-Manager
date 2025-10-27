@@ -129,7 +129,7 @@ export const useScenarioForm = () => {
     }
   }, [formData, frames, checklists]);
 
-  const getTabStatus = useCallback((aba: string) => {
+  const getTabStatus = useCallback((aba: string): "completo" | "ativo" | "incompleto" => {
     if (validarAba(aba)) {
       return "completo";
     } else if (aba === activeTab) {
