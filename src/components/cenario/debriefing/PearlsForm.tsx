@@ -10,15 +10,38 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScenarioFormData } from "@/types/prisma";
-import { Plus, Info } from "lucide-react";
+import { Plus, Info, Upload, Link as LinkIcon, Trash2 } from "lucide-react";
 
 interface PearlsFormProps {
   scenarioData: ScenarioFormData;
 }
 
+interface CriticalMoment {
+  id: number;
+  description: string;
+  expectedAction: string;
+  possibleGap: string;
+}
+
 const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
   const [analysisApproach, setAnalysisApproach] = useState("advocacy-inquiry");
   const [summaryApproach, setSummaryApproach] = useState("aprendiz");
+  const [criticalMoments, setCriticalMoments] = useState<CriticalMoment[]>([
+    { id: 1, description: "", expectedAction: "", possibleGap: "" }
+  ]);
+
+  const addCriticalMoment = () => {
+    setCriticalMoments([
+      ...criticalMoments,
+      { id: Date.now(), description: "", expectedAction: "", possibleGap: "" }
+    ]);
+  };
+
+  const removeCriticalMoment = (id: number) => {
+    if (criticalMoments.length > 1) {
+      setCriticalMoments(criticalMoments.filter(moment => moment.id !== id));
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -34,7 +57,7 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
           <CardTitle>Informações Básicas do Cenário</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <Label>Nome do Cenário</Label>
               <Input value={scenarioData.title} disabled />
@@ -48,6 +71,19 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
                 </SelectContent>
               </Select>
             </div>
+            <div>
+              <Label>Nível dos Participantes</Label>
+              <Select>
+                <SelectTrigger><SelectValue placeholder="Selecione o nível" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="graduacao">Estudantes de graduação</SelectItem>
+                  <SelectItem value="residente_r1_r2">Residentes R1-R2</SelectItem>
+                  <SelectItem value="residente_r3+">Residentes R3+</SelectItem>
+                  <SelectItem value="profissionais">Profissionais</SelectItem>
+                  <SelectItem value="multiprofissional">Equipe multiprofissional</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -55,13 +91,48 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Objetivos de Aprendizagem</CardTitle>
-          <CardDescription>Revise os objetivos definidos para o cenário.</CardDescription>
+          <CardDescription>Revise os objetivos definidos para o cenário, que guiarão o debriefing.</CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2">
             {scenarioData.technicalLearningObjectives.map((obj, i) => <li key={`tech-${i}`} className="text-sm p-2 bg-muted rounded-md">{obj} (Técnico)</li>)}
             {scenarioData.nonTechnicalLearningObjectives.map((obj, i) => <li key={`nontech-${i}`} className="text-sm p-2 bg-muted rounded-md">{obj} (Não Técnico)</li>)}
           </ul>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Momentos Críticos Antecipados</CardTitle>
+          <CardDescription>Identifique 2-4 pontos decisivos esperados no cenário para focar sua análise.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {criticalMoments.map((moment, index) => (
+            <div key={moment.id} className="p-4 border rounded-lg space-y-3 relative">
+              <Label className="font-semibold">Momento Crítico {index + 1}</Label>
+              <div className="space-y-2">
+                <Label htmlFor={`desc-${moment.id}`}>Descrição do momento</Label>
+                <Input id={`desc-${moment.id}`} placeholder="Ex: Paciente desenvolve taquicardia ventricular sem pulso." />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`action-${moment.id}`}>Ação/decisão esperada</Label>
+                <Input id={`action-${moment.id}`} placeholder="Ex: Iniciar RCP e desfibrilar imediatamente." />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor={`gap-${moment.id}`}>Lacuna de performance possível</Label>
+                <Input id={`gap-${moment.id}`} placeholder="Ex: Atraso na desfibrilação, comunicação ineficaz da equipe." />
+              </div>
+              {criticalMoments.length > 1 && (
+                <Button variant="ghost" size="icon" className="absolute top-2 right-2 text-destructive" onClick={() => removeCriticalMoment(moment.id)}>
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+          ))}
+          <Button variant="outline" onClick={addCriticalMoment}>
+            <Plus className="h-4 w-4 mr-2" />
+            Adicionar Momento Crítico
+          </Button>
         </CardContent>
       </Card>
 
@@ -234,12 +305,50 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
               <Textarea defaultValue="Gostaria de encerrar pedindo que cada um de vocês compartilhe um ou dois pontos-chave que levarão dessa experiência e que os ajudarão na prática clínica futura." />
             </div>
           )}
+          {summaryApproach === 'instrutor' && (
+            <div className="p-4 border rounded-md mt-4 space-y-2">
+              <Label>Pontos-Chave para Resumir</Label>
+              <Textarea placeholder="Resuma os 2-3 pontos mais importantes que foram discutidos e que se alinham com os objetivos de aprendizagem." />
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Recursos de Apoio</CardTitle>
+          <CardDescription>Anexe protocolos, artigos ou links relevantes para o debriefing.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-2">
+            <Input placeholder="Nome do recurso" className="flex-1" />
+            <Input placeholder="Link ou upload" className="flex-1" />
+            <Button variant="ghost" size="icon"><Upload className="h-4 w-4" /></Button>
+          </div>
+          <Button variant="outline" size="sm"><Plus className="h-4 w-4 mr-2" />Adicionar Recurso</Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Checklist de Preparação do Facilitador</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <h4 className="font-semibold text-sm">Antes do Debriefing:</h4>
+          <div className="flex items-center space-x-2"><Checkbox id="prep1" /><Label htmlFor="prep1">Ambiente preparado (sala privada, confortável)</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox id="prep2" /><Label htmlFor="prep2">Materiais de apoio disponíveis</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox id="prep3" /><Label htmlFor="prep3">Revisei objetivos de aprendizagem e momentos críticos</Label></div>
+          <h4 className="font-semibold text-sm mt-4">Durante o Debriefing:</h4>
+          <div className="flex items-center space-x-2"><Checkbox id="during1" /><Label htmlFor="during1">Manter segurança psicológica</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox id="during2" /><Label htmlFor="during2">Envolver todos os participantes</Label></div>
+          <div className="flex items-center space-x-2"><Checkbox id="during3" /><Label htmlFor="during3">Gerenciar tempo efetivamente</Label></div>
         </CardContent>
       </Card>
 
       <div className="flex justify-end space-x-2">
         <Button variant="outline">Salvar Rascunho</Button>
         <Button>Gerar Script Completo</Button>
+        <Button variant="secondary">Exportar PDF</Button>
       </div>
     </div>
   );
