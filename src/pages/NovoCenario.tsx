@@ -7,7 +7,7 @@ import { ArrowLeft, Save } from "lucide-react";
 import { useScenarioForm } from "@/hooks/useScenarioForm";
 import FramesTab from "../components/cenario/FramesTab";
 import TabNavigation from "../components/cenario/TabNavigation";
-import { showSuccess, showError } from "@/utils/toast";
+import { showSuccess } from "@/utils/toast";
 import IdentificacaoTab from "../components/cenario/tabs/IdentificacaoTab";
 import ObjetivosTab from "../components/cenario/tabs/ObjetivosTab";
 import PacienteTab from "../components/cenario/tabs/PacienteTab";
@@ -35,7 +35,6 @@ const NovoCenario = () => {
     updateEquipmentItem,
     removeEquipmentItem,
     salvarCenario,
-    validarAba,
     getTabsConfig
   } = useScenarioForm();
 
@@ -58,12 +57,6 @@ const NovoCenario = () => {
   const handleNext = () => {
     if (canGoNext) {
       const nextTab = tabs[currentIndex + 1].value;
-      
-      if (!validarAba(activeTab)) {
-        showError("Complete a aba atual antes de avançar");
-        return;
-      }
-      
       setActiveTab(nextTab);
     }
   };
@@ -74,13 +67,6 @@ const NovoCenario = () => {
   };
 
   const handlePublicarCenario = () => {
-    const todasValidas = tabs.every(tab => validarAba(tab.value));
-    
-    if (!todasValidas) {
-      showError("Complete todas as seções obrigatórias antes de publicar");
-      return;
-    }
-    
     salvarCenario();
     showSuccess("Cenário publicado com sucesso!");
     navigate("/cenarios");
@@ -91,7 +77,7 @@ const NovoCenario = () => {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Novo Cenário</h1>
-          <p className="text-gray-600">Crie um cenário de simulação com estrutura completa</p>
+          <p className="text-gray-600">Crie um cenário de simulação - todos os campos são opcionais</p>
         </div>
         <div className="flex space-x-2">
           <Button variant="outline" onClick={() => navigate("/cenarios")}>

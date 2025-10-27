@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Save, AlertCircle, CheckCircle } from "lucide-react";
+import { Save, CheckCircle } from "lucide-react";
 import { ScenarioFormData, Frame } from "@/types/prisma";
 
 interface RevisaoTabProps {
@@ -20,13 +20,11 @@ const RevisaoTab = ({
   handleSalvarRascunho,
   handlePublicarCenario,
 }: RevisaoTabProps) => {
-  const todasValidas = tabs.every(tab => tab.status === 'completo');
-
   return (
     <Card>
       <CardHeader>
         <CardTitle>Revisão Final</CardTitle>
-        <CardDescription>Revise todas as informações antes de publicar</CardDescription>
+        <CardDescription>Revise todas as informações antes de publicar (todos os campos são opcionais)</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -51,27 +49,14 @@ const RevisaoTab = ({
             </div>
           </div>
 
-          <div className={`p-4 rounded-lg border-2 ${todasValidas ? 'border-green-300 bg-green-50' : 'border-yellow-300 bg-yellow-50'}`}>
+          <div className="p-4 rounded-lg border-2 border-green-300 bg-green-50">
             <div className="flex items-start gap-3">
-              {todasValidas ? (
-                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
-              ) : (
-                <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
-              )}
+              <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
               <div>
-                <h4 className="font-medium">
-                  {todasValidas
-                    ? "Cenário pronto para publicação!"
-                    : "Atenção necessária"
-                  }
-                </h4>
+                <h4 className="font-medium">Cenário pronto para publicação!</h4>
                 <div className="text-sm text-gray-600 mt-1">
-                  {!todasValidas && (
-                    <p>• Complete as seções incompletas antes de publicar</p>
-                  )}
-                  {todasValidas && (
-                    <p>• Todas as seções obrigatórias foram preenchidas</p>
-                  )}
+                  <p>• Você pode publicar o cenário mesmo com campos vazios</p>
+                  <p>• Todos os campos são opcionais</p>
                 </div>
               </div>
             </div>
@@ -82,7 +67,7 @@ const RevisaoTab = ({
               <Save className="w-4 h-4 mr-2" />
               Salvar Rascunho
             </Button>
-            <Button onClick={handlePublicarCenario} disabled={!todasValidas}>
+            <Button onClick={handlePublicarCenario}>
               Publicar Cenário
             </Button>
           </div>
