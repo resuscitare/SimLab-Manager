@@ -5,6 +5,7 @@ import DebriefingModelSelector from "@/components/cenario/debriefing/DebriefingM
 import PearlsForm from "@/components/cenario/debriefing/PearlsForm";
 import TeamGainsForm from "@/components/cenario/debriefing/TeamGainsForm";
 import ThreeDForm from "@/components/cenario/debriefing/ThreeDForm";
+import GasForm from "@/components/cenario/debriefing/GasForm";
 import { ScenarioFormData } from "@/types/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -27,7 +28,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
       case "3D":
         return <ThreeDForm scenarioData={scenarioData} />;
       case "GAS":
-        return <Card><CardHeader><CardTitle>Em Breve</CardTitle><CardDescription>O formulário para o modelo GAS será adicionado em breve.</CardDescription></CardHeader></Card>;
+        return <GasForm scenarioData={scenarioData} />;
       default:
         return <DebriefingModelSelector onSelectModel={setSelectedModel} />;
     }
