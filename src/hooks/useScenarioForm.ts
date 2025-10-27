@@ -132,6 +132,8 @@ export const useScenarioForm = () => {
         return frames.length >= 1 && frames.every(f => f.title && f.parameterSet);
       case "materiais":
         return scenarioData.equipmentList.length >= 1;
+      case "debriefing":
+        return true;
       default:
         return true;
     }
@@ -154,6 +156,7 @@ export const useScenarioForm = () => {
       { value: "paciente", label: "Paciente" },
       { value: "frames", label: "Frames" },
       { value: "materiais", label: "Materiais" },
+      { value: "debriefing", label: "Debriefing" },
       { value: "revisao", label: "Revisão" }
     ];
 

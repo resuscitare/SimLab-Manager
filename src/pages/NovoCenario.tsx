@@ -13,6 +13,7 @@ import ObjetivosTab from "../components/cenario/tabs/ObjetivosTab";
 import PacienteTab from "../components/cenario/tabs/PacienteTab";
 import MateriaisTab from "../components/cenario/tabs/MateriaisTab";
 import RevisaoTab from "../components/cenario/tabs/RevisaoTab";
+import DebriefingTab from "../components/cenario/tabs/DebriefingTab";
 
 const NovoCenario = () => {
   const navigate = useNavigate();
@@ -153,6 +154,10 @@ const NovoCenario = () => {
             adicionarEquipamento={adicionarEquipamento}
             removerEquipamento={removerEquipamento}
           />
+        </TabsContent>
+
+        <TabsContent value="debriefing">
+          <DebriefingTab scenarioData={scenarioData} />
         </TabsContent>
 
         <TabsContent value="revisao">
