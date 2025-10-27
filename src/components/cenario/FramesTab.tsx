@@ -37,12 +37,12 @@ import { useState, useCallback, useMemo } from "react";
 import { cn } from "@/lib/utils";
 import { Frame, ParameterSet } from "@/types/prisma";
 
-interface PrismaFramesTabProps {
+interface FramesTabProps {
   frames: Frame[];
   onFramesChange: (frames: Frame[]) => void;
 }
 
-const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
+const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
   const [frameExpandido, setFrameExpandido] = useState<string | null>(frames[0]?.id || null);
   const [filtroStatus, setFiltroStatus] = useState<'todos' | 'completos' | 'incompletos'>('todos');
 
@@ -717,4 +717,4 @@ const PrismaFramesTab = ({ frames, onFramesChange }: PrismaFramesTabProps) => {
   );
 };
 
-export default PrismaFramesTab;
+export default FramesTab;
