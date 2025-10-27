@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Upload, Download, Save, FileSpreadsheet } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import Papa from "papaparse";
@@ -18,12 +19,15 @@ interface MaterialItem {
   quantidadePadrao: string;
   quantidadeDisponivel: string;
   dataValidade: string;
+  local: string;
   observacoes: string;
 }
 
 const Materiais = () => {
   const [materiais, setMateriais] = useState<MaterialItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [lab, setLab] = useState("CSR");
+  const [sala, setSala] = useState("Sala 1");
 
   useEffect(() => {
     try {
@@ -49,6 +53,7 @@ const Materiais = () => {
         quantidadePadrao: "0",
         quantidadeDisponivel: "0",
         dataValidade: "",
+        local: "",
         observacoes: ""
       }
     ]);
@@ -88,6 +93,7 @@ const Materiais = () => {
             quantidadePadrao: row["Quantidade Padrão"] || "0",
             quantidadeDisponivel: row["Quantidade Disponível"] || "0",
             dataValidade: row["Data de Validade"] || "",
+            local: row["Local"] || "",
             observacoes: row["Observações"] || ""
           }));
           setMateriais(prev => [...prev, ...newMateriais]);
@@ -121,6 +127,7 @@ const Materiais = () => {
             quantidadePadrao: String(row["Quantidade Padrão"] || "0"),
             quantidadeDisponivel: String(row["Quantidade Disponível"] || "0"),
             dataValidade: row["Data de Validade"] || "",
+            local: row["Local"] || "",
             observacoes: row["Observações"] || ""
           }));
 
@@ -143,6 +150,7 @@ const Materiais = () => {
       "Quantidade Padrão", 
       "Quantidade Disponível", 
       "Data de Validade", 
+      "Local",
       "Observações"
     ];
     const sampleRow = [
@@ -152,6 +160,7 @@ const Materiais = () => {
       "1",
       "1",
       "N/A",
+      "Armário A, Gaveta 2",
       "Localizado na Sala A"
     ];
     
@@ -173,6 +182,23 @@ const Materiais = () => {
           <p className="text-gray-600">Gerencie o inventário central de materiais do laboratório.</p>
         </div>
       </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Filtros de Localização</CardTitle>
+          <CardDescription>Filtre o inventário por laboratório e sala.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-4">
+          <div className="space-y-2">
+            <Label htmlFor="laboratorio">Laboratório</Label>
+            <Input id="laboratorio" value={lab} onChange={(e) => setLab(e.target.value)} placeholder="Ex: CSR" />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="sala">Sala</Label>
+            <Input id="sala" value={sala} onChange={(e) => setSala(e.target.value)} placeholder="Ex: Sala 1" />
+          </div>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -223,6 +249,7 @@ const Materiais = () => {
                   <TableHead>Qtd. Padrão</TableHead>
                   <TableHead>Qtd. Disponível</TableHead>
                   <TableHead>Validade</TableHead>
+                  <TableHead>Local</TableHead>
                   <TableHead>Observações</TableHead>
                   <TableHead className="w-[50px]"></TableHead>
                 </TableRow>
@@ -236,6 +263,7 @@ const Materiais = () => {
                     <TableCell><Input type="number" value={item.quantidadePadrao} onChange={(e) => handleItemChange(item.id, 'quantidadePadrao', e.target.value)} /></TableCell>
                     <TableCell><Input type="number" value={item.quantidadeDisponivel} onChange={(e) => handleItemChange(item.id, 'quantidadeDisponivel', e.target.value)} /></TableCell>
                     <TableCell><Input type="date" value={item.dataValidade} onChange={(e) => handleItemChange(item.id, 'dataValidade', e.target.value)} /></TableCell>
+                    <TableCell><Input value={item.local} onChange={(e) => handleItemChange(item.id, 'local', e.target.value)} placeholder="Armário A, Gaveta B" /></TableCell>
                     <TableCell><Input value={item.observacoes} onChange={(e) => handleItemChange(item.id, 'observacoes', e.target.value)} /></TableCell>
                     <TableCell>
                       <Button variant="ghost" size="icon" onClick={() => handleRemoveItem(item.id)} className="text-destructive">
