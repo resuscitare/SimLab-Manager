@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScenarioFormData } from "@/types/prisma";
-import { Plus } from "lucide-react";
+import { Plus, Info } from "lucide-react";
 
 interface PearlsFormProps {
   scenarioData: ScenarioFormData;
@@ -114,6 +114,7 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Fase 4: Análise (10-15 min)</CardTitle>
+          <CardDescription>Identificação de domínios de performance e lacunas. Escolha uma das três abordagens dependendo do contexto.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Label>Selecione a Abordagem de Análise Principal</Label>
@@ -121,76 +122,99 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
             <div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="plus-delta" id="plus-delta" />
-                <Label htmlFor="plus-delta">Plus-Delta (Autoavaliação do Aprendiz)</Label>
+                <Label htmlFor="plus-delta">A) Autoavaliação do Aprendiz (Plus-Delta)</Label>
               </div>
-              <p className="text-sm text-muted-foreground ml-6">Use quando: tempo limitado, aprendizes geram os objetivos.</p>
+              <p className="text-sm text-muted-foreground ml-6">Usar quando o tempo é limitado e o aprendiz gera os objetivos.</p>
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="advocacy-inquiry" id="advocacy-inquiry" />
-                <Label htmlFor="advocacy-inquiry">Advocacy-Inquiry (Facilitação Focada)</Label>
+                <Label htmlFor="advocacy-inquiry">B) Facilitação Focada (Advocacy-Inquiry)</Label>
               </div>
-              <p className="text-sm text-muted-foreground ml-6">Use quando: justificativa para ação não é clara, tempo para explorar performance.</p>
+              <p className="text-sm text-muted-foreground ml-6">Usar quando a justificativa para a ação não é clara e há tempo para explorar.</p>
             </div>
             <div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="feedback-diretivo" id="feedback-diretivo" />
-                <Label htmlFor="feedback-diretivo">Feedback Diretivo (Ensino Direto)</Label>
+                <Label htmlFor="feedback-diretivo">C) Feedback Diretivo e Ensino</Label>
               </div>
-              <p className="text-sm text-muted-foreground ml-6">Use quando: prazos menores, lacunas técnicas/cognitivas claras.</p>
+              <p className="text-sm text-muted-foreground ml-6">Usar para prazos menores e para lacunas de conteúdo técnico/cognitivo.</p>
             </div>
           </RadioGroup>
 
           {analysisApproach === 'plus-delta' && (
             <div className="p-4 border rounded-md mt-4 space-y-4">
-              <h4 className="font-semibold">Plus-Delta</h4>
+              <h4 className="font-semibold">A) Autoavaliação do Aprendiz (Plus-Delta)</h4>
               <div className="space-y-2">
-                <Label>Perguntas Plus (Positivo)</Label>
-                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">Quais aspectos do caso vocês acham que gerenciaram bem?</Label></div>
-                <div className="flex items-center space-x-2"><Checkbox /><Label className="font-normal">O que funcionou bem na equipe?</Label></div>
-              </div>
-              <div className="space-y-2">
-                <Label>Perguntas Delta (Mudança)</Label>
-                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">Quais aspectos vocês gostariam de mudar?</Label></div>
-                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">Por quê?</Label></div>
-                <div className="flex items-center space-x-2"><Checkbox /><Label className="font-normal">O que fariam diferente na próxima vez?</Label></div>
+                <Label>Perguntas Sugeridas:</Label>
+                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">"Quais aspectos do caso vocês acham que gerenciaram bem?" (Plus)</Label></div>
+                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">"Quais aspectos vocês gostariam de mudar?" (Delta)</Label></div>
+                <div className="flex items-center space-x-2"><Checkbox defaultChecked /><Label className="font-normal">"Por quê?"</Label></div>
               </div>
             </div>
           )}
 
           {analysisApproach === 'advocacy-inquiry' && (
             <div className="p-4 border rounded-md mt-4 space-y-4">
-              <h4 className="font-semibold">Advocacy-Inquiry</h4>
-              <p className="text-sm text-muted-foreground">Para cada objetivo, prepare sua observação e pergunta.</p>
-              {scenarioData.technicalLearningObjectives.map((obj, i) => (
-                <div key={i} className="p-3 border bg-background rounded-lg space-y-2">
-                  <p className="font-medium text-sm">Para Objetivo: "{obj}"</p>
-                  <Label>Observação (O que você notou):</Label>
-                  <Input placeholder="Eu notei que..." />
-                  <Label>Pergunta de Inquiry:</Label>
-                  <Input defaultValue="O que estava passando pela sua cabeça naquele momento?" />
+              <h4 className="font-semibold">B) Facilitação Focada (Advocacy-Inquiry)</h4>
+              
+              <div className="p-3 border bg-background rounded-lg space-y-3">
+                <h5 className="font-medium text-sm">Etapa 1 - Explorar Lacunas de Performance</h5>
+                <p className="text-xs text-muted-foreground">Para cada objetivo, prepare sua observação (Advocacy) e sua pergunta (Inquiry).</p>
+                <Label>Observação (Advocacy):</Label>
+                <Textarea placeholder={`"Eu notei que..." / "Eu ouvi você dizer..." (Apreciação)\n"Eu gostei que..." (Preocupação)\n"Eu fiquei desconfortável porque..."`} rows={3}/>
+                <Label>Pergunta (Inquiry):</Label>
+                <Textarea placeholder={`"Como você vê isso?"\n"O que estava passando pela sua cabeça naquele momento?"`} rows={2}/>
+              </div>
+
+              <div className="p-3 border bg-background rounded-lg space-y-3">
+                <h5 className="font-medium text-sm">Etapa 2 - Compreender e Fechar Lacunas</h5>
+                <p className="text-xs text-muted-foreground">Use estas estruturas como guia durante a discussão.</p>
+                <div className="space-y-1">
+                  <Label className="text-xs">Clarificar:</Label>
+                  <p className="text-sm p-2 bg-muted rounded-md">"Então o que estou ouvindo é que [lacuna de performance] estava relacionado a [frame/justificativa]..."</p>
                 </div>
-              ))}
+                <div className="space-y-1">
+                  <Label className="text-xs">Ensinar:</Label>
+                  <p className="text-sm p-2 bg-muted rounded-md">Ensinar para fechar a lacuna quando a necessidade de aprendizado está clara.</p>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Perguntar:</Label>
+                  <p className="text-sm p-2 bg-muted rounded-md">"Que estratégias vocês veem daqui para frente?"</p>
+                </div>
+              </div>
             </div>
           )}
 
           {analysisApproach === 'feedback-diretivo' && (
              <div className="p-4 border rounded-md mt-4 space-y-4">
-                <h4 className="font-semibold">Feedback Diretivo</h4>
-                <p className="text-sm text-muted-foreground">Para cada lacuna de performance antecipada, prepare o feedback.</p>
+                <h4 className="font-semibold">C) Feedback Diretivo e Ensino</h4>
+                <div className="flex items-start gap-2 p-3 bg-blue-50 border-l-4 border-blue-400 rounded-md">
+                  <Info className="h-4 w-4 text-blue-600 mt-1 shrink-0"/>
+                  <p className="text-xs text-blue-800">
+                    <strong>Formato:</strong> "Eu notei que [lacuna de performance]. Na próxima vez, você pode querer... [fechar lacuna] porque [fornecer justificativa]."
+                  </p>
+                </div>
                 <div className="p-3 border bg-background rounded-lg space-y-2">
                     <Label>Lacuna de Performance 1</Label>
                     <Input placeholder="Descrição da lacuna de performance" />
                     <Label>Observação Direta</Label>
-                    <Input placeholder="Eu notei que [lacuna específica]..." />
+                    <Input placeholder="Eu notei que..." />
                     <Label>Estratégia Corretiva</Label>
                     <Input placeholder="Na próxima vez, você pode querer..." />
                     <Label>Justificativa (evidência/protocolo)</Label>
-                    <Input placeholder="...porque [fornecer justificativa baseada em evidência]" />
+                    <Input placeholder="...porque..." />
                 </div>
                 <Button variant="outline" size="sm"><Plus className="h-4 w-4 mr-2" />Adicionar Lacuna</Button>
              </div>
           )}
+
+          <div className="pt-4 border-t">
+            <div className="flex items-center space-x-2">
+              <Checkbox id="q-final" />
+              <Label htmlFor="q-final">"Há alguma questão pendente que não discutimos antes de começarmos a encerrar?"</Label>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
