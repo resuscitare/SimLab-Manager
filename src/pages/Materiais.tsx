@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
-import { Plus, Trash2, Upload, Download, Save } from "lucide-react";
+import { Plus, Trash2, Upload, Download, Save, FileSpreadsheet } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import Papa from "papaparse";
+import * as XLSX from 'xlsx';
 
 interface MaterialItem {
   id: string;
@@ -72,7 +73,7 @@ const Materiais = () => {
     }
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleCSVFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       Papa.parse(file, {
@@ -100,6 +101,68 @@ const Materiais = () => {
     }
   };
 
+  const handleXLSXFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = e.target?.result;
+          const workbook = XLSX.read(data, { type: 'array' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const json = XLSX.utils.sheet_to_json(worksheet);
+          
+          const newMateriais = json.map((row: any, index: number) => ({
+            id: Date.now().toString() + index,
+            nome: row["Material/Equipamento"] || "",
+            modelo: row["Nome do Modelo"] || "",
+            marca: row["Marca"] || "",
+            quantidadePadrao: String(row["Quantidade Padrão"] || "0"),
+            quantidadeDisponivel: String(row["Quantidade Disponível"] || "0"),
+            dataValidade: row["Data de Validade"] || "",
+            observacoes: row["Observações"] || ""
+          }));
+
+          setMateriais(prev => [...prev, ...newMateriais]);
+          showSuccess(`${newMateriais.length} itens importados do XLSX.`);
+        } catch (err) {
+          showError("Erro ao processar o arquivo XLSX.");
+          console.error(err);
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const handleDownloadTemplate = () => {
+    const headers = [
+      "Material/Equipamento", 
+      "Nome do Modelo", 
+      "Marca", 
+      "Quantidade Padrão", 
+      "Quantidade Disponível", 
+      "Data de Validade", 
+      "Observações"
+    ];
+    const sampleRow = [
+      "Desfibrilador",
+      "HeartStart XL+",
+      "Philips",
+      "1",
+      "1",
+      "N/A",
+      "Localizado na Sala A"
+    ];
+    
+    const data = [headers, sampleRow];
+    
+    const worksheet = XLSX.utils.aoa_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Template");
+    XLSX.writeFile(workbook, "template_materiais.xlsx");
+  };
+
   if (loading) return <p>Carregando...</p>;
 
   return (
@@ -115,21 +178,31 @@ const Materiais = () => {
         <CardHeader>
           <CardTitle>Importar / Exportar</CardTitle>
           <CardDescription>
-            Importe um arquivo CSV para adicionar itens em massa. O arquivo deve conter as colunas: 
-            "Material/Equipamento", "Nome do Modelo", "Marca", "Quantidade Padrão", "Quantidade Disponível", "Data de Validade", "Observações".
+            Importe um arquivo XLSX ou CSV para adicionar itens em massa. Use o template para garantir a formatação correta.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex gap-4">
+        <CardContent className="flex flex-wrap gap-4">
+          <Button variant="outline" onClick={handleDownloadTemplate}>
+            <FileSpreadsheet className="w-4 h-4 mr-2" />
+            Baixar Template XLSX
+          </Button>
+          <Button asChild variant="outline">
+            <label htmlFor="xlsx-upload">
+              <Upload className="w-4 h-4 mr-2" />
+              Importar XLSX
+              <input type="file" id="xlsx-upload" accept=".xlsx, .xls" className="hidden" onChange={handleXLSXFileChange} />
+            </label>
+          </Button>
           <Button asChild variant="outline">
             <label htmlFor="csv-upload">
               <Upload className="w-4 h-4 mr-2" />
               Importar CSV
-              <input type="file" id="csv-upload" accept=".csv" className="hidden" onChange={handleFileChange} />
+              <input type="file" id="csv-upload" accept=".csv" className="hidden" onChange={handleCSVFileChange} />
             </label>
           </Button>
           <Button variant="outline" disabled>
             <Download className="w-4 h-4 mr-2" />
-            Exportar CSV
+            Exportar Inventário
           </Button>
         </CardContent>
       </Card>
