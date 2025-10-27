@@ -98,11 +98,11 @@ const Cenarios = () => {
   // Filtrar cenários com base no termo de busca
   const cenariosFiltrados = cenarios.filter(cenario => {
     const matchesSearch = searchTerm === "" || 
-      scenario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      scenario.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      scenario.palavrasChave.some(palavra => palavra.toLowerCase().includes(searchTerm.toLowerCase()));
+      cenario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cenario.autor.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cenario.palavrasChave.some(palavra => palavra.toLowerCase().includes(searchTerm.toLowerCase()));
     
-    const matchesTipo = filtroTipo === "todos" || scenario.tipo === filtroTipo;
+    const matchesTipo = filtroTipo === "todos" || cenario.tipo === filtroTipo;
     
     return matchesSearch && matchesTipo;
   });
@@ -238,22 +238,22 @@ const Cenarios = () => {
             </TableHeader>
             <TableBody>
               {cenariosFiltrados.map((cenario) => (
-                <TableRow key={scenario.id}>
-                  <TableCell className="font-medium">{scenario.nome}</TableCell>
-                  <TableCell>{scenario.autor}</TableCell>
-                  <TableCell>{scenario.dataCriacao}</TableCell>
+                <TableRow key={cenario.id}>
+                  <TableCell className="font-medium">{cenario.nome}</TableCell>
+                  <TableCell>{cenario.autor}</TableCell>
+                  <TableCell>{cenario.dataCriacao}</TableCell>
                   <TableCell>
-                    <Badge className={getStatusBadge(scenario.status)}>
-                      {scenario.status}
+                    <Badge className={getStatusBadge(cenario.status)}>
+                      {cenario.status}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge className={getTipoBadge(scenario.tipo)}>
-                      {scenario.tipo}
+                    <Badge className={getTipoBadge(cenario.tipo)}>
+                      {cenario.tipo}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {scenario.usouIA && (
+                    {cenario.usouIA && (
                       <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
                         ✨ IA
                       </Badge>
@@ -261,10 +261,10 @@ const Cenarios = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="outline" size="sm" onClick={() => handleVisualizar(scenario.id)}>
+                      <Button variant="outline" size="sm" onClick={() => handleVisualizar(cenario.id)}>
                         Visualizar
                       </Button>
-                      <Button variant="outline" size="sm" onClick={() => handleEditar(scenario.id)}>
+                      <Button variant="outline" size="sm" onClick={() => handleEditar(cenario.id)}>
                         Editar
                       </Button>
                     </div>

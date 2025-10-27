@@ -57,7 +57,10 @@ const TabNavigation = ({
 
   return (
     <div className="space-y-6">
-      <div className="grid w-full grid-cols-7">
+      <div 
+        className="grid w-full"
+        style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}
+      >
         {tabs.map((tab) => (
           <button
             key={tab.value}
