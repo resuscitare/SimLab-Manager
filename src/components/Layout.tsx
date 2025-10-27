@@ -227,17 +227,11 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
                   location.pathname === item.href
                     ? "bg-green-600 text-white font-semibold"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  location.pathname !== item.href && "hover:translate-x-1",
-                  "focus:outline-none focus:ring-2 focus:ring-sidebar-ring focus:ring-offset-2 focus:ring-offset-sidebar"
+                  location.pathname !== item.href && "hover:translate-x-1"
                 )}
               >
                 <item.icon className="h-4 w-4" />
                 <span>{item.title}</span>
-                {location.pathname === item.href && (
-                  <div className="ml-auto">
-                    <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
-                  </div>
-                )}
               </Link>
             )
           )}
