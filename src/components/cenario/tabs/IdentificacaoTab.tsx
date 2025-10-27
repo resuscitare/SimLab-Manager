@@ -21,7 +21,7 @@ const IdentificacaoTab = ({ scenarioData, handleScenarioDataChange }: Identifica
           <Eye className="h-5 w-5" />
           Identificação do Cenário
         </CardTitle>
-        <CardDescription>Informações básicas do cenário</CardDescription>
+        <CardDescription>Informações básicas para categorizar e identificar o cenário.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -47,6 +47,32 @@ const IdentificacaoTab = ({ scenarioData, handleScenarioDataChange }: Identifica
                 <SelectItem value="Ambos">Ambos</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="curso">Curso</Label>
+            <Select value={scenarioData.curso} onValueChange={(value) => handleScenarioDataChange('curso', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione o curso" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ACLS">ACLS</SelectItem>
+                <SelectItem value="BLS">BLS</SelectItem>
+                <SelectItem value="APH">APH</SelectItem>
+                <SelectItem value="PALS">PALS</SelectItem>
+                <SelectItem value="Outro">Outro</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="turma">Turma</Label>
+            <Input
+              id="turma"
+              value={scenarioData.turma}
+              onChange={(e) => handleScenarioDataChange('turma', e.target.value)}
+              placeholder="Ex: Turma de Março/2024"
+            />
           </div>
         </div>
 

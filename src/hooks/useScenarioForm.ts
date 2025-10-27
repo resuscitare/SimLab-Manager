@@ -24,6 +24,8 @@ export const useScenarioForm = () => {
 
   const [scenarioData, setScenarioData] = useState<ScenarioFormData>({
     title: "",
+    curso: "",
+    turma: "",
     patientName: "",
     patientAge: "",
     patientGender: "",
@@ -183,6 +185,8 @@ export const useScenarioForm = () => {
     const scenarioCompleto: Scenario = {
       id: Date.now().toString(),
       title: scenarioData.title,
+      curso: scenarioData.curso,
+      turma: scenarioData.turma,
       patientName: scenarioData.patientName,
       patientAge: scenarioData.patientAge,
       patientGender: scenarioData.patientGender,
@@ -225,6 +229,8 @@ export const useScenarioForm = () => {
       const scenario: Scenario = JSON.parse(salvo);
       setScenarioData({
         title: scenario.title,
+        curso: scenario.curso,
+        turma: scenario.turma,
         patientName: scenario.patientName,
         patientAge: scenario.patientAge,
         patientGender: scenario.patientGender,

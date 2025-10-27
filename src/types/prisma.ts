@@ -30,6 +30,8 @@ export interface EquipmentItem {
 export interface Scenario {
   id: string;
   title: string;
+  curso?: string;
+  turma?: string;
   patientName?: string;
   patientAge?: string;
   patientGender?: string;
@@ -260,6 +262,8 @@ export interface FrameFormData {
 
 export interface ScenarioFormData {
   title: string;
+  curso?: string;
+  turma?: string;
   patientName?: string;
   patientAge?: string;
   patientGender?: string;
