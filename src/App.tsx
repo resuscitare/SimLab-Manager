@@ -9,6 +9,7 @@ import Agendamentos from "./pages/Agendamentos";
 import NovoAgendamento from "./pages/NovoAgendamento";
 import Cenarios from "./pages/Cenarios";
 import NovoCenario from "./pages/NovoCenario";
+import NovoCenarioPrisma from "./pages/NovoCenarioPrisma";
 import Checklists from "./pages/Checklists";
 import NovoChecklist from "./pages/NovoChecklist";
 import EditarChecklist from "./pages/EditarChecklist";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/agendamentos/novo" element={<NovoAgendamento />} />
             <Route path="/cenarios" element={<Cenarios />} />
             <Route path="/cenarios/novo" element={<NovoCenario />} />
+            <Route path="/cenarios/novo-prisma" element={<NovoCenarioPrisma />} />
             <Route path="/checklists" element={<Checklists />} />
             <Route path="/checklists/novo" element={<NovoChecklist />} />
             <Route path="/checklists/editar/:id" element={<EditarChecklist />} />

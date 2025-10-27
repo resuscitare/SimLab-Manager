@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, Filter, FileText, Sparkles } from "lucide-react";
+import { Plus, Search, Filter, FileText, Sparkles, Database } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 
@@ -20,7 +20,8 @@ const Cenarios = () => {
       status: "Publicado",
       publicoAlvo: "Residentes de Medicina",
       palavrasChave: ["RCP", "Emergência", "Cardiologia"],
-      usouIA: true
+      usouIA: true,
+      tipo: "Prisma"
     },
     {
       id: 2,
@@ -30,7 +31,8 @@ const Cenarios = () => {
       status: "Publicado",
       publicoAlvo: "Enfermeiros",
       palavrasChave: ["IAM", "Cardiologia", "ECG"],
-      usouIA: true
+      usouIA: true,
+      tipo: "Tradicional"
     },
     {
       id: 3,
@@ -40,7 +42,8 @@ const Cenarios = () => {
       status: "Rascunho",
       publicoAlvo: "Pediatras",
       palavrasChave: ["Sepse", "Pediatria", "Antibioticoterapia"],
-      usouIA: false
+      usouIA: false,
+      tipo: "Prisma"
     },
     {
       id: 4,
@@ -50,7 +53,8 @@ const Cenarios = () => {
       status: "Publicado",
       publicoAlvo: "Médicos Emergencistas",
       palavrasChave: ["Trauma", "Emergência", "ATLS"],
-      usouIA: true
+      usouIA: true,
+      tipo: "Tradicional"
     }
   ];
 
@@ -60,6 +64,14 @@ const Cenarios = () => {
       "Rascunho": "bg-yellow-100 text-yellow-800"
     };
     return variants[status as keyof typeof variants] || "bg-gray-100 text-gray-800";
+  };
+
+  const getTipoBadge = (tipo: string) => {
+    const variants = {
+      "Prisma": "bg-blue-100 text-blue-800",
+      "Tradicional": "bg-purple-100 text-purple-800"
+    };
+    return variants[tipo as keyof typeof variants] || "bg-gray-100 text-gray-800";
   };
 
   return (
@@ -74,6 +86,10 @@ const Cenarios = () => {
             <Sparkles className="w-4 h-4 mr-2" />
             Assistente IA
           </Button>
+          <Button onClick={() => navigate("/cenarios/novo-prisma")}>
+            <Database className="w-4 h-4 mr-2" />
+            Novo Cenário Prisma
+          </Button>
           <Button onClick={() => navigate("/cenarios/novo")}>
             <Plus className="w-4 h-4 mr-2" />
             Novo Cenário
@@ -81,7 +97,7 @@ const Cenarios = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total de Cenários</CardTitle>
@@ -114,6 +130,17 @@ const Cenarios = () => {
             <p className="text-xs text-gray-500">Dos cenários usam IA</p>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Cenários Prisma</CardTitle>
+            <Database className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold">8</div>
+            <p className="text-xs text-gray-500">Com schema completo</p>
+          </CardContent>
+        </Card>
       </div>
 
       <Card>
@@ -139,7 +166,7 @@ const Cenarios = () => {
                 <TableHead>Nome do Cenário</TableHead>
                 <TableHead>Autor</TableHead>
                 <TableHead>Data</TableHead>
-                <TableHead>Público-Alvo</TableHead>
+                <TableHead>Tipo</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>IA</TableHead>
                 <TableHead>Ações</TableHead>
@@ -147,18 +174,22 @@ const Cenarios = () => {
             </TableHeader>
             <TableBody>
               {cenarios.map((cenario) => (
-                <TableRow key={cenario.id}>
-                  <TableCell className="font-medium">{cenario.nome}</TableCell>
-                  <TableCell>{cenario.autor}</TableCell>
-                  <TableCell>{cenario.dataCriacao}</TableCell>
-                  <TableCell>{cenario.publicoAlvo}</TableCell>
+                <TableRow key={scenario.id}>
+                  <TableCell className="font-medium">{scenario.nome}</TableCell>
+                  <TableCell>{scenario.autor}</TableCell>
+                  <TableCell>{scenario.dataCriacao}</TableCell>
                   <TableCell>
-                    <Badge className={getStatusBadge(cenario.status)}>
-                      {cenario.status}
+                    <Badge className={getTipoBadge(scenario.tipo)}>
+                      {scenario.tipo}
                     </Badge>
                   </TableCell>
                   <TableCell>
-                    {cenario.usouIA && (
+                    <Badge className={getStatusBadge(scenario.status)}>
+                      {scenario.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    {scenario.usouIA && (
                       <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
                         ✨ IA
                       </Badge>
