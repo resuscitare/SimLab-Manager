@@ -12,6 +12,8 @@ import { showError, showSuccess } from "@/utils/toast";
 import Papa from "papaparse";
 import * as XLSX from 'xlsx';
 import { isPast, differenceInDays } from 'date-fns';
+import { Local } from "@/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface MaterialItem {
   id: string;
@@ -30,6 +32,7 @@ type MaterialStatus = "Disponível" | "Estoque Baixo" | "Vencendo" | "Vencido";
 
 const Materiais = () => {
   const [materiais, setMateriais] = useState<MaterialItem[]>([]);
+  const [locais, setLocais] = useState<Local[]>([]);
   const [loading, setLoading] = useState(true);
   const [lab, setLab] = useState("CSR");
   const [sala, setSala] = useState("Sala 1");
@@ -41,8 +44,12 @@ const Materiais = () => {
       if (savedMateriais) {
         setMateriais(JSON.parse(savedMateriais));
       }
+      const savedLocais = localStorage.getItem('simlab_locais');
+      if (savedLocais) {
+        setLocais(JSON.parse(savedLocais));
+      }
     } catch (e) {
-      showError("Erro ao carregar materiais do inventário.");
+      showError("Erro ao carregar dados do inventário.");
     } finally {
       setLoading(false);
     }
@@ -179,7 +186,7 @@ const Materiais = () => {
       "1",
       "1",
       "N/A",
-      "Armário A, Gaveta 2",
+      "Laboratório Térreo > Sala 1 > Carrinho de Emergência 1 > Gaveta de Medicamentos",
       "Localizado na Sala A"
     ];
     
@@ -271,7 +278,26 @@ const Materiais = () => {
                         <div className="font-medium">{item.nome}</div>
                         <div className="text-xs text-muted-foreground">{item.marca} - {item.modelo}</div>
                       </TableCell>
-                      <TableCell><Input className="h-8" value={item.local} onChange={(e) => handleItemChange(item.id, 'local', e.target.value)} placeholder="Armário A, Gaveta B" /></TableCell>
+                      <TableCell>
+                        <Select
+                          value={item.local}
+                          onValueChange={(value) => handleItemChange(item.id, 'local', value)}
+                        >
+                          <SelectTrigger className="h-8">
+                            <SelectValue placeholder="Selecione um local" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {locais.map((local) => {
+                              const localString = `${local.laboratorio} > ${local.sala} > ${local.armario} > ${local.gaveta}`;
+                              return (
+                                <SelectItem key={local.id} value={localString}>
+                                  {localString}
+                                </SelectItem>
+                              );
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </TableCell>
                       <TableCell><Input className="h-8 w-20" type="number" value={item.quantidadeDisponivel} onChange={(e) => handleItemChange(item.id, 'quantidadeDisponivel', e.target.value)} /></TableCell>
                       <TableCell><Input className="h-8" type="date" value={item.dataValidade} onChange={(e) => handleItemChange(item.id, 'dataValidade', e.target.value)} /></TableCell>
                       <TableCell><Input className="h-8" value={item.codigo} onChange={(e) => handleItemChange(item.id, 'codigo', e.target.value)} placeholder="123456" /></TableCell>
