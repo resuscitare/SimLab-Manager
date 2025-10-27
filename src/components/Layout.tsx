@@ -16,7 +16,8 @@ import {
   Package,
   LogOut,
   User,
-  Settings
+  Settings,
+  Database
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -57,9 +58,14 @@ const sidebarItems = [
     icon: Sparkles
   },
   {
-    title: "Equipamentos",
+    title: "Status dos Equipamentos",
     href: "/equipamentos",
     icon: Package
+  },
+  {
+    title: "Gestão de Materiais",
+    href: "/materiais",
+    icon: Database
   },
   {
     title: "Instrutores",

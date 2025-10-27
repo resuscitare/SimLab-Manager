@@ -16,6 +16,7 @@ import NovoDebriefingTemplate from "./pages/NovoDebriefingTemplate";
 import EditarDebriefingTemplate from "./pages/EditarDebriefingTemplate";
 import AssistenteIA from "./pages/AssistenteIA";
 import Equipamentos from "./pages/Equipamentos";
+import Materiais from "./pages/Materiais";
 import Instrutores from "./pages/Instrutores";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/debriefing-templates/editar/:id" element={<EditarDebriefingTemplate />} />
             <Route path="/ia" element={<AssistenteIA />} />
             <Route path="/equipamentos" element={<Equipamentos />} />
+            <Route path="/materiais" element={<Materiais />} />
             <Route path="/instrutores" element={<Instrutores />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/login" element={<Login />} />
