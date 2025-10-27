@@ -292,25 +292,68 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
       <Card>
         <CardHeader>
           <CardTitle>Fase 5: Resumo/Aplicação (3-5 min)</CardTitle>
+          <CardDescription>Consolide o aprendizado e conecte a simulação à prática clínica real.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Label>Escolha a Abordagem de Resumo</Label>
-          <RadioGroup value={summaryApproach} onValueChange={setSummaryApproach}>
-            <div className="flex items-center space-x-2"><RadioGroupItem value="aprendiz" id="aprendiz" /><Label htmlFor="aprendiz">Centrado no Aprendiz (Recomendado)</Label></div>
-            <div className="flex items-center space-x-2"><RadioGroupItem value="instrutor" id="instrutor" /><Label htmlFor="instrutor">Centrado no Instrutor</Label></div>
-          </RadioGroup>
-          {summaryApproach === 'aprendiz' && (
-            <div className="p-4 border rounded-md mt-4 space-y-2">
-              <Label>Pergunta de Encerramento</Label>
-              <Textarea defaultValue="Gostaria de encerrar pedindo que cada um de vocês compartilhe um ou dois pontos-chave que levarão dessa experiência e que os ajudarão na prática clínica futura." />
-            </div>
-          )}
-          {summaryApproach === 'instrutor' && (
-            <div className="p-4 border rounded-md mt-4 space-y-2">
-              <Label>Pontos-Chave para Resumir</Label>
-              <Textarea placeholder="Resuma os 2-3 pontos mais importantes que foram discutidos e que se alinham com os objetivos de aprendizagem." />
-            </div>
-          )}
+        <CardContent className="space-y-6">
+          <div>
+            <Label className="font-semibold">Escolha a Abordagem de Resumo</Label>
+            <RadioGroup value={summaryApproach} onValueChange={setSummaryApproach} className="mt-2 space-y-4">
+              <div className="p-4 border rounded-lg has-[:checked]:bg-muted has-[:checked]:border-primary">
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="aprendiz" id="aprendiz" />
+                  <div className="grid gap-1.5 leading-none">
+                    <Label htmlFor="aprendiz" className="font-medium">
+                      A) Centrado no Aprendiz (Recomendado)
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Promove apropriação do aprendizado e reforça a reflexão.
+                    </p>
+                  </div>
+                </div>
+                {summaryApproach === 'aprendiz' && (
+                  <div className="mt-4 pl-8 space-y-2">
+                    <Label>Pergunta-chave de Encerramento</Label>
+                    <Textarea 
+                      defaultValue="Gostaria de encerrar pedindo que cada um de vocês compartilhe um ou dois pontos-chave que levarão dessa experiência e que os ajudarão na prática clínica futura." 
+                      rows={3}
+                    />
+                  </div>
+                )}
+              </div>
+              
+              <div className="p-4 border rounded-lg has-[:checked]:bg-muted has-[:checked]:border-primary">
+                <div className="flex items-center space-x-3">
+                  <RadioGroupItem value="instrutor" id="instrutor" />
+                  <div className="grid gap-1.5 leading-none">
+                    <Label htmlFor="instrutor" className="font-medium">
+                      B) Centrado no Instrutor
+                    </Label>
+                    <p className="text-sm text-muted-foreground">
+                      Garante que os pontos-chave sejam cobertos, útil com tempo curto.
+                    </p>
+                  </div>
+                </div>
+                {summaryApproach === 'instrutor' && (
+                  <div className="mt-4 pl-8 space-y-2">
+                    <Label>Pontos-Chave para Resumir (2-3 pontos)</Label>
+                    <Textarea 
+                      placeholder="1. A importância da comunicação em circuito fechado.&#10;2. O reconhecimento precoce dos sinais de choque.&#10;3. A administração correta da medicação X na dose Y." 
+                      rows={4}
+                    />
+                  </div>
+                )}
+              </div>
+            </RadioGroup>
+          </div>
+
+          <div className="pt-6 border-t">
+              <Label className="font-semibold">Frase de Encerramento Final</Label>
+              <Textarea 
+                  className="mt-2"
+                  placeholder="Ex: Obrigado a todos pela participação e pelo excelente trabalho em equipe. Continuem aplicando esses aprendizados."
+                  rows={2}
+              />
+          </div>
         </CardContent>
       </Card>
 
