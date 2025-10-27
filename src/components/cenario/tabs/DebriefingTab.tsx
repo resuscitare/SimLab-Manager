@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import DebriefingModelSelector from "components/cenario/debriefing/DebriefingModelSelector";
-import PearlsForm from "components/cenario/debriefing/PearlsForm";
+import DebriefingModelSelector from "@/components/cenario/debriefing/DebriefingModelSelector";
+import PearlsForm from "@/components/cenario/debriefing/PearlsForm";
 import { ScenarioFormData } from "@/types/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
