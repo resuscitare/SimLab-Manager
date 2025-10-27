@@ -39,3 +39,12 @@ export interface Sala {
   equipamentos: string[];
   disponivel: boolean;
 }
+
+export interface Local {
+  id: string;
+  laboratorio: string;
+  sala: string;
+  armario: string;
+  gaveta: string;
+  descricao: string;
+}

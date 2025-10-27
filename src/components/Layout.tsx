@@ -19,7 +19,8 @@ import {
   Settings,
   Database,
   Briefcase,
-  ChevronRight
+  ChevronRight,
+  Warehouse
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -64,6 +65,11 @@ const sidebarItems = [
     title: "Gestão",
     icon: Briefcase,
     subItems: [
+      {
+        title: "Locais",
+        href: "/locais",
+        icon: Warehouse
+      },
       {
         title: "Status dos Equipamentos",
         href: "/equipamentos",

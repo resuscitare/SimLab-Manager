@@ -18,6 +18,7 @@ import AssistenteIA from "./pages/AssistenteIA";
 import Equipamentos from "./pages/Equipamentos";
 import Materiais from "./pages/Materiais";
 import Instrutores from "./pages/Instrutores";
+import Locais from "./pages/Locais";
 import AdminDashboard from "./pages/AdminDashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="/equipamentos" element={<Equipamentos />} />
             <Route path="/materiais" element={<Materiais />} />
             <Route path="/instrutores" element={<Instrutores />} />
+            <Route path="/locais" element={<Locais />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/404" element={<NotFound />} />
