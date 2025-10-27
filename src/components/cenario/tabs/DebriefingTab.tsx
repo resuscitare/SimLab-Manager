@@ -1,43 +1,91 @@
 "use client";
 
-import { useState } from "react";
-import DebriefingModelSelector from "@/components/cenario/debriefing/DebriefingModelSelector";
-import PearlsForm from "@/components/cenario/debriefing/PearlsForm";
-import TeamGainsForm from "@/components/cenario/debriefing/TeamGainsForm";
-import ThreeDForm from "@/components/cenario/debriefing/ThreeDForm";
-import GasForm from "@/components/cenario/debriefing/GasForm";
-import { ScenarioFormData } from "@/types/prisma";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-
-type DebriefingModel = "PEARLS" | "TeamGAINS" | "3D" | "GAS" | null;
+import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Plus, MessageSquare } from "lucide-react";
+import { DebriefingTemplate } from "@/types/debriefing";
+import { ScenarioFormData } from "@/types/prisma";
+import { Label } from "@/components/ui/label";
 
 interface DebriefingTabProps {
   scenarioData: ScenarioFormData;
-  // onDebriefingChange: (data: any) => void;
+  // In a real app, we'd have a callback like this:
+  // onDebriefingTemplateSelect: (templateId: string) => void;
 }
 
 const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
-  const [selectedModel, setSelectedModel] = useState<DebriefingModel>(null);
+  const navigate = useNavigate();
+  const [templates, setTemplates] = useState<DebriefingTemplate[]>([]);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
-  const renderForm = () => {
-    switch (selectedModel) {
-      case "PEARLS":
-        return <PearlsForm scenarioData={scenarioData} />;
-      case "TeamGAINS":
-        return <TeamGainsForm scenarioData={scenarioData} />;
-      case "3D":
-        return <ThreeDForm scenarioData={scenarioData} />;
-      case "GAS":
-        return <GasForm scenarioData={scenarioData} />;
-      default:
-        return <DebriefingModelSelector onSelectModel={setSelectedModel} />;
+  useEffect(() => {
+    try {
+      const allItems = JSON.parse(localStorage.getItem('checklists') || '[]');
+      const debriefingTemplates = allItems.filter((item: any) => item.tipo === 'debriefing');
+      setTemplates(debriefingTemplates);
+    } catch (e) {
+      console.error("Failed to load debriefing templates", e);
     }
-  };
+  }, []);
+
+  const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
 
   return (
-    <div className="space-y-6">
-      {renderForm()}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <MessageSquare className="h-5 w-5" />
+          Plano de Debriefing
+        </CardTitle>
+        <CardDescription>
+          Associe um template de debriefing a este cenário ou crie um novo.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+          <div className="space-y-2">
+            <Label>Selecionar Template de Debriefing</Label>
+            <Select onValueChange={setSelectedTemplateId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Escolha um template existente..." />
+              </SelectTrigger>
+              <SelectContent>
+                {templates.map(template => (
+                  <SelectItem key={template.id} value={template.id}>
+                    {template.titulo} ({template.modelo})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <Button variant="outline" onClick={() => navigate("/debriefing-templates/novo")}>
+            <Plus className="w-4 h-4 mr-2" />
+            Criar Novo Template
+          </Button>
+        </div>
+
+        {selectedTemplate && (
+          <div className="p-4 border rounded-lg bg-muted">
+            <h4 className="font-semibold mb-2">Template Selecionado: {selectedTemplate.titulo}</h4>
+            <p className="text-sm text-muted-foreground">
+              <strong>Modelo:</strong> {selectedTemplate.modelo}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              <strong>Autor:</strong> {selectedTemplate.autor}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              <strong>Criado em:</strong> {selectedTemplate.dataCriacao}
+            </p>
+            <Button variant="link" className="p-0 h-auto mt-2" onClick={() => navigate(`/debriefing-templates/editar/${selectedTemplate.id}`)}>
+              Visualizar / Editar Template
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 

@@ -10,8 +10,10 @@ import NovoAgendamento from "./pages/NovoAgendamento";
 import Cenarios from "./pages/Cenarios";
 import NovoCenario from "./pages/NovoCenario";
 import Checklists from "./pages/Checklists";
-import NovoChecklist from "./pages/NovoChecklist";
-import EditarChecklist from "./pages/EditarChecklist";
+import NovoChecklist from "./pages/NovoChecklist"; // This will be for materials
+import EditarChecklist from "./pages/EditarChecklist"; // This will be for materials
+import NovoDebriefingTemplate from "./pages/NovoDebriefingTemplate";
+import EditarDebriefingTemplate from "./pages/EditarDebriefingTemplate";
 import AssistenteIA from "./pages/AssistenteIA";
 import Equipamentos from "./pages/Equipamentos";
 import Instrutores from "./pages/Instrutores";
@@ -35,8 +37,10 @@ const App = () => (
             <Route path="/cenarios" element={<Cenarios />} />
             <Route path="/cenarios/novo" element={<NovoCenario />} />
             <Route path="/checklists" element={<Checklists />} />
-            <Route path="/checklists/novo" element={<NovoChecklist />} />
-            <Route path="/checklists/editar/:id" element={<EditarChecklist />} />
+            <Route path="/checklists/materiais/novo" element={<NovoChecklist />} />
+            <Route path="/checklists/materiais/editar/:id" element={<EditarChecklist />} />
+            <Route path="/debriefing-templates/novo" element={<NovoDebriefingTemplate />} />
+            <Route path="/debriefing-templates/editar/:id" element={<EditarDebriefingTemplate />} />
             <Route path="/ia" element={<AssistenteIA />} />
             <Route path="/equipamentos" element={<Equipamentos />} />
             <Route path="/instrutores" element={<Instrutores />} />
