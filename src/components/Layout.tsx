@@ -52,11 +52,6 @@ const sidebarItems = [
     icon: FileText
   },
   {
-    title: "Checklists",
-    href: "/checklists",
-    icon: CheckSquare
-  },
-  {
     title: "Assistente IA",
     href: "/ia",
     icon: Sparkles
@@ -65,6 +60,11 @@ const sidebarItems = [
     title: "Gestão",
     icon: Briefcase,
     subItems: [
+      {
+        title: "Checklists",
+        href: "/checklists",
+        icon: CheckSquare
+      },
       {
         title: "Locais",
         href: "/locais",
