@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Scenario, Frame, ParameterSet, ScenarioFormData } from "@/types/prisma";
+import { Scenario, Frame, ParameterSet, ScenarioFormData, HistoricoMedico } from "@/types/prisma";
 
 export const useScenarioForm = () => {
   const [activeTab, setActiveTab] = useState("identificacao");
@@ -29,14 +29,43 @@ export const useScenarioForm = () => {
     patientGender: "",
     patientHeight: "",
     patientWeight: "",
+    perfilFisico: "",
+    perfilPsicologico: "",
+    perfilTecnico: "",
+    atualizadoEm: "",
+    historicoMedico: {
+      dm: false,
+      has: false,
+      asma: false,
+      alergias: false,
+      alergiasDesc: "",
+      etilismo: false,
+      tabagismo: false,
+      tabagismoDesc: "",
+      outros: false,
+      outrosDesc: "",
+    },
+    acompanhamentoMedico: "",
+    medicacoesEmUso: "",
+    cirurgiasAnteriores: "",
     scenarioOutline: "",
     learnerBrief: "",
     learningObjectives: [],
     equipmentList: []
   });
 
-  const handleScenarioDataChange = useCallback((field: string, value: any) => {
+  const handleScenarioDataChange = useCallback((field: keyof ScenarioFormData, value: any) => {
     setScenarioData(prev => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleHistoricoMedicoChange = useCallback((field: keyof HistoricoMedico, value: string | boolean) => {
+    setScenarioData(prev => ({
+      ...prev,
+      historicoMedico: {
+        ...prev.historicoMedico!,
+        [field]: value,
+      }
+    }));
   }, []);
 
   const handleFramesChange = useCallback((newFrames: Frame[]) => {
@@ -66,15 +95,15 @@ export const useScenarioForm = () => {
   const validarAba = useCallback((aba: string) => {
     switch (aba) {
       case "identificacao":
-        return !!(scenarioData.title && scenarioData.patientName && scenarioData.patientAge);
+        return !!(scenarioData.title);
       case "objetivos":
-        return scenarioData.learningObjectives.length >= 2;
+        return scenarioData.learningObjectives.length >= 1;
       case "paciente":
         return !!(scenarioData.patientName && scenarioData.patientAge && scenarioData.patientGender);
       case "frames":
-        return frames.length >= 3 && frames.filter(f => f.parameterSet).length >= 3;
+        return frames.length >= 1 && frames.every(f => f.title && f.parameterSet);
       case "materiais":
-        return scenarioData.equipmentList.length >= 3;
+        return scenarioData.equipmentList.length >= 1;
       default:
         return true;
     }
@@ -115,6 +144,14 @@ export const useScenarioForm = () => {
       patientGender: scenarioData.patientGender,
       patientHeight: scenarioData.patientHeight,
       patientWeight: scenarioData.patientWeight,
+      perfilFisico: scenarioData.perfilFisico,
+      perfilPsicologico: scenarioData.perfilPsicologico,
+      perfilTecnico: scenarioData.perfilTecnico,
+      atualizadoEm: scenarioData.atualizadoEm,
+      historicoMedico: scenarioData.historicoMedico,
+      acompanhamentoMedico: scenarioData.acompanhamentoMedico,
+      medicacoesEmUso: scenarioData.medicacoesEmUso,
+      cirurgiasAnteriores: scenarioData.cirurgiasAnteriores,
       scenarioOutline: scenarioData.scenarioOutline,
       learnerBrief: scenarioData.learnerBrief,
       learningObjectives: scenarioData.learningObjectives,
@@ -147,6 +184,14 @@ export const useScenarioForm = () => {
         patientGender: scenario.patientGender,
         patientHeight: scenario.patientHeight,
         patientWeight: scenario.patientWeight,
+        perfilFisico: scenario.perfilFisico,
+        perfilPsicologico: scenario.perfilPsicologico,
+        perfilTecnico: scenario.perfilTecnico,
+        atualizadoEm: scenario.atualizadoEm,
+        historicoMedico: scenario.historicoMedico,
+        acompanhamentoMedico: scenario.acompanhamentoMedico,
+        medicacoesEmUso: scenario.medicacoesEmUso,
+        cirurgiasAnteriores: scenario.cirurgiasAnteriores,
         scenarioOutline: scenario.scenarioOutline,
         learnerBrief: scenario.learnerBrief,
         learningObjectives: scenario.learningObjectives,
@@ -169,6 +214,7 @@ export const useScenarioForm = () => {
     
     // Handlers
     handleScenarioDataChange,
+    handleHistoricoMedicoChange,
     handleFramesChange,
     adicionarObjetivoAprendizagem,
     removerObjetivoAprendizagem,

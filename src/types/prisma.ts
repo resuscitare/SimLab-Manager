@@ -1,3 +1,16 @@
+export interface HistoricoMedico {
+  dm: boolean;
+  has: boolean;
+  asma: boolean;
+  alergias: boolean;
+  alergiasDesc?: string;
+  etilismo: boolean;
+  tabagismo: boolean;
+  tabagismoDesc?: string;
+  outros: boolean;
+  outrosDesc?: string;
+}
+
 export interface Scenario {
   id: string;
   title: string;
@@ -6,6 +19,14 @@ export interface Scenario {
   patientGender?: string;
   patientHeight?: string;
   patientWeight?: string;
+  perfilFisico?: string;
+  perfilPsicologico?: string;
+  perfilTecnico?: string;
+  atualizadoEm?: string;
+  historicoMedico?: HistoricoMedico;
+  acompanhamentoMedico?: string;
+  medicacoesEmUso?: string;
+  cirurgiasAnteriores?: string;
   scenarioOutline?: string;
   learnerBrief?: string;
   learningObjectives: string[];
@@ -226,6 +247,14 @@ export interface ScenarioFormData {
   patientGender?: string;
   patientHeight?: string;
   patientWeight?: string;
+  perfilFisico?: string;
+  perfilPsicologico?: string;
+  perfilTecnico?: string;
+  atualizadoEm?: string;
+  historicoMedico?: HistoricoMedico;
+  acompanhamentoMedico?: string;
+  medicacoesEmUso?: string;
+  cirurgiasAnteriores?: string;
   scenarioOutline?: string;
   learnerBrief?: string;
   learningObjectives: string[];
