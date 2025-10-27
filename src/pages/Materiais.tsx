@@ -13,7 +13,7 @@ import Papa from "papaparse";
 import * as XLSX from 'xlsx';
 import { isPast, differenceInDays } from 'date-fns';
 import { Local } from "@/types";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { LocationCombobox } from "@/components/LocationCombobox";
 
 interface MaterialItem {
   id: string;
@@ -279,24 +279,11 @@ const Materiais = () => {
                         <div className="text-xs text-muted-foreground">{item.marca} - {item.modelo}</div>
                       </TableCell>
                       <TableCell>
-                        <Select
+                        <LocationCombobox
+                          locais={locais}
                           value={item.local}
                           onValueChange={(value) => handleItemChange(item.id, 'local', value)}
-                        >
-                          <SelectTrigger className="h-8">
-                            <SelectValue placeholder="Selecione um local" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {locais.map((local) => {
-                              const localString = `${local.laboratorio} > ${local.sala} > ${local.armario} > ${local.gaveta}`;
-                              return (
-                                <SelectItem key={local.id} value={localString}>
-                                  {localString}
-                                </SelectItem>
-                              );
-                            })}
-                          </SelectContent>
-                        </Select>
+                        />
                       </TableCell>
                       <TableCell><Input className="h-8 w-20" type="number" value={item.quantidadeDisponivel} onChange={(e) => handleItemChange(item.id, 'quantidadeDisponivel', e.target.value)} /></TableCell>
                       <TableCell><Input className="h-8" type="date" value={item.dataValidade} onChange={(e) => handleItemChange(item.id, 'dataValidade', e.target.value)} /></TableCell>
