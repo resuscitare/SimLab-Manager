@@ -50,7 +50,9 @@ export const useScenarioForm = () => {
     cirurgiasAnteriores: "",
     scenarioOutline: "",
     learnerBrief: "",
-    learningObjectives: [],
+    smartObjectives: "",
+    technicalLearningObjectives: [],
+    nonTechnicalLearningObjectives: [],
     equipmentList: []
   });
 
@@ -72,15 +74,25 @@ export const useScenarioForm = () => {
     setFrames(newFrames);
   }, []);
 
-  const adicionarObjetivoAprendizagem = useCallback((objetivo: string) => {
-    if (objetivo.trim() && !scenarioData.learningObjectives.includes(objetivo.trim())) {
-      handleScenarioDataChange('learningObjectives', [...scenarioData.learningObjectives, objetivo.trim()]);
+  const adicionarObjetivoTecnico = useCallback((objetivo: string) => {
+    if (objetivo.trim() && !scenarioData.technicalLearningObjectives.includes(objetivo.trim())) {
+      handleScenarioDataChange('technicalLearningObjectives', [...scenarioData.technicalLearningObjectives, objetivo.trim()]);
     }
-  }, [scenarioData.learningObjectives, handleScenarioDataChange]);
+  }, [scenarioData.technicalLearningObjectives, handleScenarioDataChange]);
 
-  const removerObjetivoAprendizagem = useCallback((objetivo: string) => {
-    handleScenarioDataChange('learningObjectives', scenarioData.learningObjectives.filter(o => o !== objetivo));
-  }, [scenarioData.learningObjectives, handleScenarioDataChange]);
+  const removerObjetivoTecnico = useCallback((objetivo: string) => {
+    handleScenarioDataChange('technicalLearningObjectives', scenarioData.technicalLearningObjectives.filter(o => o !== objetivo));
+  }, [scenarioData.technicalLearningObjectives, handleScenarioDataChange]);
+
+  const adicionarObjetivoNaoTecnico = useCallback((objetivo: string) => {
+    if (objetivo.trim() && !scenarioData.nonTechnicalLearningObjectives.includes(objetivo.trim())) {
+      handleScenarioDataChange('nonTechnicalLearningObjectives', [...scenarioData.nonTechnicalLearningObjectives, objetivo.trim()]);
+    }
+  }, [scenarioData.nonTechnicalLearningObjectives, handleScenarioDataChange]);
+
+  const removerObjetivoNaoTecnico = useCallback((objetivo: string) => {
+    handleScenarioDataChange('nonTechnicalLearningObjectives', scenarioData.nonTechnicalLearningObjectives.filter(o => o !== objetivo));
+  }, [scenarioData.nonTechnicalLearningObjectives, handleScenarioDataChange]);
 
   const adicionarEquipamento = useCallback((equipamento: string) => {
     if (equipamento.trim() && !scenarioData.equipmentList.includes(equipamento.trim())) {
@@ -97,7 +109,7 @@ export const useScenarioForm = () => {
       case "identificacao":
         return !!(scenarioData.title);
       case "objetivos":
-        return scenarioData.learningObjectives.length >= 1;
+        return scenarioData.technicalLearningObjectives.length >= 1 || scenarioData.nonTechnicalLearningObjectives.length >= 1;
       case "paciente":
         return !!(scenarioData.patientName && scenarioData.patientAge && scenarioData.patientGender);
       case "frames":
@@ -154,7 +166,9 @@ export const useScenarioForm = () => {
       cirurgiasAnteriores: scenarioData.cirurgiasAnteriores,
       scenarioOutline: scenarioData.scenarioOutline,
       learnerBrief: scenarioData.learnerBrief,
-      learningObjectives: scenarioData.learningObjectives,
+      smartObjectives: scenarioData.smartObjectives,
+      technicalLearningObjectives: scenarioData.technicalLearningObjectives,
+      nonTechnicalLearningObjectives: scenarioData.nonTechnicalLearningObjectives,
       equipmentList: scenarioData.equipmentList,
       requiredResources: [],
       initialFrameId: frames[0]?.id,
@@ -194,7 +208,9 @@ export const useScenarioForm = () => {
         cirurgiasAnteriores: scenario.cirurgiasAnteriores,
         scenarioOutline: scenario.scenarioOutline,
         learnerBrief: scenario.learnerBrief,
-        learningObjectives: scenario.learningObjectives,
+        smartObjectives: scenario.smartObjectives,
+        technicalLearningObjectives: scenario.technicalLearningObjectives,
+        nonTechnicalLearningObjectives: scenario.nonTechnicalLearningObjectives,
         equipmentList: scenario.equipmentList
       });
       setFrames(scenario.frames);
@@ -216,8 +232,10 @@ export const useScenarioForm = () => {
     handleScenarioDataChange,
     handleHistoricoMedicoChange,
     handleFramesChange,
-    adicionarObjetivoAprendizagem,
-    removerObjetivoAprendizagem,
+    adicionarObjetivoTecnico,
+    removerObjetivoTecnico,
+    adicionarObjetivoNaoTecnico,
+    removerObjetivoNaoTecnico,
     adicionarEquipamento,
     removerEquipamento,
     salvarCenario,

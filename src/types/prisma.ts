@@ -29,7 +29,9 @@ export interface Scenario {
   cirurgiasAnteriores?: string;
   scenarioOutline?: string;
   learnerBrief?: string;
-  learningObjectives: string[];
+  smartObjectives?: string;
+  technicalLearningObjectives: string[];
+  nonTechnicalLearningObjectives: string[];
   equipmentList: string[];
   requiredResources: Resource[];
   initialFrameId?: string;
@@ -257,6 +259,8 @@ export interface ScenarioFormData {
   cirurgiasAnteriores?: string;
   scenarioOutline?: string;
   learnerBrief?: string;
-  learningObjectives: string[];
+  smartObjectives?: string;
+  technicalLearningObjectives: string[];
+  nonTechnicalLearningObjectives: string[];
   equipmentList: string[];
 }
