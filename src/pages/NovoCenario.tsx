@@ -3,11 +3,11 @@
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ProgramaTab from "@/components/cenario/ProgramaTab";
+import CenarioSMARTTab from "@/components/cenario/CenarioSMARTTab";
+import PacientePerfilTab from "@/components/cenario/PacientePerfilTab";
 import FramesTab from "@/components/cenario/FramesTab";
-import IdentificacaoTab from "@/components/cenario/IdentificacaoTab";
-import ObjetivosTab from "@/components/cenario/ObjetivosTab";
-import PacienteTab from "@/components/cenario/PacienteTab";
-import ChecklistTab from "@/components/cenario/ChecklistTab";
+import MateriaisDebriefingTab from "@/components/cenario/MateriaisDebriefingTab";
 import RevisaoTab from "@/components/cenario/RevisaoTab";
 import TabNavigation from "@/components/cenario/TabNavigation";
 import ScenarioHeader from "@/components/cenario/ScenarioHeader";
@@ -120,7 +120,7 @@ const NovoCenario = () => {
     <div className="p-6 space-y-6">
       <ScenarioHeader
         title="Novo Cenário"
-        description="Crie um novo cenário de simulação realística"
+        description="Crie um novo cenário de simulação realística seguindo o modelo estruturado"
         onCancel={() => navigate("/cenarios")}
         onSaveDraft={salvarRascunho}
       />
@@ -136,9 +136,9 @@ const NovoCenario = () => {
           canGoNext={canGoNext}
         />
 
-        {/* Aba Identificação */}
-        <TabsContent value="identificacao">
-          <IdentificacaoTab
+        {/* Aba Programa */}
+        <TabsContent value="programa">
+          <ProgramaTab
             formData={formData}
             palavrasChave={palavrasChave}
             novaPalavra={novaPalavra}
@@ -148,18 +148,17 @@ const NovoCenario = () => {
           />
         </TabsContent>
 
-        {/* Aba Objetivos */}
-        <TabsContent value="objetivos">
-          <ObjetivosTab
+        {/* Aba Cenário */}
+        <TabsContent value="cenario">
+          <CenarioSMARTTab
             formData={formData}
             onFormDataChange={handleFormDataChange}
-            onAISuggestion={(tipo) => handleAISuggestion(`objetivos_${tipo}`)}
           />
         </TabsContent>
 
         {/* Aba Paciente */}
         <TabsContent value="paciente">
-          <PacienteTab
+          <PacientePerfilTab
             formData={formData}
             onFormDataChange={handleFormDataChange}
             onAISuggestion={handleAISuggestion}
@@ -174,22 +173,20 @@ const NovoCenario = () => {
           />
         </TabsContent>
 
-        {/* Aba Materiais */}
+        {/* Aba Materiais e Debriefing */}
         <TabsContent value="materiais">
-          <ChecklistTab
-            tipo="materiais"
-            checklist={checklists.materiais}
-            onChecklistChange={(checklist) => handleChecklistChange('materiais', checklist)}
+          <MateriaisDebriefingTab
+            formData={formData}
+            onFormDataChange={handleFormDataChange}
+            onAISuggestion={handleAISuggestion}
           />
         </TabsContent>
 
         {/* Aba Debriefing */}
         <TabsContent value="debriefing">
-          <ChecklistTab
-            tipo="debriefing"
-            checklist={checklists.debriefing}
-            onChecklistChange={(checklist) => handleChecklistChange('debriefing', checklist)}
-          />
+          <div className="text-center py-8">
+            <p className="text-gray-500">Conteúdo específico do debriefing será implementado aqui</p>
+          </div>
         </TabsContent>
 
         {/* Aba Revisão */}
