@@ -4,6 +4,7 @@ import { useState } from "react";
 import DebriefingModelSelector from "@/components/cenario/debriefing/DebriefingModelSelector";
 import PearlsForm from "@/components/cenario/debriefing/PearlsForm";
 import TeamGainsForm from "@/components/cenario/debriefing/TeamGainsForm";
+import ThreeDForm from "@/components/cenario/debriefing/ThreeDForm";
 import { ScenarioFormData } from "@/types/prisma";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -24,7 +25,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
       case "TeamGAINS":
         return <TeamGainsForm scenarioData={scenarioData} />;
       case "3D":
-        return <Card><CardHeader><CardTitle>Em Breve</CardTitle><CardDescription>O formulário para o modelo 3D será adicionado em breve.</CardDescription></CardHeader></Card>;
+        return <ThreeDForm scenarioData={scenarioData} />;
       case "GAS":
         return <Card><CardHeader><CardTitle>Em Breve</CardTitle><CardDescription>O formulário para o modelo GAS será adicionado em breve.</CardDescription></CardHeader></Card>;
       default:
