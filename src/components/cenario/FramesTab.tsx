@@ -377,7 +377,7 @@ const FramesTab = ({ frames, onFramesChange }: FramesTabProps) => {
 
                   <Separator />
 
-                  {/* Sinais Vitais - RESTAURADOS */}
+                  {/* Sinais Vitais */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
                       <h4 className="font-medium flex items-center gap-2">
