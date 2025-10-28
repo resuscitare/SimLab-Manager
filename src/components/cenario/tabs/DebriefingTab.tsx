@@ -17,9 +17,14 @@ interface DebriefingTabProps {
 const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
   const [templates, setTemplates] = useState<DebriefingTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [templateCounter, setTemplateCounter] = useState(1);
 
   useEffect(() => {
     loadTemplates();
+    // Inicializar o contador baseado nos templates existentes
+    const existingTemplates = JSON.parse(localStorage.getItem('checklists') || '[]')
+      .filter((item: any) => item.tipo === 'debriefing');
+    setTemplateCounter(existingTemplates.length + 1);
   }, []);
 
   const loadTemplates = () => {
@@ -32,10 +37,14 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
     }
   };
 
+  const generateUniqueId = () => {
+    return `template-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
   const handleCreateNewTemplate = () => {
     const newTemplate: DebriefingTemplate = {
-      id: Date.now().toString(),
-      titulo: `Novo Template - ${new Date().toLocaleDateString()}`,
+      id: generateUniqueId(),
+      titulo: `Template de Debriefing ${templateCounter}`,
       tipo: "debriefing",
       modelo: "PEARLS" as DebriefingModelType,
       dados: {},
@@ -50,6 +59,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
       
       setTemplates([...templates, newTemplate]);
       setSelectedTemplateId(newTemplate.id);
+      setTemplateCounter(prev => prev + 1);
       
       showSuccess("Novo template criado com sucesso!");
     } catch (e) {
