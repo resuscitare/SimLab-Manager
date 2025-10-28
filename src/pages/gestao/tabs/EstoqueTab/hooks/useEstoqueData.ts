@@ -26,7 +26,7 @@ export const useEstoqueData = () => {
       const itensSalvos = localStorage.getItem('estoque_centro_custos');
       if (itensSalvos) {
         const itensParseados = JSON.parse(itensSalvos);
-        setItens(itensParseados.map(item => ({
+        setItens(itensParseados.map((item: any) => ({
           ...item,
           status: calcularStatus(item),
           valorTotal: item.quantidade * item.valorUnitario

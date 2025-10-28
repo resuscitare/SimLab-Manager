@@ -9,8 +9,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { LocationCombobox } from "@/components/LocationCombobox";
-import { EstoqueItem, Categoria, Local } from "../types";
+import { EstoqueItem, Categoria } from "../types";
 import { useEstoqueUtils } from "../hooks/useEstoqueUtils";
+import { Local } from "@/types";
 
 interface ItemDialogProps {
   isOpen: boolean;

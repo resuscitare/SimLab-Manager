@@ -3,43 +3,15 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  FileText, 
-  Download, 
-  Calendar,
-  BarChart3,
-  Eye,
-  Trash2,
-  Edit,
-  Copy,
-  Share,
-  TrendingUp,
-  TrendingDown,
-  CheckCircle,
-  AlertTriangle
-} from "lucide-react";
-import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Search, Plus, Edit, Trash2, Download, FileText, Calendar, Filter, BarChart3, PieChart, TrendingUp } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 
 interface Relatorio {
   id: string;
@@ -47,85 +19,34 @@ interface Relatorio {
   tipo: string;
   descricao: string;
   periodo: string;
-  dataGeracao: string;
   dataInicio: string;
   dataFim: string;
-  status: "rascunho" | "gerado" | "publicado" | "arquivado";
-  arquivo: string;
   formato: "pdf" | "excel" | "csv";
-  tamanho: string;
+  status: "rascunho" | "gerado" | "publicado" | "arquivado";
+  dataGeracao: string;
+  arquivo: string;
+  tamanho: number;
   geradoPor: string;
-  visualizacoes: number;
-  downloads: number;
-  categorias: string[];
   parametros: Record<string, any>;
-}
-
-interface TipoRelatorio {
-  id: string;
-  nome: string;
-  descricao: string;
-  cor: string;
-  icone: string;
 }
 
 const RelatoriosTab = () => {
   const [relatorios, setRelatorios] = useState<Relatorio[]>([]);
-  const [tiposRelatorios, setTiposRelatorios] = useState<TipoRelatorio[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [tipoFiltro, setTipoFiltro] = useState("todos");
   const [statusFiltro, setStatusFiltro] = useState("todos");
-  const [ordenacao, setOrdenacao] = useState("dataGeracao");
+  const [periodoFiltro, setPeriodoFiltro] = useState("todos");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [relatorioEditando, setRelatorioEditando] = useState<Relatorio | null>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [relatorioPreview, setRelatorioPreview] = useState<Relatorio | null>(null);
 
-  // Tipos de relatórios pré-definidos
-  const tiposRelatoriosPredefinidos: TipoRelatorio[] = [
-    {
-      id: "financeiro",
-      nome: "Financeiro",
-      descricao: "Relatórios financeiros e de custos",
-      cor: "bg-green-100 text-green-800",
-      icone: "dollar-sign"
-    },
-    {
-      id: "estoque",
-      nome: "Estoque",
-      descricao: "Relatórios de controle de estoque",
-      cor: "bg-blue-100 text-blue-800",
-      icone: "package"
-    },
-    {
-      id: "cursos",
-      nome: "Cursos",
-      descricao: "Relatórios de desempenho e avaliação de cursos",
-      cor: "bg-purple-100 text-purple-800",
-      icone: "users"
-    },
-    {
-      id: "utilizacao",
-      nome: "Utilização",
-      descricao: "Relatórios de utilização de recursos",
-      cor: "bg-orange-100 text-orange-800",
-      icone: "trending-up"
-    },
-    {
-      id: "qualidade",
-      nome: "Qualidade",
-      descricao: "Relatórios de qualidade e auditoria",
-      cor: "bg-red-100 text-red-800",
-      icone: "check-circle"
-    },
-    {
-      id: "personalizado",
-      nome: "Personalizado",
-      descricao: "Relatórios personalizados",
-      cor: "bg-gray-100 text-gray-800",
-      icone: "file-text"
-    }
+  const tiposRelatorio = [
+    { id: "estoque", nome: "Estoque", descricao: "Relatório de itens em estoque" },
+    { id: "cursos", nome: "Cursos", descricao: "Relatório de cursos e turmas" },
+    { id: "financeiro", nome: "Financeiro", descricao: "Relatório financeiro" },
+    { id: "alunos", nome: "Alunos", descricao: "Relatório de alunos" },
+    { id: "instrutores", nome: "Instrutores", descricao: "Relatório de instrutores" },
+    { id: "simulacoes", nome: "Simulações", descricao: "Relatório de simulações realizadas" },
   ];
 
   useEffect(() => {
@@ -134,73 +55,132 @@ const RelatoriosTab = () => {
 
   const carregarDados = () => {
     try {
-      // Carregar relatórios do localStorage
-      const relatoriosSalvos = localStorage.getItem('relatorios_centro_custos');
+      const relatoriosSalvos = localStorage.getItem('simlab_relatorios');
       if (relatoriosSalvos) {
-        const relatoriosParseados = JSON.parse(relatoriosSalvos);
-        setRelatorios(relatoriosParseados);
+        setRelatorios(JSON.parse(relatoriosSalvos));
       } else {
         // Dados mock para demonstração
         const relatoriosMock: Relatorio[] = [
           {
             id: "1",
-            nome: "Relatório Financeiro Mensal - Janeiro/2025",
-            tipo: "financeiro",
-            descricao: "Análise detalhada das finanças do centro de custos",
-            periodo: "Janeiro/2025",
-            dataGeracao: "2025-02-05",
-            dataInicio: "2025-01-01",
-            dataFim: "2025-01-31",
-            status: "publicado",
-            arquivo: "relatorio_financeiro_janeiro_2025.pdf",
+            nome: "Relatório de Estoque - Janeiro 2024",
+            tipo: "estoque",
+            descricao: "Relatório completo de itens em estoque no período",
+            periodo: "mensal",
+            dataInicio: "2024-01-01",
+            dataFim: "2024-01-31",
             formato: "pdf",
-            tamanho: "2.5 MB",
+            status: "gerado",
+            dataGeracao: "2024-02-01",
+            arquivo: "relatorio_estoque_janeiro_2024.pdf",
+            tamanho: 2048576,
             geradoPor: "João Silva",
-            visualizacoes: 45,
-            downloads: 23,
-            categorias: ["financeiro", "custos"],
             parametros: {
-              receitaTotal: 45000,
-              custosTotais: 38000,
-              margem: 7000,
-              desvioOrcamento: 8.5,
-              economiaPotencial: 15000
+              categoria: "todas",
+              status: "todos",
+              ordenacao: "nome"
             }
           },
           {
             id: "2",
-            nome: "Relatório de Estoque - Q1/2025",
-            tipo: "estoque",
-            descricao: "Análise completa do estoque e movimentações",
-            periodo: "Q1/2025",
-            dataGeracao: "2025-04-10",
-            dataInicio: "2025-01-01",
-            dataFim: "2025-03-31",
-            status: "publicado",
-            arquivo: "relatorio_estoque_q1_2025.xlsx",
+            nome: "Relatório de Cursos - Q1 2024",
+            tipo: "cursos",
+            descricao: "Relatório trimestral de cursos realizados",
+            periodo: "trimestral",
+            dataInicio: "2024-01-01",
+            dataFim: "2024-03-31",
             formato: "excel",
-            tamanho: "1.8 MB",
+            status: "publicado",
+            dataGeracao: "2024-04-05",
+            arquivo: "relatorio_cursos_q1_2024.xlsx",
+            tamanho: 3145728,
             geradoPor: "Maria Santos",
-            visualizacoes: 67,
-            downloads: 34,
-            categorias: ["estoque", "movimentacoes"],
             parametros: {
-              valorTotal: 125000,
-              itensCriticos: 3,
-              taxaRotatividade: 12.5,
-              tempoMedioPermanencia: 45
+              categoria: "todas",
+              status: "concluido",
+              incluir_alunos: true
             }
           }
         ];
         setRelatorios(relatoriosMock);
       }
-
-      setTiposRelatorios(tiposRelatoriosPredefinidos);
       setLoading(false);
     } catch (error) {
       console.error("Erro ao carregar dados:", error);
       showError("Erro ao carregar dados dos relatórios");
       setLoading(false);
+    }
+  };
+
+  const relatoriosFiltrados = relatorios.filter(relatorio => {
+    const matchSearch = relatorio.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                       relatorio.descricao.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchTipo = tipoFiltro === "todos" || relatorio.tipo === tipoFiltro;
+    const matchStatus = statusFiltro === "todos" || relatorio.status === statusFiltro;
+    const matchPeriodo = periodoFiltro === "todos" || relatorio.periodo === periodoFiltro;
+    
+    return matchSearch && matchTipo && matchStatus && matchPeriodo;
+  });
+
+  const estatisticas = {
+    total: relatorios.length,
+    rascunho: relatorios.filter(r => r.status === "rascunho").length,
+    gerados: relatorios.filter(r => r.status === "gerado").length,
+    publicados: relatorios.filter(r => r.status === "publicado").length,
+    arquivados: relatorios.filter(r => r.status === "arquivado").length
+  };
+
+  const handleSalvarRelatorio = (relatorio: Relatorio) => {
+    try {
+      const relatoriosAtualizados = relatorios.map(r => r.id === relatorio.id ? relatorio : r);
+      if (!relatorio.id) {
+        relatoriosAtualizados.push({ ...relatorio, id: Date.now().toString() });
+      }
+      setRelatorios(relatoriosAtualizados);
+      localStorage.setItem('simlab_relatorios', JSON.stringify(relatoriosAtualizados));
+      showSuccess("Relatório salvo com sucesso!");
+      setIsDialogOpen(false);
+      setRelatorioEditando(null);
+    } catch (error) {
+      showError("Erro ao salvar relatório");
+    }
+  };
+
+  const handleExcluirRelatorio = (id: string) => {
+    try {
+      const relatoriosAtualizados = relatorios.filter(r => r.id !== id);
+      setRelatorios(relatoriosAtualizados);
+      localStorage.setItem('simlab_relatorios', JSON.stringify(relatoriosAtualizados));
+      showSuccess("Relatório excluído com sucesso!");
+    } catch (error) {
+      showError("Erro ao excluir relatório");
+    }
+  };
+
+  const handleGerarRelatorio = (relatorio: Relatorio) => {
+    try {
+      const relatorioAtualizado = {
+        ...relatorio,
+        status: "gerado" as const,
+        dataGeracao: new Date().toISOString().split('T')[0],
+        arquivo: `${relatorio.nome.toLowerCase().replace(/\s+/g, '_')}_${Date.now()}.${relatorio.formato}`,
+        tamanho: Math.floor(Math.random() * 5000000) + 1000000
+      };
+      handleSalvarRelatorio(relatorioAtualizado);
+    } catch (error) {
+      showError("Erro ao gerar relatório");
+    }
+  };
+
+  const handlePublicarRelatorio = (relatorio: Relatorio) => {
+    try {
+      const relatorioAtualizado = {
+        ...relatorio,
+        status: "publicado" as const
+      };
+      handleSalvarRelatorio(relatorioAtualizado);
+    } catch (error) {
+      showError("Erro ao publicar relatório");
     }
   };
 
@@ -214,21 +194,6 @@ const RelatoriosTab = () => {
     return variants[status as keyof typeof variants] || "bg-gray-100 text-gray-800";
   };
 
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case "rascunho":
-        return <FileText className="h-4 w-4 text-gray-600" />;
-      case "gerado":
-        return <CheckCircle className="h-4 w-4 text-blue-600" />;
-      case "publicado":
-        return <CheckCircle className="h-4 w-4 text-green-600" />;
-      case "arquivado":
-        return <AlertTriangle className="h-4 w-4 text-yellow-600" />;
-      default:
-        return null;
-    }
-  };
-
   const getStatusText = (status: string) => {
     const textos = {
       rascunho: "Rascunho",
@@ -239,238 +204,12 @@ const RelatoriosTab = () => {
     return textos[status as keyof typeof textos] || status;
   };
 
-  const getFormatoIcon = (formato: string) => {
-    switch (formato) {
-      case "pdf":
-        return <FileText className="h-4 w-4 text-red-600" />;
-      case "excel":
-        return <BarChart3 className="h-4 w-4 text-green-600" />;
-      case "csv":
-        return <FileText className="h-4 w-4 text-blue-600" />;
-      default:
-        return <FileText className="h-4 w-4 text-gray-600" />;
-    }
-  };
-
-  const relatoriosFiltrados = relatorios.filter(relatorio => {
-    const matchSearch = relatorio.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         relatorio.descricao.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchTipo = tipoFiltro === "todos" || relatorio.tipo === tipoFiltro;
-    const matchStatus = statusFiltro === "todos" || relatorio.status === statusFiltro;
-    
-    return matchSearch && matchTipo && matchStatus;
-  });
-
-  const relatoriosOrdenados = [...relatoriosFiltrados].sort((a, b) => {
-    switch (ordenacao) {
-      case "nome":
-        return a.nome.localeCompare(b.nome);
-      case "dataGeracao":
-        return new Date(b.dataGeracao).getTime() - new Date(a.dataGeracao).getTime();
-      case "visualizacoes":
-        return b.visualizacoes - a.visualizacoes;
-      case "downloads":
-        return b.downloads - a.downloads;
-      default:
-        return 0;
-    }
-  });
-
-  const estatisticas = {
-    total: relatorios.length,
-    rascunho: relatorios.filter(r => r.status === "rascunho").length,
-    gerados: relatorios.filter(r => r.status === "gerado").length,
-    publicados: relatorios.filter(r => r.status === "publicado").length,
-    arquivados: relatorios.filter(r => r.status === "arquivado").length,
-    totalVisualizacoes: relatorios.reduce((acc, relatorio) => acc + relatorio.visualizacoes, 0),
-    totalDownloads: relatorios.reduce((acc, relatorio) => acc + relatorio.downloads, 0),
-    tipos: tiposRelatorios.map(tipo => ({
-      ...tipo,
-      quantidade: relatorios.filter(r => r.tipo === tipo.id).length
-    }))
-  };
-
-  const handleSalvarRelatorio = (relatorio: Relatorio) => {
-    try {
-      const relatoriosAtualizados = relatorios.map(r => r.id === relatorio.id ? relatorio : r);
-      setRelatorios(relatoriosAtualizados);
-      localStorage.setItem('relatorios_centro_custos', JSON.stringify(relatoriosAtualizados));
-      showSuccess("Relatório salvo com sucesso!");
-    } catch (error) {
-      showError("Erro ao salvar relatório");
-    }
-  };
-
-  const handleExcluirRelatorio = (id: string) => {
-    if (confirm("Tem certeza que deseja excluir este relatório?")) {
-      try {
-        const relatoriosAtualizados = relatorios.filter(r => r.id !== id);
-        setRelatorios(relatoriosAtualizados);
-        localStorage.setItem('relatorios_centro_custos', JSON.stringify(relatoriosAtualizados));
-        showSuccess("Relatório excluído com sucesso!");
-      } catch (error) {
-        showError("Erro ao excluir relatório");
-      }
-    }
-  };
-
-  const handleGerarRelatorio = (relatorio: Relatorio) => {
-    try {
-      // Marcar como gerado
-      const relatorioAtualizado = {
-        ...relatorio,
-        status: "gerado",
-        dataGeracao: format(new Date(), 'yyyy-MM-dd'),
-        arquivo: `relatorio_${relatorio.tipo}_${relatorio.periodo}_${format(new Date(), 'yyyy-MM-dd')}.${relatorio.formato}`
-      };
-      
-      handleSalvarRelatorio(relatorioAtualizado);
-    } catch (error) {
-      showError("Erro ao gerar relatório");
-    }
-  };
-
-  const handlePublicarRelatorio = (relatorio: Relatorio) => {
-    try {
-      // Marcar como publicado
-      const relatorioAtualizado = {
-        ...relatorio,
-        status: "publicado",
-        dataFim: format(new Date(), 'yyyy-MM-dd')
-      };
-      
-      handleSalvarRelatorio(relatorioAtualizado);
-    } catch (error) {
-      showError("Erro ao publicar relatório");
-    }
-  };
-
-  const handleDownloadRelatorio = (relatorio: Relatorio) => {
-    try {
-      // Simular download do arquivo
-      const link = document.createElement('a');
-      link.href = '#'; // URL simulada
-      link.download = relatorio.arquivo;
-      link.click();
-      
-      // Incrementar contador de downloads
-      const relatoriosAtualizados = relatorios.map(r => 
-        r.id === relatorio.id 
-          ? { ...r, downloads: r.downloads + 1 }
-          : r
-      );
-      setRelatorios(relatoriosAtualizados);
-      localStorage.setItem('relatorios_centro_custos', JSON.stringify(relatoriosAtualizados));
-      
-      showSuccess("Download iniciado!");
-    } catch (error) {
-      showError("Erro ao baixar arquivo");
-    }
-  };
-
-  const handleAbrirDialog = (relatorio?: Relatorio) => {
-    setRelatorioEditando(relatorio || null);
-    setIsDialogOpen(true);
-  };
-
-  const handleFecharDialog = () => {
-    setIsDialogOpen(false);
-    setRelatorioEditando(null);
-  };
-
-  const handleSalvarDialog = () => {
-    if (!relatorioEditando) return;
-
-    if (relatorioEditando.id) {
-      // Editar relatório existente
-      handleSalvarRelatorio(relatorioEditando);
-    } else {
-      // Criar novo relatório
-      const novoRelatorio: Relatorio = {
-        ...relatorioEditando,
-        id: Date.now().toString(),
-        status: "rascunho",
-        dataInicio: format(new Date(), 'yyyy-MM-dd'),
-        visualizacoes: 0,
-        downloads: 0,
-        categorias: [],
-        parametros: {}
-      };
-      handleSalvarRelatorio(novoRelatorio);
-    }
-
-    handleFecharDialog();
-  };
-
-  const handlePreviewRelatorio = (relatorio: Relatorio) => {
-    setRelatorioPreview(relatorio);
-    setIsPreviewOpen(true);
-  };
-
-  const handleFecharPreview = () => {
-    setIsPreviewOpen(false);
-    setRelatorioPreview(null);
-  };
-
-  const handleGerarRelatorioAutomatico = (tipo: string, periodo: string) => {
-    try {
-      // Gerar relatório automático com base nos dados atuais
-      const dadosAtuais = {
-        financeiro: {
-          receitaTotal: 45000,
-          custosTotais: 38000,
-          margem: 7000,
-          desvioOrcamento: 8.5,
-          economiaPotencial: 15000
-        },
-        estoque: {
-          valorTotal: 125000,
-          itensCriticos: 3,
-          taxaRotatividade: 12.5,
-          tempoMedioPermanencia: 45
-        },
-        cursos: {
-          totalCursos: 12,
-          cursosAtivos: 8,
-          taxaConclusao: 85,
-          notaMedia: 4.5,
-          satisfacaoAlunos: 4.2
-        },
-        utilizacao: {
-          taxaOcupacao: 78,
-          horasUtilizadas: 1560,
-          eficiencia: 85
-        }
-      };
-
-      const dadosRelatorio = dadosAtuais[tipo as keyof typeof dadosAtuais] || {};
-
-      const novoRelatorio: Relatorio = {
-        id: Date.now().toString(),
-        nome: `Relatório de ${tiposRelatorios.find(t => t.id === tipo)?.nome || tipo} - ${periodo}`,
-        tipo: tipo,
-        descricao: `Relatório automático de ${tiposRelatorios.find(t => t.id === tipo)?.descricao || tipo}`,
-        periodo: periodo,
-        dataGeracao: format(new Date(), 'yyyy-MM-dd'),
-        dataInicio: format(new Date(), 'yyyy-MM-dd'),
-        dataFim: format(new Date(), 'yyyy-MM-dd'),
-        status: "gerado",
-        arquivo: `relatorio_${tipo}_${periodo}_${format(new Date(), 'yyyy-MM-dd')}.pdf`,
-        formato: "pdf",
-        tamanho: "0 KB",
-        geradoPor: "Sistema Automático",
-        visualizacoes: 0,
-        downloads: 0,
-        categorias: [tipo],
-        parametros: dadosRelatorio
-      };
-
-      handleSalvarRelatorio(novoRelatorio);
-      showSuccess("Relatório gerado automaticamente com sucesso!");
-    } catch (error) {
-      showError("Erro ao gerar relatório automático");
-    }
+  const formatarTamanho = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
   };
 
   if (loading) {
@@ -484,7 +223,7 @@ const RelatoriosTab = () => {
 
   return (
     <div className="space-y-6">
-      {/* Cabeçalho com Estatísticas */}
+      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -493,60 +232,60 @@ const RelatoriosTab = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{estatisticas.total}</div>
-            <p className="text-xs text-gray-500">Relatórios gerados</p>
+            <p className="text-xs text-gray-500">Relatórios cadastrados</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Rascunhos</CardTitle>
+            <FileText className="h-4 w-4 text-gray-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-600">{estatisticas.rascunho}</div>
+            <p className="text-xs text-gray-500">Em elaboração</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Gerados</CardTitle>
+            <BarChart3 className="h-4 w-4 text-blue-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-blue-600">{estatisticas.gerados}</div>
+            <p className="text-xs text-gray-500">Prontos para download</p>
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Publicados</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{estatisticas.publicados}</div>
-            <p className="text-xs text-gray-500">Relatórios publicados</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Downloads</CardTitle>
-            <Download className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-purple-600">{estatisticas.totalDownloads}</div>
-            <p className="text-xs text-gray-500">Downloads realizados</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Visualizações</CardTitle>
-            <Eye className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{estatisticas.totalVisualizacoes}</div>
-            <p className="text-xs text-gray-500">Visualizações totais</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Taxa de Conclusão</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">85%</div>
-            <p className="text-xs text-gray-500">Média de conclusão</p>
+            <div className="text-2xl font-bold text-green-600">{estatisticas.publicados}</div>
+            <p className="text-xs text-gray-500">Disponíveis publicamente</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">Arquivados</CardTitle>
+            <PieChart className="h-4 w-4 text-yellow-600" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-yellow-600">{estatisticas.arquivados}</div>
+            <p className="text-xs text-gray-500">Arquivados</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Filtros e Ações */}
+      {/* Filters and Actions */}
       <Card>
         <CardHeader>
           <CardTitle>Filtros e Ações</CardTitle>
-          <CardDescription>Filtre e gere os relatórios do centro de custos</CardDescription>
+          <CardDescription>Filtre e gerencie os relatórios</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col lg:flex-row gap-4">
@@ -566,7 +305,7 @@ const RelatoriosTab = () => {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos os tipos</SelectItem>
-                {tiposRelatorios.map(tipo => (
+                {tiposRelatorio.map(tipo => (
                   <SelectItem key={tipo.id} value={tipo.id}>
                     {tipo.nome}
                   </SelectItem>
@@ -579,7 +318,7 @@ const RelatoriosTab = () => {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="todos">Todos os status</SelectItem>
+                <SelectItem value="todos">Todos</SelectItem>
                 <SelectItem value="rascunho">Rascunho</SelectItem>
                 <SelectItem value="gerado">Gerado</SelectItem>
                 <SelectItem value="publicado">Publicado</SelectItem>
@@ -587,115 +326,109 @@ const RelatoriosTab = () => {
               </SelectContent>
             </Select>
 
-            <Select value={ordenacao} onValueChange={setOrdenacao}>
+            <Select value={periodoFiltro} onValueChange={setPeriodoFiltro}>
               <SelectTrigger className="w-40">
-                <SelectValue placeholder="Ordenar por" />
+                <SelectValue placeholder="Período" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="nome">Nome</SelectItem>
-                <SelectItem value="dataGeracao">Data de Geração</SelectItem>
-                <SelectItem value="visualizacoes">Visualizações</SelectItem>
-                <SelectItem value="downloads">Downloads</SelectItem>
+                <SelectItem value="todos">Todos</SelectItem>
+                <SelectItem value="diario">Diário</SelectItem>
+                <SelectItem value="semanal">Semanal</SelectItem>
+                <SelectItem value="mensal">Mensal</SelectItem>
+                <SelectItem value="trimestral">Trimestral</SelectItem>
+                <SelectItem value="anual">Anual</SelectItem>
               </SelectContent>
             </Select>
 
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => handleGerarRelatorioAutomatico("financeiro", "Janeiro/2025")}>
-                <FileText className="h-4 w-4 mr-2" />
-                Gerar Relatório Financeiro
-              </Button>
-              <Button variant="outline" onClick={() => handleGerarRelatorioAutomatico("estoque", "Q1/2025")}>
-                <FileText className="h-4 w-4 mr-2" />
-                Gerar Relatório de Estoque
-              </Button>
-              <Button variant="outline" onClick={() => handleGerarRelatorioAutomatico("cursos", "Anual 2025")}>
-                <FileText className="h-4 w-4 mr-2" />
-                Gerar Relatório de Cursos
-              </Button>
-              <Button onClick={() => handleAbrirDialog()}>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Relatório
-              </Button>
-            </div>
+            <Button onClick={() => setIsDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Relatório
+            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Tabela de Relatórios */}
+      {/* Reports Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Relatórios Gerados</CardTitle>
-          <CardDescription>Gerencie todos os relatórios do centro de custos</CardDescription>
+          <CardTitle>Relatórios</CardTitle>
+          <CardDescription>Gerencie todos os relatórios do sistema</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="rounded-md border">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Tipo</TableHead>
                   <TableHead>Nome</TableHead>
+                  <TableHead>Tipo</TableHead>
                   <TableHead>Período</TableHead>
-                  <TableHead>Data Geração</TableHead>
                   <TableHead>Formato</TableHead>
-                  <TableHead>Visualizações</TableHead>
-                  <TableHead>Downloads</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Data Geração</TableHead>
+                  <TableHead>Tamanho</TableHead>
                   <TableHead>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {relatoriosOrdenados.map((relatorio) => (
+                {relatoriosFiltrados.map((relatorio) => (
                   <TableRow key={relatorio.id}>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getStatusIcon(relatorio.status)}
-                        <Badge className={getStatusBadge(relatorio.status)}>
-                          {getStatusText(relatorio.status)}
-                        </Badge>
+                      <div>
+                        <div className="font-medium">{relatorio.nome}</div>
+                        <div className="text-sm text-gray-500 truncate max-w-xs">{relatorio.descricao}</div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className="bg-gray-50">
-                        {tiposRelatorios.find(tipo => tipo.id === relatorio.tipo)?.nome || relatorio.tipo}
+                        {tiposRelatorio.find(t => t.id === relatorio.tipo)?.nome || relatorio.tipo}
                       </Badge>
                     </TableCell>
-                    <TableCell className="font-medium">{relatorio.nome}</TableCell>
-                    <TableCell>{relatorio.periodo}</TableCell>
-                    <TableCell>{format(new Date(relatorio.dataGeracao), 'dd/MM/yyyy')}</TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getFormatoIcon(relatorio.formato)}
-                        <span className="text-xs text-gray-500">
-                          {relatorio.formato.toUpperCase()}
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4 text-gray-500" />
+                        <span className="text-sm">
+                          {new Date(relatorio.dataInicio).toLocaleDateString('pt-BR')} - {new Date(relatorio.dataFim).toLocaleDateString('pt-BR')}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm text-gray-500">
-                          {relatorio.visualizacoes}
-                        </span>
-                      </div>
+                      <Badge variant="outline">
+                        {relatorio.formato.toUpperCase()}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Badge className={getStatusBadge(relatorio.status)}>
+                        {getStatusText(relatorio.status)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      {relatorio.dataGeracao ? new Date(relatorio.dataGeracao).toLocaleDateString('pt-BR') : '-'}
+                    </TableCell>
+                    <TableCell>
+                      {relatorio.tamanho ? formatarTamanho(relatorio.tamanho) : '-'}
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <Download className="h-4 w-4 text-purple-600" />
-                        <span className="text-sm text-gray-500">
-                          {relatorio.downloads}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" onClick={() => handlePreviewRelatorio(relatorio)}>
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleAbrirDialog(relatorio)}>
+                        {relatorio.status === "rascunho" && (
+                          <Button variant="ghost" size="sm" onClick={() => handleGerarRelatorio(relatorio)}>
+                            Gerar
+                          </Button>
+                        )}
+                        {relatorio.status === "gerado" && (
+                          <Button variant="ghost" size="sm" onClick={() => handlePublicarRelatorio(relatorio)}>
+                            Publicar
+                          </Button>
+                        )}
+                        {relatorio.status !== "rascunho" && (
+                          <Button variant="ghost" size="icon">
+                            <Download className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="icon" onClick={() => {
+                          setRelatorioEditando(relatorio);
+                          setIsDialogOpen(true);
+                        }}>
                           <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="icon" onClick={() => handleDownloadRelatorio(relatorio)}>
-                          <Download className="h-4 w-4" />
                         </Button>
                         <Button variant="ghost" size="icon" onClick={() => handleExcluirRelatorio(relatorio.id)} className="text-red-600">
                           <Trash2 className="h-4 w-4" />
@@ -710,15 +443,15 @@ const RelatoriosTab = () => {
         </CardContent>
       </Card>
 
-      {/* Dialog de Adicionar/Editar Relatório */}
+      {/* Add/Edit Report Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
               {relatorioEditando?.id ? "Editar Relatório" : "Novo Relatório"}
             </DialogTitle>
             <DialogDescription>
-              {relatorioEditando?.id ? "Edite as informações do relatório existente" : "Crie um novo relatório no centro de custos"}
+              {relatorioEditando?.id ? "Edite as informações do relatório existente" : "Cadastre um novo relatório"}
             </DialogDescription>
           </DialogHeader>
           
@@ -730,31 +463,18 @@ const RelatoriosTab = () => {
                   id="nome"
                   value={relatorioEditando?.nome || ""}
                   onChange={(e) => setRelatorioEditando(prev => prev ? { ...prev, nome: e.target.value } : null)}
-                  placeholder="Ex: Relatório Financeiro Mensal - Janeiro/2025"
+                  placeholder="Ex: Relatório de Estoque - Janeiro 2024"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="descricao">Descrição *</Label>
-                <Textarea
-                  id="descricao"
-                  value={relatorioEditando?.descricao || ""}
-                  onChange={(e) => setRelatorioEditando(prev => prev ? { ...prev, descricao: e.target.value } : null)}
-                  placeholder="Descreva o propósito e escopo do relatório"
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="tipo">Tipo de Relatório *</Label>
+                <Label htmlFor="tipo">Tipo *</Label>
                 <Select value={relatorioEditando?.tipo || ""} onValueChange={(value) => setRelatorioEditando(prev => prev ? { ...prev, tipo: value } : null)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione o tipo" />
                   </SelectTrigger>
                   <SelectContent>
-                    {tiposRelatorios.map(tipo => (
+                    {tiposRelatorio.map(tipo => (
                       <SelectItem key={tipo.id} value={tipo.id}>
                         {tipo.nome}
                       </SelectItem>
@@ -762,19 +482,36 @@ const RelatoriosTab = () => {
                   </SelectContent>
                 </Select>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="periodo">Período *</Label>
-                <Input
-                  id="periodo"
-                  value={relatorioEditando?.periodo || ""}
-                  onChange={(e) => setRelatorioEditando(prev => prev ? { ...prev, periodo: e.target.value } : null)}
-                  placeholder="Ex: Janeiro/2025, Q1/2025, Anual 2025"
-                />
-              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="descricao">Descrição *</Label>
+              <Textarea
+                id="descricao"
+                value={relatorioEditando?.descricao || ""}
+                onChange={(e) => setRelatorioEditando(prev => prev ? { ...prev, descricao: e.target.value } : null)}
+                placeholder="Descreva o relatório"
+                rows={3}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="periodo">Período *</Label>
+                <Select value={relatorioEditando?.periodo || ""} onValueChange={(value) => setRelatorioEditando(prev => prev ? { ...prev, periodo: value } : null)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="diario">Diário</SelectItem>
+                    <SelectItem value="semanal">Semanal</SelectItem>
+                    <SelectItem value="mensal">Mensal</SelectItem>
+                    <SelectItem value="trimestral">Trimestral</SelectItem>
+                    <SelectItem value="anual">Anual</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="dataInicio">Data Início *</Label>
                 <Input
@@ -782,7 +519,6 @@ const RelatoriosTab = () => {
                   type="date"
                   value={relatorioEditando?.dataInicio || ""}
                   onChange={(e) => setRelatorioEditando(prev => prev ? { ...prev, dataInicio: e.target.value } : null)}
-                  placeholder="DD/MM/AAAA"
                 />
               </div>
               
@@ -793,8 +529,38 @@ const RelatoriosTab = () => {
                   type="date"
                   value={relatorioEditando?.dataFim || ""}
                   onChange={(e) => setRelatorioEditando(prev => prev ? { ...prev, dataFim: e.target.value } : null)}
-                  placeholder="DD/MM/AAAA"
                 />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="formato">Formato *</Label>
+                <Select value={relatorioEditando?.formato || ""} onValueChange={(value) => setRelatorioEditando(prev => prev ? { ...prev, formato: value as any } : null)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o formato" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pdf">PDF</SelectItem>
+                    <SelectItem value="excel">Excel</SelectItem>
+                    <SelectItem value="csv">CSV</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="status">Status</Label>
+                <Select value={relatorioEditando?.status || ""} onValueChange={(value) => setRelatorioEditando(prev => prev ? { ...prev, status: value as any } : null)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="rascunho">Rascunho</SelectItem>
+                    <SelectItem value="gerado">Gerado</SelectItem>
+                    <SelectItem value="publicado">Publicado</SelectItem>
+                    <SelectItem value="arquivado">Arquivado</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
@@ -802,61 +568,28 @@ const RelatoriosTab = () => {
               <Label htmlFor="observacoes">Observações</Label>
               <Textarea
                 id="observacoes"
-                value={relatorioEditando?.observacoes || ""}
+                value={(relatorioEditando as any)?.observacoes || ""}
                 onChange={(e) => setRelatorioEditando(prev => prev ? { ...prev, observacoes: e.target.value } : null)}
                 placeholder="Observações adicionais sobre o relatório"
-                rows={4}
+                rows={3}
               />
             </div>
           </div>
 
           <div className="flex justify-end gap-2 px-6 py-4 border-t">
-            <Button variant="outline" onClick={handleFecharDialog}>
+            <Button variant="outline" onClick={() => {
+              setIsDialogOpen(false);
+              setRelatorioEditando(null);
+            }}>
               Cancelar
             </Button>
-            <Button onClick={handleSalvarDialog}>
-              {relatorioEditando?.id ? "Salvar Alterações" : "Criar Relatório"}
+            <Button onClick={() => {
+              if (relatorioEditando) {
+                handleSalvarRelatorio(relatorioEditando);
+              }
+            }}>
+              {relatorioEditando?.id ? "Salvar Alterações" : "Adicionar Relatório"}
             </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Dialog de Preview */}
-      <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Visualização Prévia</DialogTitle>
-            <DialogDescription>
-              Visualização do relatório em formato de relatório
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="text-lg font-semibold mb-2">Pré-visualização do Relatório</h4>
-              <p className="text-sm text-gray-600 mb-4">
-                <strong>Nome:</strong> {relatorioPreview?.nome || "Relatório Sem Título"}
-              </p>
-              <p className="text-sm text-gray-500">
-                <strong>Tipo:</strong> {relatorioPreview?.tipo || "Sem Tipo"}
-              </p>
-              <p className="text-sm text-gray-500">
-                <strong>Formato:</strong> {relatorioPreview?.formato?.toUpperCase() || "PDF"}
-              </p>
-              <p className="text-sm text-gray-500">
-                <strong>Tamanho:</strong> {relatorioPreview?.tamanho || "0 KB"}
-              </p>
-            </div>
-            
-            <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={handleFecharPreview}>
-                <Download className="h-4 w-4 mr-2" />
-                Baixar Relatório
-              </Button>
-              <Button variant="outline" onClick={handleFecharPreview}>
-                Fechar Preview
-              </Button>
-            </div>
           </div>
         </DialogContent>
       </Dialog>
