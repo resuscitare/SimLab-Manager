@@ -129,6 +129,10 @@ const EditarChecklist = () => {
     return null;
   }
 
+  // CORREÇÃO: Verificar se checklist.secoes existe antes de usar .length
+  const totalItens = checklist.secoes ? checklist.secoes.reduce((acc, secao) => 
+    acc + (secao.itens ? secao.itens.length : 0), 0) : 0;
+
   return (
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
@@ -167,13 +171,13 @@ const EditarChecklist = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">
-                {checklist.secoes.length}
+                {checklist.secoes ? checklist.secoes.length : 0}
               </div>
               <div className="text-sm text-blue-600">Seções</div>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">
-                {checklist.secoes.reduce((acc, secao) => acc + secao.itens.length, 0)}
+                {totalItens}
               </div>
               <div className="text-sm text-green-600">Itens</div>
             </div>
