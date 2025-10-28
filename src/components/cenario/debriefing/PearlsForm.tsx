@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ScenarioFormData } from "@/types/prisma";
-import { Plus, Info, Upload, Link as LinkIcon, Trash2 } from "lucide-react";
+import { Plus, Trash2, Info, Upload, Link as LinkIcon } from "lucide-react";
 
 interface PearlsFormProps {
   scenarioData: ScenarioFormData;
@@ -95,8 +95,12 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
         </CardHeader>
         <CardContent>
           <ul className="space-y-2">
-            {scenarioData.technicalLearningObjectives.map((obj, i) => <li key={`tech-${i}`} className="text-sm p-2 bg-muted rounded-md">{obj} (Técnico)</li>)}
-            {scenarioData.nonTechnicalLearningObjectives.map((obj, i) => <li key={`nontech-${i}`} className="text-sm p-2 bg-muted rounded-md">{obj} (Não Técnico)</li>)}
+            {scenarioData.technicalLearningObjectives.map((obj, i) => (
+              <li key={`tech-${i}`} className="text-sm p-2 bg-muted rounded-md">{obj} (Técnico)</li>
+            ))}
+            {scenarioData.nonTechnicalLearningObjectives.map((obj, i) => (
+              <li key={`nontech-${i}`} className="text-sm p-2 bg-muted rounded-md">{obj} (Não Técnico)</li>
+            ))}
           </ul>
         </CardContent>
       </Card>
@@ -233,14 +237,14 @@ const PearlsForm = ({ scenarioData }: PearlsFormProps) => {
                 <h5 className="font-medium text-sm">Etapa 1 - Explorar Lacunas de Performance</h5>
                 <p className="text-xs text-muted-foreground">Para cada objetivo, prepare sua observação (Advocacy) e sua pergunta (Inquiry).</p>
                 <Label>Observação (Advocacy):</Label>
-                <Textarea placeholder={`"Eu notei que..." / "Eu ouvi você dizer..." (Apreciação)\n"Eu gostei que..." (Preocupação)\n"Eu fiquei desconfortável porque..."`} rows={3}/>
+                <Textarea placeholder={`"Eu notei que..." / "Eu ouvi você dizer..." (Apreciação)\n"Eu gostai que..." (Preocupação)\n"Eu fiquei desconfortável porque..."`} rows={3}/>
                 <Label>Pergunta (Inquiry):</Label>
                 <Textarea placeholder={`"Como você vê isso?"\n"O que estava passando pela sua cabeça naquele momento?"`} rows={2}/>
               </div>
 
               <div className="p-3 border bg-background rounded-lg space-y-3">
                 <h5 className="font-medium text-sm">Etapa 2 - Compreender e Fechar Lacunas</h5>
-                <p className="text-xs text-muted-foreground">Use estas estruturas como guia durante a discussão.</p>
+                <p className="text-xs text-muted-foreground">Use estas estruturas como guia durante a discussion.</p>
                 <div className="space-y-1">
                   <Label className="text-xs">Clarificar:</Label>
                   <p className="text-sm p-2 bg-muted rounded-md">"Então o que estou ouvindo é que [lacuna de performance] estava relacionado a [frame/justificativa]..."</p>

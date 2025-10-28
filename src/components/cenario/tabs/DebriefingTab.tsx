@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, MessageSquare, Edit, Save, X, Trash2, ArrowRight, CheckCircle } from "lucide-react";
+import { Plus, MessageSquare, Edit, Save, X, Trash2, ArrowRight, CheckCircle, Copy } from "lucide-react";
 import { DebriefingTemplate, DebriefingModelType } from "@/types/debriefing";
 import { ScenarioFormData } from "@/types/prisma";
 import { Label } from "@/components/ui/label";
@@ -17,8 +17,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PearlsForm from "../debriefing/PearlsForm";
+import TeamGainsForm from "../debriefing/TeamGainsForm";
+import ThreeDForm from "../debriefing/ThreeDForm";
+import GasForm from "../debriefing/GasForm";
 
 interface DebriefingTabProps {
   scenarioData: ScenarioFormData;
@@ -29,6 +33,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<DebriefingModelType>("PEARLS");
   const [newTemplate, setNewTemplate] = useState<Partial<DebriefingTemplate>>({
     titulo: "",
     modelo: "PEARLS",
@@ -67,7 +72,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
   const handleStartCreating = () => {
     setNewTemplate({
       titulo: "",
-      modelo: "PEARLS",
+      modelo: selectedModel,
       dados: {
         descricao: "",
         duracao: "30",
@@ -91,6 +96,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
       const template = templates.find(t => t.id === selectedTemplateId);
       if (template) {
         setNewTemplate({ ...template });
+        setSelectedModel(template.modelo);
         setIsEditing(true);
         setIsCreating(false);
       }
@@ -131,7 +137,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
         id: isEditing ? newTemplate.id! : generateUniqueId(),
         titulo: newTemplate.titulo!,
         tipo: "debriefing",
-        modelo: newTemplate.modelo as DebriefingModelType || "PEARLS",
+        modelo: selectedModel,
         dados: newTemplate.dados || {
           descricao: "",
           duracao: "30",
@@ -204,6 +210,33 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
     }
   };
 
+  const handleDuplicateTemplate = () => {
+    if (!selectedTemplateId) return;
+    
+    const template = templates.find(t => t.id === selectedTemplateId);
+    if (template) {
+      const duplicatedTemplate: DebriefingTemplate = {
+        ...template,
+        id: generateUniqueId(),
+        titulo: `${template.titulo} (Cópia)`,
+        dataCriacao: new Date().toISOString().split('T')[0]
+      };
+
+      try {
+        const allItems = JSON.parse(localStorage.getItem('checklists') || '[]');
+        allItems.push(duplicatedTemplate);
+        localStorage.setItem('checklists', JSON.stringify(allItems));
+        
+        setTemplates(allItems.filter((item: any) => item.tipo === 'debriefing'));
+        setSelectedTemplateId(duplicatedTemplate.id);
+        
+        showSuccess("Template duplicado com sucesso!");
+      } catch (e) {
+        showError("Erro ao duplicar template.");
+      }
+    }
+  };
+
   const handleTemplateFieldChange = (field: string, value: any) => {
     setNewTemplate(prev => ({
       ...prev,
@@ -230,6 +263,21 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
     GAS: "Debriefings rápidos e objetivos (10-15 minutos). Modelo oficial da American Heart Association."
   };
 
+  const renderModelForm = () => {
+    switch (selectedModel) {
+      case "PEARLS":
+        return <PearlsForm scenarioData={scenarioData} />;
+      case "TeamGAINS":
+        return <TeamGainsForm scenarioData={scenarioData} />;
+      case "3D":
+        return <ThreeDForm scenarioData={scenarioData} />;
+      case "GAS":
+        return <GasForm scenarioData={scenarioData} />;
+      default:
+        return <PearlsForm scenarioData={scenarioData} />;
+    }
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -250,10 +298,23 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
                 <h3 className="font-semibold text-blue-800">Templates de Debriefing</h3>
                 <p className="text-sm text-blue-600">Selecione ou crie um template para este cenário</p>
               </div>
-              <Button onClick={handleStartCreating} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                Criar Novo Template
-              </Button>
+              <div className="flex gap-2">
+                <Select value={selectedModel} onValueChange={(value: DebriefingModelType) => setSelectedModel(value)}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PEARLS">PEARLS</SelectItem>
+                    <SelectItem value="TeamGAINS">TeamGAINS</SelectItem>
+                    <SelectItem value="3D">3D</SelectItem>
+                    <SelectItem value="GAS">GAS</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Button onClick={handleStartCreating} className="bg-blue-600 hover:bg-blue-700">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Criar Novo Template
+                </Button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
@@ -289,6 +350,10 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
                       <Edit className="w-4 h-4 mr-2" />
                       Editar
                     </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDuplicateTemplate}>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Duplicar
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleDeleteTemplate} className="text-red-600">
                       <Trash2 className="w-4 h-4 mr-2" />
                       Excluir
@@ -313,6 +378,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
                       <strong>Criado em:</strong> {selectedTemplate.dataCriacao}
                     </p>
                   </div>
+                  <Badge variant="secondary">{selectedTemplate.modelo}</Badge>
                 </div>
                 
                 {selectedTemplate.dados?.descricao && (
@@ -372,8 +438,8 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
                 <div className="space-y-2">
                   <Label htmlFor="template-model">Modelo de Debriefing</Label>
                   <Select 
-                    value={newTemplate.modelo || "PEARLS"} 
-                    onValueChange={(value) => handleTemplateFieldChange('modelo', value)}
+                    value={selectedModel} 
+                    onValueChange={(value: DebriefingModelType) => setSelectedModel(value)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -400,11 +466,17 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
               </div>
 
               <div className="p-4 bg-white rounded-lg">
-                <h5 className="font-medium mb-3">Modelo Selecionado: {newTemplate.modelo}</h5>
+                <h5 className="font-medium mb-3">Modelo Selecionado: {selectedModel}</h5>
                 <div className="flex items-start gap-3">
                   <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-gray-700">{modelDescriptions[newTemplate.modelo as DebriefingModelType]}</p>
+                  <p className="text-sm text-gray-700">{modelDescriptions[selectedModel]}</p>
                 </div>
+              </div>
+
+              {/* Formulário específico do modelo */}
+              <div className="pt-4 border-t">
+                <h5 className="font-medium mb-4">Configurações do Modelo {selectedModel}</h5>
+                {renderModelForm()}
               </div>
             </div>
           </div>
