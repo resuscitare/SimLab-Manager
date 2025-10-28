@@ -133,7 +133,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
   };
 
   const handleDataFieldChange = (field: string, value: any) => {
-    if (editingTemplate) {
+    if (editingTemplate && editingTemplate.dados) {
       setEditingTemplate(prev => ({
         ...prev,
         dados: {
@@ -190,7 +190,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
               <h4 className="font-semibold">Template Selecionado: {selectedTemplate.titulo}</h4>
               <Button variant="outline" size="sm" onClick={handleStartEditing}>
                 <Edit className="w-4 h-4 mr-1" />
-                Editar
+                Editar Template
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
