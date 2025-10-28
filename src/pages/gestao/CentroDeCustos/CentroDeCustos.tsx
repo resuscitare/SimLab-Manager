@@ -1,3 +1,1 @@
-categoria: "Equipamentos Médicos",
-            localizacao: "Sala de Emergência",
-            status: "ativo"
+// This file is a duplicate and should be deleted
