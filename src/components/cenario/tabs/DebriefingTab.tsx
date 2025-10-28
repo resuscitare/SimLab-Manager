@@ -5,9 +5,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, MessageSquare } from "lucide-react";
-import { DebriefingTemplate } from "@/types/debriefing";
+import { DebriefingTemplate, DebriefingModelType } from "@/types/debriefing";
 import { ScenarioFormData } from "@/types/prisma";
 import { Label } from "@/components/ui/label";
+import { showSuccess } from "@/utils/toast";
 
 interface DebriefingTabProps {
   scenarioData: ScenarioFormData;
@@ -18,6 +19,10 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
   useEffect(() => {
+    loadTemplates();
+  }, []);
+
+  const loadTemplates = () => {
     try {
       const allItems = JSON.parse(localStorage.getItem('checklists') || '[]');
       const debriefingTemplates = allItems.filter((item: any) => item.tipo === 'debriefing');
@@ -25,7 +30,32 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
     } catch (e) {
       console.error("Failed to load debriefing templates", e);
     }
-  }, []);
+  };
+
+  const handleCreateNewTemplate = () => {
+    const newTemplate: DebriefingTemplate = {
+      id: Date.now().toString(),
+      titulo: `Novo Template - ${new Date().toLocaleDateString()}`,
+      tipo: "debriefing",
+      modelo: "PEARLS" as DebriefingModelType,
+      dados: {},
+      autor: "Usuário",
+      dataCriacao: new Date().toISOString().split('T')[0]
+    };
+
+    try {
+      const allItems = JSON.parse(localStorage.getItem('checklists') || '[]');
+      allItems.push(newTemplate);
+      localStorage.setItem('checklists', JSON.stringify(allItems));
+      
+      setTemplates([...templates, newTemplate]);
+      setSelectedTemplateId(newTemplate.id);
+      
+      showSuccess("Novo template criado com sucesso!");
+    } catch (e) {
+      console.error("Erro ao criar template:", e);
+    }
+  };
 
   const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
 
@@ -44,7 +74,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
           <div className="space-y-2">
             <Label>Selecionar Template de Debriefing</Label>
-            <Select onValueChange={setSelectedTemplateId}>
+            <Select value={selectedTemplateId || ""} onValueChange={setSelectedTemplateId}>
               <SelectTrigger>
                 <SelectValue placeholder="Escolha um template existente..." />
               </SelectTrigger>
@@ -57,8 +87,8 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" onClick={() => console.log("Criar novo template de debriefing")}>
-            <Plus className="w-4 h-4 mr-2" />
+          <Button variant="outline" onClick={handleCreateNewTemplate}>
+            <Plus className="w-4 w-4 mr-2" />
             Criar Novo Template
           </Button>
         </div>
@@ -75,9 +105,14 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
             <p className="text-sm text-muted-foreground">
               <strong>Criado em:</strong> {selectedTemplate.dataCriacao}
             </p>
-            <Button variant="link" className="p-0 h-auto mt-2" onClick={() => console.log("Visualizar template")}>
-              Visualizar Template
-            </Button>
+          </div>
+        )}
+
+        {templates.length === 0 && (
+          <div className="p-4 border rounded-lg bg-blue-50">
+            <p className="text-sm text-blue-800">
+              Nenhum template de debriefing encontrado. Clique em "Criar Novo Template" para começar.
+            </p>
           </div>
         )}
       </CardContent>
