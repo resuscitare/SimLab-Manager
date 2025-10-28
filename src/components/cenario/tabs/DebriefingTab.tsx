@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,12 +11,9 @@ import { Label } from "@/components/ui/label";
 
 interface DebriefingTabProps {
   scenarioData: ScenarioFormData;
-  // In a real app, we'd have a callback like this:
-  // onDebriefingTemplateSelect: (templateId: string) => void;
 }
 
 const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
-  const navigate = useNavigate();
   const [templates, setTemplates] = useState<DebriefingTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
@@ -41,7 +37,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
           Plano de Debriefing
         </CardTitle>
         <CardDescription>
-          Associe um template de debriefing a este cenário ou crie um novo.
+          Associe um template de debriefing a este cenário.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -61,7 +57,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" onClick={() => navigate("/debriefing-templates/novo")}>
+          <Button variant="outline" onClick={() => console.log("Criar novo template de debriefing")}>
             <Plus className="w-4 h-4 mr-2" />
             Criar Novo Template
           </Button>
@@ -79,8 +75,8 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
             <p className="text-sm text-muted-foreground">
               <strong>Criado em:</strong> {selectedTemplate.dataCriacao}
             </p>
-            <Button variant="link" className="p-0 h-auto mt-2" onClick={() => navigate(`/debriefing-templates/editar/${selectedTemplate.id}`)}>
-              Visualizar / Editar Template
+            <Button variant="link" className="p-0 h-auto mt-2" onClick={() => console.log("Visualizar template")}>
+              Visualizar Template
             </Button>
           </div>
         )}
