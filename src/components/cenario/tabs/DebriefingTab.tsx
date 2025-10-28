@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, MessageSquare, Edit, Save, X, Trash2, ArrowRight } from "lucide-react";
+import { Plus, MessageSquare, Edit, Save, X, Trash2, ArrowRight, CheckCircle } from "lucide-react";
 import { DebriefingTemplate, DebriefingModelType } from "@/types/debriefing";
 import { ScenarioFormData } from "@/types/prisma";
 import { Label } from "@/components/ui/label";
@@ -18,24 +17,37 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Badge } from "@/components/ui/badge";
 
 interface DebriefingTabProps {
   scenarioData: ScenarioFormData;
 }
 
 const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
-  const navigate = useNavigate();
   const [templates, setTemplates] = useState<DebriefingTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
-  const [templateCounter, setTemplateCounter] = useState(1);
+  const [isCreating, setIsCreating] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [editingTemplate, setEditingTemplate] = useState<Partial<DebriefingTemplate> | null>(null);
+  const [newTemplate, setNewTemplate] = useState<Partial<DebriefingTemplate>>({
+    titulo: "",
+    modelo: "PEARLS",
+    dados: {
+      descricao: "",
+      duracao: "30",
+      nivelParticipantes: "graduacao",
+      objetivos: [],
+      momentosCriticos: [],
+      fasePreparacao: "",
+      faseReacao: "",
+      faseDescricao: "",
+      faseAnalise: "",
+      faseResumo: ""
+    }
+  });
 
   useEffect(() => {
     loadTemplates();
-    const existingTemplates = JSON.parse(localStorage.getItem('checklists') || '[]')
-      .filter((item: any) => item.tipo === 'debriefing');
-    setTemplateCounter(existingTemplates.length + 1);
   }, []);
 
   const loadTemplates = () => {
@@ -48,46 +60,126 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
     }
   };
 
-  const handleCreateNewTemplate = () => {
-    // Navegar para a página de criação de template, passando o ID do cenário atual
-    navigate(`/debriefing-templates/novo?fromScenario=true&scenarioId=new`);
+  const generateUniqueId = () => {
+    return `template-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  };
+
+  const handleStartCreating = () => {
+    setNewTemplate({
+      titulo: "",
+      modelo: "PEARLS",
+      dados: {
+        descricao: "",
+        duracao: "30",
+        nivelParticipantes: "graduacao",
+        objetivos: scenarioData.technicalLearningObjectives.concat(scenarioData.nonTechnicalLearningObjectives),
+        momentosCriticos: [],
+        fasePreparacao: "",
+        faseReacao: "",
+        faseDescricao: "",
+        faseAnalise: "",
+        faseResumo: ""
+      }
+    });
+    setIsCreating(true);
+    setIsEditing(false);
+    setSelectedTemplateId(null);
   };
 
   const handleStartEditing = () => {
     if (selectedTemplateId) {
       const template = templates.find(t => t.id === selectedTemplateId);
       if (template) {
-        setEditingTemplate({ ...template });
+        setNewTemplate({ ...template });
         setIsEditing(true);
+        setIsCreating(false);
       }
     }
   };
 
-  const handleCancelEditing = () => {
+  const handleCancel = () => {
+    setIsCreating(false);
     setIsEditing(false);
-    setEditingTemplate(null);
+    setNewTemplate({
+      titulo: "",
+      modelo: "PEARLS",
+      dados: {
+        descricao: "",
+        duracao: "30",
+        nivelParticipantes: "graduacao",
+        objetivos: [],
+        momentosCriticos: [],
+        fasePreparacao: "",
+        faseReacao: "",
+        faseDescricao: "",
+        faseAnalise: "",
+        faseResumo: ""
+      }
+    });
   };
 
   const handleSaveTemplate = () => {
-    if (!editingTemplate || !editingTemplate.id) {
-      showError("Nenhum template para salvar.");
+    if (!newTemplate.titulo?.trim()) {
+      showError("Por favor, dê um título ao template.");
       return;
     }
 
     try {
       const allItems = JSON.parse(localStorage.getItem('checklists') || '[]');
-      const index = allItems.findIndex((item: any) => item.id === editingTemplate.id);
       
-      if (index !== -1) {
-        allItems[index] = { ...allItems[index], ...editingTemplate };
-        localStorage.setItem('checklists', JSON.stringify(allItems));
-        
-        setTemplates(allItems.filter((item: any) => item.tipo === 'debriefing'));
-        setIsEditing(false);
-        setEditingTemplate(null);
-        
-        showSuccess("Template salvo com sucesso!");
+      const templateToSave: DebriefingTemplate = {
+        id: isEditing ? newTemplate.id! : generateUniqueId(),
+        titulo: newTemplate.titulo!,
+        tipo: "debriefing",
+        modelo: newTemplate.modelo as DebriefingModelType || "PEARLS",
+        dados: newTemplate.dados || {
+          descricao: "",
+          duracao: "30",
+          nivelParticipantes: "graduacao",
+          objetivos: [],
+          momentosCriticos: [],
+          fasePreparacao: "",
+          faseReacao: "",
+          faseDescricao: "",
+          faseAnalise: "",
+          faseResumo: ""
+        },
+        autor: "Usuário",
+        dataCriacao: new Date().toISOString().split('T')[0]
+      };
+
+      if (isEditing) {
+        const index = allItems.findIndex((item: any) => item.id === newTemplate.id);
+        if (index !== -1) {
+          allItems[index] = templateToSave;
+        }
+      } else {
+        allItems.push(templateToSave);
       }
+
+      localStorage.setItem('checklists', JSON.stringify(allItems));
+      setTemplates(allItems.filter((item: any) => item.tipo === 'debriefing'));
+      
+      setIsCreating(false);
+      setIsEditing(false);
+      setNewTemplate({
+        titulo: "",
+        modelo: "PEARLS",
+        dados: {
+          descricao: "",
+          duracao: "30",
+          nivelParticipantes: "graduacao",
+          objetivos: [],
+          momentosCriticos: [],
+          fasePreparacao: "",
+          faseReacao: "",
+          faseDescricao: "",
+          faseAnalise: "",
+          faseResumo: ""
+        }
+      });
+
+      showSuccess(isEditing ? "Template atualizado com sucesso!" : "Template criado com sucesso!");
     } catch (e) {
       showError("Erro ao salvar template.");
     }
@@ -113,27 +205,30 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
   };
 
   const handleTemplateFieldChange = (field: string, value: any) => {
-    if (editingTemplate) {
-      setEditingTemplate(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    }
+    setNewTemplate(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleDataFieldChange = (field: string, value: any) => {
-    if (editingTemplate && editingTemplate.dados) {
-      setEditingTemplate(prev => ({
-        ...prev,
-        dados: {
-          ...prev.dados,
-          [field]: value
-        }
-      }));
-    }
+    setNewTemplate(prev => ({
+      ...prev,
+      dados: {
+        ...prev.dados,
+        [field]: value
+      }
+    }));
   };
 
   const selectedTemplate = templates.find(t => t.id === selectedTemplateId);
+
+  const modelDescriptions = {
+    PEARLS: "Debriefings abrangentes com tempo adequado (20-30 minutos). 5 fases estruturadas com 3 opções de análise.",
+    TeamGAINS: "Focado em trabalho em equipe e dinâmica interprofissional. 6 fases incluindo prebriefing.",
+    "3D": "Para cenários emocionalmente intensos. 3 fases focadas em processamento emocional e cognitivo.",
+    GAS: "Debriefings rápidos e objetivos (10-15 minutos). Modelo oficial da American Heart Association."
+  };
 
   return (
     <Card>
@@ -143,104 +238,122 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
           Plano de Debriefing
         </CardTitle>
         <CardDescription>
-          Associe um template de debriefing a este cenário ou crie um novo
+          Crie e gerencie templates de debriefing para este cenário
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Cabeçalho com ações */}
-        <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
-          <div>
-            <h3 className="font-semibold text-blue-800">Templates de Debriefing</h3>
-            <p className="text-sm text-blue-600">Gerencie modelos pré-configurados para suas sessões</p>
-          </div>
-          <Button onClick={handleCreateNewTemplate} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="w-4 h-4 mr-2" />
-            Criar Novo Template
-            <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-          <div className="space-y-2">
-            <Label>Selecionar Template Existente</Label>
-            <Select 
-              value={selectedTemplateId || ""} 
-              onValueChange={setSelectedTemplateId}
-              disabled={isEditing}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Escolha um template existente..." />
-              </SelectTrigger>
-              <SelectContent>
-                {templates.map(template => (
-                  <SelectItem key={template.id} value={template.id}>
-                    {template.titulo} ({template.modelo})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          {selectedTemplateId && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" disabled={isEditing}>
-                  <Edit className="w-4 h-4 mr-2" />
-                  Ações do Template
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuItem onClick={handleStartEditing}>
-                  <Edit className="w-4 h-4 mr-2" />
-                  Editar
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={handleDeleteTemplate} className="text-red-600">
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  Excluir
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
-        </div>
-
-        {selectedTemplate && !isEditing && (
-          <div className="p-4 border rounded-lg bg-muted">
-            <div className="flex justify-between items-start mb-2">
+        {/* Modo de visualização */}
+        {!isCreating && !isEditing && (
+          <>
+            <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
               <div>
-                <h4 className="font-semibold">{selectedTemplate.titulo}</h4>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Modelo:</strong> {selectedTemplate.modelo}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Autor:</strong> {selectedTemplate.autor}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  <strong>Criado em:</strong> {selectedTemplate.dataCriacao}
-                </p>
+                <h3 className="font-semibold text-blue-800">Templates de Debriefing</h3>
+                <p className="text-sm text-blue-600">Selecione ou crie um template para este cenário</p>
               </div>
+              <Button onClick={handleStartCreating} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Criar Novo Template
+              </Button>
             </div>
-            
-            {selectedTemplate.dados?.descricao && (
-              <div className="mt-3 p-3 bg-white rounded-md">
-                <h5 className="font-medium text-sm mb-2">Descrição:</h5>
-                <p className="text-sm text-gray-700">{selectedTemplate.dados.descricao}</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+              <div className="space-y-2">
+                <Label>Selecionar Template Existente</Label>
+                <Select 
+                  value={selectedTemplateId || ""} 
+                  onValueChange={setSelectedTemplateId}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Escolha um template..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templates.map(template => (
+                      <SelectItem key={template.id} value={template.id}>
+                        {template.titulo} ({template.modelo})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {selectedTemplateId && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="outline">
+                      <Edit className="w-4 h-4 mr-2" />
+                      Ações
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onClick={handleStartEditing}>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleDeleteTemplate} className="text-red-600">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
+
+            {selectedTemplate && (
+              <div className="p-4 border rounded-lg bg-muted">
+                <div className="flex justify-between items-start mb-2">
+                  <div>
+                    <h4 className="font-semibold">{selectedTemplate.titulo}</h4>
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Modelo:</strong> {selectedTemplate.modelo}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Autor:</strong> {selectedTemplate.autor}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Criado em:</strong> {selectedTemplate.dataCriacao}
+                    </p>
+                  </div>
+                </div>
+                
+                {selectedTemplate.dados?.descricao && (
+                  <div className="mt-3 p-3 bg-white rounded-md">
+                    <h5 className="font-medium text-sm mb-2">Descrição:</h5>
+                    <p className="text-sm text-gray-700">{selectedTemplate.dados.descricao}</p>
+                  </div>
+                )}
               </div>
             )}
-          </div>
+
+            {templates.length === 0 && (
+              <div className="p-4 border rounded-lg bg-blue-50 text-center">
+                <MessageSquare className="h-8 w-8 text-blue-400 mx-auto mb-2" />
+                <p className="text-sm text-blue-800 mb-4">
+                  Nenhum template de debriefing encontrado.
+                </p>
+                <Button onClick={handleStartCreating} variant="outline">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Criar Primeiro Template
+                </Button>
+              </div>
+            )}
+          </>
         )}
 
-        {isEditing && editingTemplate && (
+        {/* Modo de criação/edição */}
+        {(isCreating || isEditing) && (
           <div className="p-4 border-2 border-blue-300 rounded-lg bg-blue-50">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="font-semibold text-blue-800">Editando Template</h4>
+              <h4 className="font-semibold text-blue-800">
+                {isCreating ? "Criando Novo Template" : "Editando Template"}
+              </h4>
               <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={handleCancelEditing}>
+                <Button variant="outline" size="sm" onClick={handleCancel}>
                   <X className="w-4 h-4 mr-1" />
                   Cancelar
                 </Button>
                 <Button size="sm" onClick={handleSaveTemplate}>
                   <Save className="w-4 h-4 mr-1" />
-                  Salvar
+                  {isCreating ? "Criar" : "Salvar"}
                 </Button>
               </div>
             </div>
@@ -248,18 +361,18 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="template-title">Título do Template</Label>
+                  <Label htmlFor="template-title">Título do Template *</Label>
                   <Input
                     id="template-title"
-                    value={editingTemplate.titulo || ""}
+                    value={newTemplate.titulo || ""}
                     onChange={(e) => handleTemplateFieldChange('titulo', e.target.value)}
-                    placeholder="Digite o título do template"
+                    placeholder="Ex: Debriefing Padrão para RCP"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="template-model">Modelo de Debriefing</Label>
                   <Select 
-                    value={editingTemplate.modelo || "PEARLS"} 
+                    value={newTemplate.modelo || "PEARLS"} 
                     onValueChange={(value) => handleTemplateFieldChange('modelo', value)}
                   >
                     <SelectTrigger>
@@ -279,26 +392,21 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
                 <Label htmlFor="template-description">Descrição</Label>
                 <Textarea
                   id="template-description"
-                  value={editingTemplate.dados?.descricao || ""}
+                  value={newTemplate.dados?.descricao || ""}
                   onChange={(e) => handleDataFieldChange('descricao', e.target.value)}
                   placeholder="Descreva o propósito deste template de debriefing..."
                   rows={3}
                 />
               </div>
-            </div>
-          </div>
-        )}
 
-        {templates.length === 0 && !isEditing && (
-          <div className="p-4 border rounded-lg bg-blue-50 text-center">
-            <MessageSquare className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-            <p className="text-sm text-blue-800 mb-4">
-              Nenhum template de debriefing encontrado.
-            </p>
-            <Button onClick={handleCreateNewTemplate} variant="outline">
-              <Plus className="w-4 h-4 mr-2" />
-              Criar Primeiro Template
-            </Button>
+              <div className="p-4 bg-white rounded-lg">
+                <h5 className="font-medium mb-3">Modelo Selecionado: {newTemplate.modelo}</h5>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">{modelDescriptions[newTemplate.modelo as DebriefingModelType]}</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </CardContent>

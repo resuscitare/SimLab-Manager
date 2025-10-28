@@ -12,7 +12,6 @@ import NovoCenario from "./pages/NovoCenario";
 import Checklists from "./pages/Checklists";
 import NovoChecklist from "./pages/NovoChecklist";
 import EditarChecklist from "./pages/EditarChecklist";
-import NovoDebriefingTemplate from "./pages/NovoDebriefingTemplate";
 import EditarDebriefingTemplate from "./pages/EditarDebriefingTemplate";
 import AssistenteIA from "./pages/AssistenteIA";
 import Equipamentos from "./pages/Equipamentos";
@@ -41,7 +40,6 @@ const App = () => (
             <Route path="/checklists" element={<Checklists />} />
             <Route path="/checklists/materiais/novo" element={<NovoChecklist />} />
             <Route path="/checklists/materiais/editar/:id" element={<EditarChecklist />} />
-            <Route path="/debriefing-templates/novo" element={<NovoDebriefingTemplate />} />
             <Route path="/debriefing-templates/editar/:id" element={<EditarDebriefingTemplate />} />
             <Route path="/ia" element={<AssistenteIA />} />
             <Route path="/equipamentos" element={<Equipamentos />} />
