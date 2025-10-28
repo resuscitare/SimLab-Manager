@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { Scenario, Frame, ScenarioFormData, HistoricoMedico, SmartObjectives, EquipmentItem } from "@/types/prisma";
+import { DebriefingTemplate } from "@/types/debriefing";
 
 export const useScenarioForm = () => {
   const [activeTab, setActiveTab] = useState("identificacao");
@@ -21,6 +22,7 @@ export const useScenarioForm = () => {
       updatedAt: new Date()
     }
   ]);
+  const [debriefingTemplate, setDebriefingTemplate] = useState<DebriefingTemplate | null>(null);
 
   const [scenarioData, setScenarioData] = useState<ScenarioFormData>({
     title: "",
@@ -73,7 +75,7 @@ export const useScenarioForm = () => {
       ...prev,
       historicoMedico: {
         ...prev.historicoMedico!,
-        [field]: value,
+        [field]: value
       }
     }));
   }, []);
@@ -82,8 +84,8 @@ export const useScenarioForm = () => {
     setScenarioData(prev => ({
       ...prev,
       smartObjectives: {
-        ...(prev.smartObjectives || {}),
-        [field]: value,
+        ...prev.smartObjectives!,
+        [field]: value
       }
     }));
   }, []);
@@ -93,94 +95,67 @@ export const useScenarioForm = () => {
   }, []);
 
   const adicionarObjetivoTecnico = useCallback((objetivo: string) => {
-    if (objetivo.trim() && !scenarioData.technicalLearningObjectives.includes(objetivo.trim())) {
-      handleScenarioDataChange('technicalLearningObjectives', [...scenarioData.technicalLearningObjectives, objetivo.trim()]);
-    }
-  }, [scenarioData.technicalLearningObjectives, handleScenarioDataChange]);
+    setScenarioData(prev => ({
+      ...prev,
+      technicalLearningObjectives: [...prev.technicalLearningObjectives, objetivo]
+    }));
+  }, []);
 
   const removerObjetivoTecnico = useCallback((objetivo: string) => {
-    handleScenarioDataChange('technicalLearningObjectives', scenarioData.technicalLearningObjectives.filter(o => o !== objetivo));
-  }, [scenarioData.technicalLearningObjectives, handleScenarioDataChange]);
+    setScenarioData(prev => ({
+      ...prev,
+      technicalLearningObjectives: prev.technicalLearningObjectives.filter(obj => obj !== objetivo)
+    }));
+  }, []);
 
   const adicionarObjetivoNaoTecnico = useCallback((objetivo: string) => {
-    if (objetivo.trim() && !scenarioData.nonTechnicalLearningObjectives.includes(objetivo.trim())) {
-      handleScenarioDataChange('nonTechnicalLearningObjectives', [...scenarioData.nonTechnicalLearningObjectives, objetivo.trim()]);
-    }
-  }, [scenarioData.nonTechnicalLearningObjectives, handleScenarioDataChange]);
+    setScenarioData(prev => ({
+      ...prev,
+      nonTechnicalLearningObjectives: [...prev.nonTechnicalLearningObjectives, objetivo]
+    }));
+  }, []);
 
   const removerObjetivoNaoTecnico = useCallback((objetivo: string) => {
-    handleScenarioDataChange('nonTechnicalLearningObjectives', scenarioData.nonTechnicalLearningObjectives.filter(o => o !== objetivo));
-  }, [scenarioData.nonTechnicalLearningObjectives, handleScenarioDataChange]);
+    setScenarioData(prev => ({
+      ...prev,
+      nonTechnicalLearningObjectives: prev.nonTechnicalLearningObjectives.filter(obj => obj !== objetivo)
+    }));
+  }, []);
 
   const addEquipmentItem = useCallback(() => {
     const newItem: EquipmentItem = {
       id: Date.now().toString(),
-      type: '',
-      modelName: '',
-      brand: '',
-      quantity: '1',
-      observations: ''
+      type: "",
+      modelName: "",
+      brand: "",
+      quantity: "1",
+      observations: ""
     };
-    handleScenarioDataChange('equipmentList', [...scenarioData.equipmentList, newItem]);
-  }, [scenarioData.equipmentList, handleScenarioDataChange]);
+    setScenarioData(prev => ({
+      ...prev,
+      equipmentList: [...prev.equipmentList, newItem]
+    }));
+  }, []);
 
   const updateEquipmentItem = useCallback((id: string, field: keyof EquipmentItem, value: string) => {
-    const updatedList = scenarioData.equipmentList.map(item => 
-      item.id === id ? { ...item, [field]: value } : item
-    );
-    handleScenarioDataChange('equipmentList', updatedList);
-  }, [scenarioData.equipmentList, handleScenarioDataChange]);
+    setScenarioData(prev => ({
+      ...prev,
+      equipmentList: prev.equipmentList.map(item => 
+        item.id === id ? { ...item, [field]: value } : item
+      )
+    }));
+  }, []);
 
   const removeEquipmentItem = useCallback((id: string) => {
-    const updatedList = scenarioData.equipmentList.filter(item => item.id !== id);
-    handleScenarioDataChange('equipmentList', updatedList);
-  }, [scenarioData.equipmentList, handleScenarioDataChange]);
-
-  const validarAba = useCallback((aba: string) => {
-    switch (aba) {
-      case "identificacao":
-        return !!(scenarioData.title);
-      case "objetivos":
-        return scenarioData.technicalLearningObjectives.length >= 1 || scenarioData.nonTechnicalLearningObjectives.length >= 1;
-      case "paciente":
-        return !!(scenarioData.patientName && scenarioData.patientAge && scenarioData.patientGender);
-      case "frames":
-        return frames.length >= 1 && frames.every(f => f.title && f.parameterSet);
-      case "materiais":
-        return scenarioData.equipmentList.length >= 1 && scenarioData.equipmentList.every(item => item.modelName.trim() !== '');
-      case "debriefing":
-        return true;
-      default:
-        return true;
-    }
-  }, [scenarioData, frames]);
-
-  const getTabStatus = useCallback((aba: string): "completo" | "ativo" | "incompleto" => {
-    if (validarAba(aba)) {
-      return "completo";
-    } else if (aba === activeTab) {
-      return "ativo";
-    } else {
-      return "incompleto";
-    }
-  }, [validarAba, activeTab]);
-
-  const getTabsConfig = useCallback(() => {
-    const tabs = [
-      { value: "identificacao", label: "Identificação" },
-      { value: "objetivos", label: "Objetivos" },
-      { value: "paciente", label: "Paciente" },
-      { value: "frames", label: "Frames" },
-      { value: "materiais", label: "Materiais" },
-      { value: "debriefing", label: "Debriefing" },
-      { value: "revisao", label: "Revisão" }
-    ];
-
-    return tabs.map(tab => ({
-      ...tab,
-      status: getTabStatus(tab.value)
+    setScenarioData(prev => ({
+      ...prev,
+      equipmentList: prev.equipmentList.filter(item => item.id !== id)
     }));
-  }, [getTabStatus]);
+  }, []);
+
+  const handleDebriefingTemplateChange = useCallback((template: DebriefingTemplate | null) => {
+    setDebriefingTemplate(template);
+  }, []);
 
   const salvarCenario = useCallback(() => {
     const scenarioCompleto: Scenario = {
@@ -216,44 +191,34 @@ export const useScenarioForm = () => {
       updatedAt: new Date()
     };
 
-    // Salvar no localStorage (mock)
     localStorage.setItem("scenario_prisma", JSON.stringify(scenarioCompleto));
-    console.log("Scenario salvo:", scenarioCompleto);
+    
+    if (debriefingTemplate) {
+      const checklists = JSON.parse(localStorage.getItem('checklists') || '[]');
+      const index = checklists.findIndex((c: any) => c.id === debriefingTemplate.id);
+      
+      if (index === -1) {
+        checklists.push(debriefingTemplate);
+      } else {
+        checklists[index] = debriefingTemplate;
+      }
+      
+      localStorage.setItem('checklists', JSON.stringify(checklists));
+    }
     
     return scenarioCompleto;
-  }, [scenarioData, frames]);
+  }, [scenarioData, frames, debriefingTemplate]);
 
-  const carregarCenario = useCallback((scenarioId: string) => {
-    // Carregar do localStorage (mock)
-    const salvo = localStorage.getItem(`scenario_${scenarioId}`);
-    if (salvo) {
-      const scenario: Scenario = JSON.parse(salvo);
-      setScenarioData({
-        title: scenario.title,
-        curso: scenario.curso,
-        turma: scenario.turma,
-        patientName: scenario.patientName,
-        patientAge: scenario.patientAge,
-        patientGender: scenario.patientGender,
-        patientHeight: scenario.patientHeight,
-        patientWeight: scenario.patientWeight,
-        perfilFisico: scenario.perfilFisico,
-        perfilPsicologico: scenario.perfilPsicologico,
-        perfilTecnico: scenario.perfilTecnico,
-        atualizadoEm: scenario.atualizadoEm,
-        historicoMedico: scenario.historicoMedico,
-        acompanhamentoMedico: scenario.acompanhamentoMedico,
-        medicacoesEmUso: scenario.medicacoesEmUso,
-        cirurgiasAnteriores: scenario.cirurgiasAnteriores,
-        scenarioOutline: scenario.scenarioOutline,
-        learnerBrief: scenario.learnerBrief,
-        smartObjectives: scenario.smartObjectives ? JSON.parse(scenario.smartObjectives) : { specific: "", measurable: "", achievable: "", relevant: "", timeBound: "" },
-        technicalLearningObjectives: scenario.technicalLearningObjectives,
-        nonTechnicalLearningObjectives: scenario.nonTechnicalLearningObjectives,
-        equipmentList: scenario.equipmentList
-      });
-      setFrames(scenario.frames);
-    }
+  const getTabsConfig = useCallback(() => {
+    return [
+      { value: "identificacao", label: "Identificação", status: "ativo" as const },
+      { value: "objetivos", label: "Objetivos", status: "ativo" as const },
+      { value: "paciente", label: "Paciente", status: "ativo" as const },
+      { value: "frames", label: "Frames", status: "ativo" as const },
+      { value: "materiais", label: "Materiais", status: "ativo" as const },
+      { value: "debriefing", label: "Debriefing", status: "ativo" as const },
+      { value: "revisao", label: "Revisão", status: "incompleto" as const }
+    ];
   }, []);
 
   return {
@@ -261,11 +226,13 @@ export const useScenarioForm = () => {
     activeTab,
     frames,
     scenarioData,
+    debriefingTemplate,
     
     // Setters
     setActiveTab,
     setScenarioData,
     setFrames,
+    setDebriefingTemplate: handleDebriefingTemplateChange,
     
     // Handlers
     handleScenarioDataChange,
@@ -280,11 +247,6 @@ export const useScenarioForm = () => {
     updateEquipmentItem,
     removeEquipmentItem,
     salvarCenario,
-    carregarCenario,
-    
-    // Validations
-    validarAba,
-    getTabStatus,
     getTabsConfig
   };
 };

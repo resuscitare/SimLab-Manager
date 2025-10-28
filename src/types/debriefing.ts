@@ -5,9 +5,42 @@ export interface DebriefingTemplate {
   titulo: string;
   tipo: "debriefing";
   modelo: DebriefingModelType;
-  dados: any; // Placeholder for form data
+  dados: {
+    descricao?: string;
+    duracao?: string;
+    nivelParticipantes?: string;
+    objetivos?: string[];
+    momentosCriticos?: Array<{
+      descricao: string;
+      acaoEsperada: string;
+      lacunaPossivel: string;
+    }>;
+    fasePreparacao?: string;
+    faseReacao?: string;
+    faseDescricao?: string;
+    faseAnalise?: string;
+    faseResumo?: string;
+    perguntasCirculares?: string[];
+    recursosApoio?: Array<{
+      nome: string;
+      link: string;
+    }>;
+  };
   autor: string;
   dataCriacao: string;
-  cenariosAssociados?: number; // Optional, can be calculated
-  itens?: number; // Optional, can be calculated
+  cenariosAssociados?: number;
+  itens?: number;
+}
+
+export interface DebriefingSession {
+  id: string;
+  cenarioId: string;
+  templateId: string;
+  data: string;
+  duracao: number;
+  participantes: string[];
+  pontosPositivos: string[];
+  pontosMelhoria: string[];
+  acoesFuturas: string[];
+  feedbackFacilitador: string;
 }
