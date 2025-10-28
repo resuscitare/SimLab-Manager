@@ -10,8 +10,8 @@ import NovoAgendamento from "./pages/NovoAgendamento";
 import Cenarios from "./pages/Cenarios";
 import NovoCenario from "./pages/NovoCenario";
 import Checklists from "./pages/Checklists";
-import NovoChecklist from "./pages/NovoChecklist"; // This will be for materials
-import EditarChecklist from "./pages/EditarChecklist"; // This will be for materials
+import NovoChecklist from "./pages/NovoChecklist";
+import EditarChecklist from "./pages/EditarChecklist";
 import NovoDebriefingTemplate from "./pages/NovoDebriefingTemplate";
 import EditarDebriefingTemplate from "./pages/EditarDebriefingTemplate";
 import AssistenteIA from "./pages/AssistenteIA";

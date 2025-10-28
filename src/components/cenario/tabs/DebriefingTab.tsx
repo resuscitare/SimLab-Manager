@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, MessageSquare, Edit, Save, X, Trash2 } from "lucide-react";
+import { Plus, MessageSquare, Edit, Save, X, Trash2, ArrowRight } from "lucide-react";
 import { DebriefingTemplate, DebriefingModelType } from "@/types/debriefing";
 import { ScenarioFormData } from "@/types/prisma";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,7 @@ interface DebriefingTabProps {
 }
 
 const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
+  const navigate = useNavigate();
   const [templates, setTemplates] = useState<DebriefingTemplate[]>([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
   const [templateCounter, setTemplateCounter] = useState(1);
@@ -46,47 +48,9 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
     }
   };
 
-  const generateUniqueId = () => {
-    return `template-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  };
-
   const handleCreateNewTemplate = () => {
-    const newTemplate: DebriefingTemplate = {
-      id: generateUniqueId(),
-      titulo: `Template de Debriefing ${templateCounter}`,
-      tipo: "debriefing",
-      modelo: "PEARLS" as DebriefingModelType,
-      dados: {
-        descricao: "Novo template de debriefing. Clique em 'Editar' para personalizar.",
-        duracao: "30",
-        nivelParticipantes: "graduacao",
-        objetivos: scenarioData.technicalLearningObjectives.concat(scenarioData.nonTechnicalLearningObjectives),
-        momentosCriticos: [],
-        fasePreparacao: "",
-        faseReacao: "",
-        faseDescricao: "",
-        faseAnalise: "",
-        faseResumo: ""
-      },
-      autor: "Usuário",
-      dataCriacao: new Date().toISOString().split('T')[0]
-    };
-
-    try {
-      const allItems = JSON.parse(localStorage.getItem('checklists') || '[]');
-      allItems.push(newTemplate);
-      localStorage.setItem('checklists', JSON.stringify(allItems));
-      
-      setTemplates([...templates, newTemplate]);
-      setSelectedTemplateId(newTemplate.id);
-      setTemplateCounter(prev => prev + 1);
-      setEditingTemplate(newTemplate);
-      setIsEditing(true);
-      
-      showSuccess("Novo template criado com sucesso! Você pode editá-lo agora.");
-    } catch (e) {
-      showError("Erro ao criar template.");
-    }
+    // Navegar para a página de criação de template, passando o ID do cenário atual
+    navigate(`/debriefing-templates/novo?fromScenario=true&scenarioId=new`);
   };
 
   const handleStartEditing = () => {
@@ -179,20 +143,33 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
           Plano de Debriefing
         </CardTitle>
         <CardDescription>
-          Gerencie templates de debriefing para este cenário
+          Associe um template de debriefing a este cenário ou crie um novo
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+        {/* Cabeçalho com ações */}
+        <div className="flex justify-between items-center p-4 bg-blue-50 rounded-lg">
+          <div>
+            <h3 className="font-semibold text-blue-800">Templates de Debriefing</h3>
+            <p className="text-sm text-blue-600">Gerencie modelos pré-configurados para suas sessões</p>
+          </div>
+          <Button onClick={handleCreateNewTemplate} className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="w-4 h-4 mr-2" />
+            Criar Novo Template
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
           <div className="space-y-2">
-            <Label>Selecionar Template</Label>
+            <Label>Selecionar Template Existente</Label>
             <Select 
               value={selectedTemplateId || ""} 
               onValueChange={setSelectedTemplateId}
               disabled={isEditing}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Escolha um template..." />
+                <SelectValue placeholder="Escolha um template existente..." />
               </SelectTrigger>
               <SelectContent>
                 {templates.map(template => (
@@ -204,33 +181,26 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
             </Select>
           </div>
           
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={handleCreateNewTemplate} disabled={isEditing}>
-              <Plus className="w-4 h-4 mr-2" />
-              Novo
-            </Button>
-            
-            {selectedTemplateId && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" disabled={isEditing}>
-                    <Edit className="w-4 h-4 mr-2" />
-                    Ações
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuItem onClick={handleStartEditing}>
-                    <Edit className="w-4 h-4 mr-2" />
-                    Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDeleteTemplate} className="text-red-600">
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
+          {selectedTemplateId && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" disabled={isEditing}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Ações do Template
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleStartEditing}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleDeleteTemplate} className="text-red-600">
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Excluir
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         {selectedTemplate && !isEditing && (
@@ -322,9 +292,13 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
         {templates.length === 0 && !isEditing && (
           <div className="p-4 border rounded-lg bg-blue-50 text-center">
             <MessageSquare className="h-8 w-8 text-blue-400 mx-auto mb-2" />
-            <p className="text-sm text-blue-800">
-              Nenhum template de debriefing encontrado. Clique em "Novo" para criar seu primeiro template.
+            <p className="text-sm text-blue-800 mb-4">
+              Nenhum template de debriefing encontrado.
             </p>
+            <Button onClick={handleCreateNewTemplate} variant="outline">
+              <Plus className="w-4 h-4 mr-2" />
+              Criar Primeiro Template
+            </Button>
           </div>
         )}
       </CardContent>
