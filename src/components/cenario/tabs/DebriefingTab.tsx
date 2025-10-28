@@ -6,11 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, MessageSquare, Edit, Save, X } from "lucide-react";
+import { Plus, MessageSquare, Edit, Save, X, Trash2 } from "lucide-react";
 import { DebriefingTemplate, DebriefingModelType } from "@/types/debriefing";
 import { ScenarioFormData } from "@/types/prisma";
 import { Label } from "@/components/ui/label";
 import { showSuccess, showError } from "@/utils/toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface DebriefingTabProps {
   scenarioData: ScenarioFormData;
@@ -123,6 +129,25 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
     }
   };
 
+  const handleDeleteTemplate = () => {
+    if (!selectedTemplateId) return;
+    
+    if (confirm("Tem certeza que deseja excluir este template?")) {
+      try {
+        const allItems = JSON.parse(localStorage.getItem('checklists') || '[]');
+        const filteredItems = allItems.filter((item: any) => item.id !== selectedTemplateId);
+        localStorage.setItem('checklists', JSON.stringify(filteredItems));
+        
+        setTemplates(filteredItems.filter((item: any) => item.tipo === 'debriefing'));
+        setSelectedTemplateId(null);
+        
+        showSuccess("Template excluído com sucesso!");
+      } catch (e) {
+        showError("Erro ao excluir template.");
+      }
+    }
+  };
+
   const handleTemplateFieldChange = (field: string, value: any) => {
     if (editingTemplate) {
       setEditingTemplate(prev => ({
@@ -154,20 +179,20 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
           Plano de Debriefing
         </CardTitle>
         <CardDescription>
-          Associe um template de debriefing a este cenário.
+          Gerencie templates de debriefing para este cenário
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
           <div className="space-y-2">
-            <Label>Selecionar Template de Debriefing</Label>
+            <Label>Selecionar Template</Label>
             <Select 
               value={selectedTemplateId || ""} 
               onValueChange={setSelectedTemplateId}
               disabled={isEditing}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Escolha um template existente..." />
+                <SelectValue placeholder="Escolha um template..." />
               </SelectTrigger>
               <SelectContent>
                 {templates.map(template => (
@@ -178,42 +203,66 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
               </SelectContent>
             </Select>
           </div>
-          <Button variant="outline" onClick={handleCreateNewTemplate} disabled={isEditing}>
-            <Plus className="w-4 h-4 mr-2" />
-            Criar Novo Template
-          </Button>
+          
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={handleCreateNewTemplate} disabled={isEditing}>
+              <Plus className="w-4 h-4 mr-2" />
+              Novo
+            </Button>
+            
+            {selectedTemplateId && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" disabled={isEditing}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Ações
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onClick={handleStartEditing}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleDeleteTemplate} className="text-red-600">
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Excluir
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+          </div>
         </div>
 
         {selectedTemplate && !isEditing && (
           <div className="p-4 border rounded-lg bg-muted">
             <div className="flex justify-between items-start mb-2">
-              <h4 className="font-semibold">Template Selecionado: {selectedTemplate.titulo}</h4>
-              <Button variant="outline" size="sm" onClick={handleStartEditing}>
-                <Edit className="w-4 h-4 mr-1" />
-                Editar Template
-              </Button>
+              <div>
+                <h4 className="font-semibold">{selectedTemplate.titulo}</h4>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Modelo:</strong> {selectedTemplate.modelo}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Autor:</strong> {selectedTemplate.autor}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  <strong>Criado em:</strong> {selectedTemplate.dataCriacao}
+                </p>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground">
-              <strong>Modelo:</strong> {selectedTemplate.modelo}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              <strong>Autor:</strong> {selectedTemplate.autor}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              <strong>Criado em:</strong> {selectedTemplate.dataCriacao}
-            </p>
+            
             {selectedTemplate.dados?.descricao && (
-              <p className="text-sm text-muted-foreground mt-2">
-                <strong>Descrição:</strong> {selectedTemplate.dados.descricao}
-              </p>
+              <div className="mt-3 p-3 bg-white rounded-md">
+                <h5 className="font-medium text-sm mb-2">Descrição:</h5>
+                <p className="text-sm text-gray-700">{selectedTemplate.dados.descricao}</p>
+              </div>
             )}
           </div>
         )}
 
         {isEditing && editingTemplate && (
-          <div className="p-4 border rounded-lg bg-blue-50">
+          <div className="p-4 border-2 border-blue-300 rounded-lg bg-blue-50">
             <div className="flex justify-between items-center mb-4">
-              <h4 className="font-semibold">Editando Template</h4>
+              <h4 className="font-semibold text-blue-800">Editando Template</h4>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={handleCancelEditing}>
                   <X className="w-4 h-4 mr-1" />
@@ -266,25 +315,15 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
                   rows={3}
                 />
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="template-duration">Duração Estimada (minutos)</Label>
-                <Input
-                  id="template-duration"
-                  type="number"
-                  value={editingTemplate.dados?.duracao || ""}
-                  onChange={(e) => handleDataFieldChange('duracao', e.target.value)}
-                  placeholder="30"
-                />
-              </div>
             </div>
           </div>
         )}
 
         {templates.length === 0 && !isEditing && (
-          <div className="p-4 border rounded-lg bg-blue-50">
+          <div className="p-4 border rounded-lg bg-blue-50 text-center">
+            <MessageSquare className="h-8 w-8 text-blue-400 mx-auto mb-2" />
             <p className="text-sm text-blue-800">
-              Nenhum template de debriefing encontrado. Clique em "Criar Novo Template" para começar.
+              Nenhum template de debriefing encontrado. Clique em "Novo" para criar seu primeiro template.
             </p>
           </div>
         )}
