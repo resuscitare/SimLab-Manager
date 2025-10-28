@@ -5,108 +5,145 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Upload, FileText, AlertCircle } from "lucide-react";
 import { EstoqueItem } from "../types";
-import { showSuccess, showError } from "@/utils/toast";
 
 interface ImportDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onImport: (items: EstoqueItem[]) => void;
+  onImport: (itens: EstoqueItem[]) => void;
 }
 
-export const ImportDialog = ({ isOpen, onClose, onImport }: ImportDialogProps) => {
-  const handleImportarCSV = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+export const ImportDialog = ({
+  isOpen,
+  onClose,
+  onImport
+}: ImportDialogProps) => {
+  const [file, setFile] = useState<File | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+    }
+  };
+
+  const handleImport = async () => {
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      try {
-        const text = e.target?.result as string;
-        const lines = text.split('\n').filter(line => line.trim());
-        
-        if (lines.length < 2) {
-          showError("Arquivo CSV inválido ou vazio");
-          return;
+    setIsProcessing(true);
+    try {
+      const text = await file.text();
+      const lines = text.split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      
+      const itens: EstoqueItem[] = [];
+      
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values.length === headers.length) {
+          const item: EstoqueItem = {
+            id: Date.now().toString() + i,
+            codigo: values[0] || '',
+            nome: values[1] || '',
+            categoria: values[2] || '',
+            marca: values[3] || '',
+            modelo: values[4] || '',
+            quantidade: parseInt(values[5]) || 0,
+            quantidadeMinima: parseInt(values[6]) || 0,
+            unidade: values[7] || '',
+            valorUnitario: parseFloat(values[8]) || 0,
+            valorTotal: 0,
+            local: values[9] || '',
+            dataValidade: values[10] || '',
+            status: 'disponivel',
+            observacoes: values[11] || ''
+          };
+          item.valorTotal = item.quantidade * item.valorUnitario;
+          itens.push(item);
         }
-
-        const headers = lines[0].split(',').map(h => h.trim());
-        const novosItens: EstoqueItem[] = [];
-
-        for (let i = 1; i < lines.length; i++) {
-          const values = lines[i].split(',').map(v => v.trim());
-          if (values.length >= headers.length) {
-            const item: any = {};
-            headers.forEach((header, index) => {
-              const key = header.toLowerCase().replace(/\s+/g, '_');
-              item[key] = values[index] || '';
-            });
-
-            // Converter campos numéricos
-            item.quantidade = parseInt(item.quantidade) || 0;
-            item.quantidadeMinima = parseInt(item.quantidade_minima) || 0;
-            item.valorUnitario = parseFloat(item.valor_unitario) || 0;
-
-            // Gerar ID se não existir
-            if (!item.id) {
-              item.id = Date.now().toString() + Math.random().toString(36).substr(2, 9);
-            }
-
-            // Definir valores padrão
-            item.status = "disponivel";
-            item.valorTotal = item.quantidade * item.valorUnitario;
-
-            novosItens.push(item as EstoqueItem);
-          }
-        }
-
-        onImport(novosItens);
-        showSuccess(`${novosItens.length} itens importados com sucesso!`);
-      } catch (error) {
-        showError("Erro ao processar arquivo CSV");
-        console.error(error);
       }
-    };
-
-    reader.readAsText(file);
+      
+      onImport(itens);
+      onClose();
+      setFile(null);
+    } catch (error) {
+      console.error('Erro ao importar arquivo:', error);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Importar Itens via CSV</DialogTitle>
+          <DialogTitle>Importar Itens</DialogTitle>
           <DialogDescription>
-            Importe múltiplos itens de uma vez usando um arquivo CSV
+            Importe itens de um arquivo CSV
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label>Formato do Arquivo CSV</Label>
-            <div className="p-3 bg-gray-50 rounded-lg text-sm">
-              <p>O arquivo CSV deve conter as seguintes colunas:</p>
-              <code className="block mt-2 text-xs bg-white p-2 rounded">
-                codigo,nome,categoria,marca,modelo,quantidade,quantidade_minima,unidade,valor_unitario,local,data_validade,observacoes
-              </code>
+            <Label htmlFor="file">Arquivo CSV</Label>
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+              <FileText className="mx-auto h-12 w-12 text-gray-400" />
+              <div className="mt-2">
+                <label htmlFor="file" className="cursor-pointer">
+                  <span className="mt-2 block text-sm font-medium text-gray-900">
+                    Clique para selecionar um arquivo
+                  </span>
+                  <input
+                    id="file"
+                    type="file"
+                    accept=".csv"
+                    onChange={handleFileChange}
+                    className="sr-only"
+                  />
+                </label>
+                <p className="mt-1 text-xs text-gray-500">
+                  CSV até 10MB
+                </p>
+              </div>
+              {file && (
+                <div className="mt-2 text-sm text-gray-600">
+                  Arquivo selecionado: {file.name}
+                </div>
+              )}
             </div>
           </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="csvFile">Selecione o arquivo CSV</Label>
-            <Input
-              id="csvFile"
-              type="file"
-              accept=".csv"
-              onChange={handleImportarCSV}
-              className="cursor-pointer"
-            />
+
+          <div className="bg-blue-50 p-3 rounded-lg">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 text-blue-600 mt-0.5" />
+              <div className="text-sm text-blue-800">
+                <p className="font-medium">Formato esperado:</p>
+                <p className="text-xs mt-1">
+                  código,nome,categoria,marca,modelo,quantidade,quantidade_minima,unidade,valor_unitario,local,data_validade,observacoes
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-        
-        <div className="flex justify-end gap-2 px-6 py-4 border-t">
+
+        <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={onClose}>
             Cancelar
+          </Button>
+          <Button onClick={handleImport} disabled={!file || isProcessing}>
+            {isProcessing ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                Processando...
+              </>
+            ) : (
+              <>
+                <Upload className="h-4 w-4 mr-2" />
+                Importar
+              </>
+            )}
           </Button>
         </div>
       </DialogContent>

@@ -1,7 +1,7 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package, CheckCircle, AlertTriangle } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Package, AlertTriangle, TrendingUp, DollarSign } from "lucide-react";
 
 interface EstoqueStatsProps {
   total: number;
@@ -29,18 +29,18 @@ export const EstoqueStats = ({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{total}</div>
-          <p className="text-xs text-gray-500">Itens no estoque</p>
+          <p className="text-xs text-gray-500">Itens cadastrados</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Disponíveis</CardTitle>
-          <CheckCircle className="h-4 w-4 text-green-600" />
+          <Package className="h-4 w-4 text-green-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-600">{disponivel}</div>
-          <p className="text-xs text-gray-500">Itens disponíveis</p>
+          <p className="text-xs text-gray-500">Em estoque</p>
         </CardContent>
       </Card>
 
@@ -58,22 +58,22 @@ export const EstoqueStats = ({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Vencendo</CardTitle>
-          <AlertTriangle className="h-4 w-4 text-orange-600" />
+          <TrendingUp className="h-4 w-4 text-orange-600" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-orange-600">{vencendo}</div>
-          <p className="text-xs text-gray-500">Próximos ao vencimento</p>
+          <p className="text-xs text-gray-500">Próximos do vencimento</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Vencidos</CardTitle>
-          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <CardTitle className="text-sm font-medium">Valor Total</CardTitle>
+          <DollarSign className="h-4 w-4 text-purple-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-red-600">{vencido}</div>
-          <p className="text-xs text-gray-500">Vencidos</p>
+          <div className="text-2xl font-bold text-purple-600">R$ {valorTotal.toFixed(2)}</div>
+          <p className="text-xs text-gray-500">Valor em estoque</p>
         </CardContent>
       </Card>
     </div>

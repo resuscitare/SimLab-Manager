@@ -56,7 +56,6 @@ export const ItemDialog = ({
     setFormData(prev => {
       const updated = { ...prev, [field]: value };
       
-      // Auto-calculate dependent fields
       if (field === "quantidade" || field === "valorUnitario") {
         updated.valorTotal = updated.quantidade * updated.valorUnitario;
       }

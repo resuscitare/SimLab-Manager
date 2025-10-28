@@ -1,9 +1,10 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, Upload, Download, Plus } from "lucide-react";
+import { Search, Download, Upload, Plus } from "lucide-react";
+import { Categoria } from "../types";
 
 interface EstoqueFiltersProps {
   searchTerm: string;
@@ -14,7 +15,7 @@ interface EstoqueFiltersProps {
   onStatusChange: (value: string) => void;
   ordenacao: string;
   onOrdenacaoChange: (value: string) => void;
-  categorias: Array<{ id: string; nome: string }>;
+  categorias: Categoria[];
   onImportClick: () => void;
   onExportClick: () => void;
   onNovoItemClick: () => void;
@@ -39,7 +40,7 @@ export const EstoqueFilters = ({
       <div className="flex-1 relative">
         <Search className="absolute left-3 top-3 h-4 w-4 text-gray-500" />
         <Input
-          placeholder="Buscar por nome, código ou marca..."
+          placeholder="Buscar por código, nome ou marca..."
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
           className="pl-10"
@@ -65,7 +66,7 @@ export const EstoqueFilters = ({
           <SelectValue placeholder="Status" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="todos">Todos os status</SelectItem>
+          <SelectItem value="todos">Todos</SelectItem>
           <SelectItem value="disponivel">Disponível</SelectItem>
           <SelectItem value="baixo">Estoque Baixo</SelectItem>
           <SelectItem value="vencendo">Vencendo</SelectItem>
@@ -86,20 +87,20 @@ export const EstoqueFilters = ({
         </SelectContent>
       </Select>
 
-      <div className="flex gap-2">
-        <Button variant="outline" onClick={onImportClick}>
-          <Upload className="h-4 w-4 mr-2" />
-          Importar CSV
-        </Button>
-        <Button variant="outline" onClick={onExportClick}>
-          <Download className="h-4 w-4 mr-2" />
-          Exportar CSV
-        </Button>
-        <Button onClick={onNovoItemClick}>
-          <Plus className="h-4 w-4 mr-2" />
-          Novo Item
-        </Button>
-      </div>
+      <Button variant="outline" onClick={onImportClick}>
+        <Upload className="h-4 w-4 mr-2" />
+        Importar
+      </Button>
+
+      <Button variant="outline" onClick={onExportClick}>
+        <Download className="h-4 w-4 mr-2" />
+        Exportar
+      </Button>
+
+      <Button onClick={onNovoItemClick}>
+        <Plus className="h-4 w-4 mr-2" />
+        Novo Item
+      </Button>
     </div>
   );
 };
