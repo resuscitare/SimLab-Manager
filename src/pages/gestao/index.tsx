@@ -18,9 +18,10 @@ import EstoqueTab from "./tabs/EstoqueTab";
 import CursosTab from "./tabs/CursosTab";
 import RelatoriosTab from "./tabs/RelatoriosTab";
 import ConfiguracoesTab from "./tabs/ConfiguracoesTab";
+import CentroDeCustosTab from "./tabs/CentroDeCustosTab";
 
 const Gestao = () => {
-  const [activeTab, setActiveTab] = useState("estoque");
+  const [activeTab, setActiveTab] = useState("centro-custos");
 
   // Dados mock para o dashboard
   const dashboardData = {
@@ -115,12 +116,16 @@ const Gestao = () => {
       <Card>
         <CardContent className="p-0">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
+              <TabsTrigger value="centro-custos">Centro de Custos</TabsTrigger>
               <TabsTrigger value="estoque">Estoque</TabsTrigger>
               <TabsTrigger value="cursos">Cursos</TabsTrigger>
               <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
               <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
             </TabsList>
+            <TabsContent value="centro-custos" className="p-6">
+              <CentroDeCustosTab />
+            </TabsContent>
             <TabsContent value="estoque" className="p-6">
               <EstoqueTab />
             </TabsContent>
