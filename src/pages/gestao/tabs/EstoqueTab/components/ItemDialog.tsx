@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { useState, useEffect } from "react";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,38 +30,44 @@ export const ItemDialog = ({
   categorias,
   locais
 }: ItemDialogProps) => {
-  const [formData, setFormData] = useState<EstoqueItem>(
-    item || {
-      id: "",
-      codigo: "",
-      nome: "",
-      categoria: "",
-      marca: "",
-      modelo: "",
-      quantidade: 0,
-      quantidadeMinima: 0,
-      unidade: "",
-      valorUnitario: 0,
-      valorTotal: 0,
-      local: "",
-      dataValidade: "",
-      status: "disponivel",
-      observacoes: ""
-    }
-  );
+  const [formData, setFormData] = useState<EstoqueItem | null>(null);
 
   const { calcularStatus, getStatusBadge, getStatusIcon, getStatusText } = useEstoqueUtils();
 
+  useEffect(() => {
+    if (isOpen) {
+      setFormData(item || {
+        id: "",
+        codigo: "",
+        nome: "",
+        categoria: "",
+        marca: "",
+        modelo: "",
+        quantidade: 0,
+        quantidadeMinima: 0,
+        unidade: "un",
+        valorUnitario: 0,
+        valorTotal: 0,
+        local: "",
+        dataValidade: "",
+        status: "disponivel",
+        observacoes: ""
+      });
+    }
+  }, [item, isOpen]);
+
   const handleInputChange = (field: keyof EstoqueItem, value: string | number) => {
+    if (!formData) return;
     setFormData(prev => {
-      const updated = { ...prev, [field]: value };
+      const updated = { ...prev!, [field]: value };
       
       if (field === "quantidade" || field === "valorUnitario") {
-        updated.valorTotal = updated.quantidade * updated.valorUnitario;
+        updated.valorTotal = (Number(updated.quantidade) || 0) * (Number(updated.valorUnitario) || 0);
       }
       
-      if (field === "quantidade" || field === "quantidadeMinima" || field === "dataValidade") {
-        updated.status = calcularStatus(updated);
+      const newStatus = calcularStatus(updated);
+      if (updated.status !== newStatus) {
+        updated.status = newStatus;
       }
       
       return updated;
@@ -69,20 +75,13 @@ export const ItemDialog = ({
   };
 
   const handleSave = () => {
-    if (!formData.codigo || !formData.nome || !formData.categoria) {
+    if (!formData || !formData.codigo || !formData.nome || !formData.categoria) {
       return;
     }
-    
-    const itemToSave = {
-      ...formData,
-      id: item?.id || Date.now().toString(),
-      valorTotal: formData.quantidade * formData.valorUnitario,
-      status: calcularStatus(formData)
-    };
-    
-    onSave(itemToSave);
-    onClose();
+    onSave(formData);
   };
+
+  if (!formData) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -100,148 +99,74 @@ export const ItemDialog = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="codigo">Código *</Label>
-              <Input
-                id="codigo"
-                value={formData.codigo}
-                onChange={(e) => handleInputChange("codigo", e.target.value)}
-                placeholder="Ex: MED001"
-              />
+              <Input id="codigo" value={formData.codigo} onChange={(e) => handleInputChange("codigo", e.target.value)} placeholder="Ex: MED001" />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="nome">Nome *</Label>
-              <Input
-                id="nome"
-                value={formData.nome}
-                onChange={(e) => handleInputChange("nome", e.target.value)}
-                placeholder="Ex: Adrenalina 1mg/1mL"
-              />
+              <Input id="nome" value={formData.nome} onChange={(e) => handleInputChange("nome", e.target.value)} placeholder="Ex: Adrenalina 1mg/1mL" />
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="categoria">Categoria *</Label>
               <Select value={formData.categoria} onValueChange={(value) => handleInputChange("categoria", value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categorias.map(cat => (
-                    <SelectItem key={cat.id} value={cat.id}>
-                      {cat.nome}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
+                <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                <SelectContent>{categorias.map(cat => (<SelectItem key={cat.id} value={cat.id}>{cat.nome}</SelectItem>))}</SelectContent>
               </Select>
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="marca">Marca</Label>
-              <Input
-                id="marca"
-                value={formData.marca}
-                onChange={(e) => handleInputChange("marca", e.target.value)}
-                placeholder="Ex: Laerdal"
-              />
+              <Input id="marca" value={formData.marca} onChange={(e) => handleInputChange("marca", e.target.value)} placeholder="Ex: Laerdal" />
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="quantidade">Quantidade *</Label>
-              <Input
-                id="quantidade"
-                type="number"
-                value={formData.quantidade}
-                onChange={(e) => handleInputChange("quantidade", parseInt(e.target.value) || 0)}
-                placeholder="0"
-              />
+              <Input id="quantidade" type="number" value={formData.quantidade} onChange={(e) => handleInputChange("quantidade", parseInt(e.target.value) || 0)} placeholder="0" />
             </div>
-            
             <div className="space-y-2">
-              <Label htmlFor="quantidadeMinima">Quantidade Mínima *</Label>
-              <Input
-                id="quantidadeMinima"
-                type="number"
-                value={formData.quantidadeMinima}
-                onChange={(e) => handleInputChange("quantidadeMinima", parseInt(e.target.value) || 0)}
-                placeholder="0"
-              />
+              <Label htmlFor="quantidadeMinima">Qtd. Mínima *</Label>
+              <Input id="quantidadeMinima" type="number" value={formData.quantidadeMinima} onChange={(e) => handleInputChange("quantidadeMinima", parseInt(e.target.value) || 0)} placeholder="0" />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="valorUnitario">Valor Unitário (R$) *</Label>
-              <Input
-                id="valorUnitario"
-                type="number"
-                step="0.01"
-                value={formData.valorUnitario}
-                onChange={(e) => handleInputChange("valorUnitario", parseFloat(e.target.value) || 0)}
-                placeholder="0.00"
-              />
+              <Input id="valorUnitario" type="number" step="0.01" value={formData.valorUnitario} onChange={(e) => handleInputChange("valorUnitario", parseFloat(e.target.value) || 0)} placeholder="0.00" />
             </div>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="dataValidade">Data de Validade</Label>
-              <Input
-                id="dataValidade"
-                type="date"
-                value={formData.dataValidade}
-                onChange={(e) => handleInputChange("dataValidade", e.target.value)}
-              />
+              <Input id="dataValidade" type="date" value={formData.dataValidade} onChange={(e) => handleInputChange("dataValidade", e.target.value)} />
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="local">Local</Label>
-              <LocationCombobox
-                locais={locais}
-                value={formData.local}
-                onValueChange={(value) => handleInputChange("local", value)}
-              />
+              <LocationCombobox locais={locais} value={formData.local} onValueChange={(value) => handleInputChange("local", value)} />
             </div>
           </div>
-
           <div className="space-y-2">
             <Label htmlFor="observacoes">Observações</Label>
-            <Textarea
-              id="observacoes"
-              value={formData.observacoes}
-              onChange={(e) => handleInputChange("observacoes", e.target.value)}
-              placeholder="Observações adicionais sobre o item"
-              rows={3}
-            />
+            <Textarea id="observacoes" value={formData.observacoes} onChange={(e) => handleInputChange("observacoes", e.target.value)} placeholder="Observações adicionais sobre o item" rows={3} />
           </div>
-
           <div className="p-4 bg-gray-50 rounded-lg">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium">Valor Total:</span>
-                <div className="text-lg font-bold">R$ {(formData.quantidade * formData.valorUnitario).toFixed(2)}</div>
+                <div className="text-lg font-bold">R$ {formData.valorTotal.toFixed(2)}</div>
               </div>
               <div>
                 <span className="font-medium">Status:</span>
                 <div className="flex items-center gap-2">
-                  {getStatusIcon(calcularStatus(formData))}
-                  <Badge className={getStatusBadge(calcularStatus(formData))}>
-                    {getStatusText(calcularStatus(formData))}
-                  </Badge>
+                  {getStatusIcon(formData.status)}
+                  <Badge className={getStatusBadge(formData.status)}>{getStatusText(formData.status)}</Badge>
                 </div>
               </div>
             </div>
           </div>
         </div>
-
-        <div className="flex justify-end gap-2 px-6 py-4 border-t">
-          <Button variant="outline" onClick={onClose}>
-            Cancelar
-          </Button>
-          <Button onClick={handleSave}>
-            {item?.id ? "Salvar Alterações" : "Adicionar Item"}
-          </Button>
-        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={onClose}>Cancelar</Button>
+          <Button onClick={handleSave}>{item?.id ? "Salvar Alterações" : "Adicionar Item"}</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

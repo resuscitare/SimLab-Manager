@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Upload, FileText, AlertCircle } from "lucide-react";
 import { EstoqueItem } from "../types";
+import Papa from "papaparse";
+import { showError } from "@/utils/toast";
 
 interface ImportDialogProps {
   isOpen: boolean;
@@ -33,46 +34,38 @@ export const ImportDialog = ({
     if (!file) return;
 
     setIsProcessing(true);
-    try {
-      const text = await file.text();
-      const lines = text.split('\n');
-      const headers = lines[0].split(',').map(h => h.trim());
-      
-      const itens: EstoqueItem[] = [];
-      
-      for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',').map(v => v.trim());
-        if (values.length === headers.length) {
-          const item: EstoqueItem = {
-            id: Date.now().toString() + i,
-            codigo: values[0] || '',
-            nome: values[1] || '',
-            categoria: values[2] || '',
-            marca: values[3] || '',
-            modelo: values[4] || '',
-            quantidade: parseInt(values[5]) || 0,
-            quantidadeMinima: parseInt(values[6]) || 0,
-            unidade: values[7] || '',
-            valorUnitario: parseFloat(values[8]) || 0,
-            valorTotal: 0,
-            local: values[9] || '',
-            dataValidade: values[10] || '',
-            status: 'disponivel',
-            observacoes: values[11] || ''
-          };
-          item.valorTotal = item.quantidade * item.valorUnitario;
-          itens.push(item);
-        }
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => {
+        const itens: EstoqueItem[] = results.data.map((row: any, index: number) => ({
+          id: row.id || Date.now().toString() + index,
+          codigo: row["Código"] || "",
+          nome: row["Nome"] || "",
+          categoria: row["Categoria"] || "",
+          marca: row["Marca"] || "",
+          modelo: row["Modelo"] || "",
+          quantidade: parseInt(row["Quantidade"]) || 0,
+          quantidadeMinima: parseInt(row["Quantidade Mínima"]) || 0,
+          unidade: row["Unidade"] || "un",
+          valorUnitario: parseFloat(row["Valor Unitário"]) || 0,
+          valorTotal: 0,
+          local: row["Local"] || "",
+          dataValidade: row["Data de Validade"] || "",
+          status: 'disponivel',
+          observacoes: row["Observações"] || ""
+        }));
+        onImport(itens);
+        onClose();
+        setFile(null);
+        setIsProcessing(false);
+      },
+      error: (error: any) => {
+        showError("Erro ao processar o arquivo CSV.");
+        console.error(error);
+        setIsProcessing(false);
       }
-      
-      onImport(itens);
-      onClose();
-      setFile(null);
-    } catch (error) {
-      console.error('Erro ao importar arquivo:', error);
-    } finally {
-      setIsProcessing(false);
-    }
+    });
   };
 
   return (
@@ -81,22 +74,22 @@ export const ImportDialog = ({
         <DialogHeader>
           <DialogTitle>Importar Itens</DialogTitle>
           <DialogDescription>
-            Importe itens de um arquivo CSV
+            Importe itens de um arquivo CSV.
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="file">Arquivo CSV</Label>
+            <Label htmlFor="file-upload">Arquivo CSV</Label>
             <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
               <FileText className="mx-auto h-12 w-12 text-gray-400" />
               <div className="mt-2">
-                <label htmlFor="file" className="cursor-pointer">
-                  <span className="mt-2 block text-sm font-medium text-gray-900">
+                <label htmlFor="file-upload" className="cursor-pointer">
+                  <span className="mt-2 block text-sm font-medium text-primary">
                     Clique para selecionar um arquivo
                   </span>
                   <input
-                    id="file"
+                    id="file-upload"
                     type="file"
                     accept=".csv"
                     onChange={handleFileChange}
@@ -121,14 +114,14 @@ export const ImportDialog = ({
               <div className="text-sm text-blue-800">
                 <p className="font-medium">Formato esperado:</p>
                 <p className="text-xs mt-1">
-                  código,nome,categoria,marca,modelo,quantidade,quantidade_minima,unidade,valor_unitario,local,data_validade,observacoes
+                  Código,Nome,Categoria,Marca,Modelo,Quantidade,Quantidade Mínima,Unidade,Valor Unitário,Local,Data de Validade,Observações
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-end gap-2">
+        <DialogFooter>
           <Button variant="outline" onClick={onClose}>
             Cancelar
           </Button>
@@ -145,7 +138,7 @@ export const ImportDialog = ({
               </>
             )}
           </Button>
-        </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

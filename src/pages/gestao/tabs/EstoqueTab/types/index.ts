@@ -22,10 +22,3 @@ export interface Categoria {
   descricao: string;
   cor: string;
 }
-
-export interface Local {
-  id: string;
-  nome: string;
-  descricao: string;
-  pai?: string;
-}

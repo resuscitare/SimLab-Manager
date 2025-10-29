@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   BarChart3, 
   DollarSign, 
@@ -12,7 +11,6 @@ import {
   Users, 
   TrendingUp,
   AlertTriangle,
-  CheckCircle
 } from "lucide-react";
 
 // Import das abas do Centro de Custos
@@ -61,17 +59,17 @@ const Gestao = () => {
       </div>
 
       {/* Cards de Métricas Principais */}
-      <div className="grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Estoque Total</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 125.000</div>
+            <div className="text-2xl font-bold">R$ {dashboardData.estoque.valorTotal.toLocaleString('pt-BR')}</div>
             <p className="text-xs text-muted-foreground flex items-center">
               <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-              {dashboardData.estoque.tendencia}
+              {dashboardData.estoque.tendencia === 'up' ? 'Aumento' : 'Redução'} no valor
             </p>
           </CardContent>
         </Card>
@@ -82,7 +80,7 @@ const Gestao = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">12</div>
+            <div className="text-2xl font-bold">{dashboardData.cursos.cursosAtivos}</div>
             <p className="text-xs text-muted-foreground">Cursos em andamento</p>
           </CardContent>
         </Card>
@@ -93,10 +91,10 @@ const Gestao = () => {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">R$ 7.000</div>
+            <div className="text-2xl font-bold">R$ {dashboardData.cursos.margem.toLocaleString('pt-BR')}</div>
             <p className="text-xs text-muted-foreground flex items-center">
               <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
-              {dashboardData.cursos.tendencia}
+              {dashboardData.cursos.tendencia === 'up' ? 'Aumento' : 'Redução'} na margem
             </p>
           </CardContent>
         </Card>
@@ -113,75 +111,29 @@ const Gestao = () => {
         </Card>
       </div>
 
-      {/* Gráficos e Tabelas */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Movimentação do Estoque</CardTitle>
-            <CardDescription>Entradas vs Saídas nos últimos 30 dias</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="h-48 flex items-center justify-center text-muted-foreground">
-              <p className="text-sm">Gráfico de movimentação</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Top 5 Itens por Valor</CardTitle>
-            <CardDescription>Itens com maior valor em estoque</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Simulador Adulto</span>
-                <span className="text-sm font-medium">R$ 45.000</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Monitor Multiparâmetros</span>
-                <span className="text-sm font-medium">R$ 32.000</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Kit de Intubação</span>
-                <span className="text-sm font-medium">R$ 28.000</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">Desfibrilador</span>
-                <span className="text-sm font-medium">R$ 20.000</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Navegação por Abas */}
       <Card>
         <CardContent className="p-0">
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="estoque">Estoque</TabsTrigger>
               <TabsTrigger value="cursos">Cursos</TabsTrigger>
               <TabsTrigger value="relatorios">Relatórios</TabsTrigger>
               <TabsTrigger value="configuracoes">Configurações</TabsTrigger>
             </TabsList>
+            <TabsContent value="estoque" className="p-6">
+              <EstoqueTab />
+            </TabsContent>
+            <TabsContent value="cursos" className="p-6">
+              <CursosTab />
+            </TabsContent>
+            <TabsContent value="relatorios" className="p-6">
+              <RelatoriosTab />
+            </TabsContent>
+            <TabsContent value="configuracoes" className="p-6">
+              <ConfiguracoesTab />
+            </TabsContent>
           </Tabs>
-          
-          <TabsContent value="estoque" className="mt-6">
-            <EstoqueTab />
-          </TabsContent>
-          
-          <TabsContent value="cursos" className="mt-6">
-            <CursosTab />
-          </TabsContent>
-          
-          <TabsContent value="relatorios" className="mt-6">
-            <RelatoriosTab />
-          </TabsContent>
-          
-          <TabsContent value="configuracoes" className="mt-6">
-            <ConfiguracoesTab />
-          </TabsContent>
         </CardContent>
       </Card>
     </div>

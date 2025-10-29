@@ -18,6 +18,7 @@ const NovoAgendamento = () => {
   const navigate = useNavigate();
   const [date, setDate] = useState<Date>();
   const [time, setTime] = useState("");
+  const [tipo, setTipo] = useState("");
 
   const salas = [
     { id: "sala-a", nome: "Sala A", capacidade: 12 },
@@ -63,16 +64,18 @@ const NovoAgendamento = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="tipo">Tipo de Sessão</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione o tipo de sessão" />
-                </SelectTrigger>
-                <SelectContent>
-                  {tiposSessao.map((tipo) => (
-                    <SelectItem key={tipo} value={tipo}>{tipo}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Input
+                id="tipo"
+                list="tipos-sessao-list"
+                value={tipo}
+                onChange={(e) => setTipo(e.target.value)}
+                placeholder="Digite ou selecione o tipo de sessão"
+              />
+              <datalist id="tipos-sessao-list">
+                {tiposSessao.map((tipo) => (
+                  <option key={tipo} value={tipo} />
+                ))}
+              </datalist>
             </div>
 
             <div className="space-y-2">
