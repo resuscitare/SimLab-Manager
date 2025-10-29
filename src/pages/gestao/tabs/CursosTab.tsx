@@ -275,12 +275,12 @@ const CursosTab = () => {
               <CardHeader><CardTitle>Custos Fixos e Variáveis</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2"><Label>Pagamento Instrutor(es)</Label><Input type="number" value={cursoEditando?.custoInstrutor || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoInstrutor: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Hospedagem</Label><Input type="number" value={cursoEditando?.custoHospedagem || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoHospedagem: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Alimentação</Label><Input type="number" value={cursoEditando?.custoAlimentacao || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoAlimentacao: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Combustível</Label><Input type="number" value={cursoEditando?.custoCombustivel || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCombustivel: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Coffee Break</Label><Input type="number" value={cursoEditando?.custoCoffeeBreak || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCoffeeBreak: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Desgaste Equipamento</Label><Input type="number" value={cursoEditando?.custoDesgasteEquipamento || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoDesgasteEquipamento: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Pagamento Instrutor(es) (R$)</Label><Input type="number" value={cursoEditando?.custoInstrutor || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoInstrutor: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Hospedagem (R$)</Label><Input type="number" value={cursoEditando?.custoHospedagem || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoHospedagem: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Alimentação (R$)</Label><Input type="number" value={cursoEditando?.custoAlimentacao || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoAlimentacao: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Combustível (R$)</Label><Input type="number" value={cursoEditando?.custoCombustivel || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCombustivel: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Coffee Break (R$)</Label><Input type="number" value={cursoEditando?.custoCoffeeBreak || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCoffeeBreak: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Desgaste Equipamento (R$)</Label><Input type="number" value={cursoEditando?.custoDesgasteEquipamento || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoDesgasteEquipamento: parseFloat(e.target.value) || 0 } : null)} /></div>
                 </div>
                 <div>
                   <Label>Outros Custos (Materiais, etc.)</Label>
@@ -291,7 +291,7 @@ const CursosTab = () => {
                         novosCustos[index].descricao = e.target.value;
                         setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
                       }} />
-                      <Input type="number" placeholder="Valor" value={custo.valor} className="w-32" onChange={(e) => {
+                      <Input type="number" placeholder="Valor (R$)" value={custo.valor} className="w-32" onChange={(e) => {
                         const novosCustos = [...cursoEditando.outrosCustos];
                         novosCustos[index].valor = parseFloat(e.target.value) || 0;
                         setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
