@@ -20,7 +20,8 @@ import {
   Database,
   Briefcase,
   ChevronRight,
-  Warehouse
+  Warehouse,
+  DollarSign
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,6 +61,11 @@ const sidebarItems = [
     title: "Gestão",
     icon: Briefcase,
     subItems: [
+      {
+        title: "Centro de Custos",
+        href: "/gestao",
+        icon: DollarSign
+      },
       {
         title: "Checklists",
         href: "/checklists",
