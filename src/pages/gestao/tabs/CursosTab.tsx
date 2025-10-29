@@ -10,9 +10,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, Edit, Trash2, Users, Clock, DollarSign, Star } from "lucide-react";
+import { Search, Plus, Edit, Trash2, Copy, Users, Clock, DollarSign, Star } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
-import { Local } from "@/types";
 
 interface CategoriaCurso {
   id: string;
@@ -40,6 +39,14 @@ interface Curso {
   observacoes: string;
   notaMedia: number;
   totalAvaliacoes: number;
+  // Campos de Custo
+  custoInstrutor: number;
+  custoHospedagem: number;
+  custoAlimentacao: number;
+  custoCombustivel: number;
+  custoCoffeeBreak: number;
+  custoDesgasteEquipamento: number;
+  outrosCustos: Array<{ id: string; descricao: string; valor: number }>;
 }
 
 const CursosTab = () => {
@@ -73,8 +80,8 @@ const CursosTab = () => {
         setCursos(JSON.parse(cursosSalvos));
       } else {
         const cursosMock: Curso[] = [
-          { id: "1", nome: "Suporte Básico de Vida", descricao: "Curso completo de suporte básico de vida com técnicas de RCP", categoria: "enfermagem", modalidade: "presencial", duracao: 2, duracaoUnidade: "dias", cargaHoraria: 16, vagas: 30, vagasDisponiveis: 15, preco: 350, dataInicio: "2024-02-01", dataFim: "2024-02-02", local: "Laboratório Térreo", status: "ativo", observacoes: "Material didático incluído", notaMedia: 4.5, totalAvaliacoes: 20 },
-          { id: "2", nome: "Ventilação Mecânica", descricao: "Curso avançado de ventilação mecânica", categoria: "medicina", modalidade: "híbrido", duracao: 1, duracaoUnidade: "meses", cargaHoraria: 40, vagas: 20, vagasDisponiveis: 8, preco: 1200, dataInicio: "2024-03-01", dataFim: "2024-03-31", local: "Laboratório 1º Andar", status: "ativo", observacoes: "Aulas teóricas online e práticas presenciais", notaMedia: 4.8, totalAvaliacoes: 15 }
+          { id: "1", nome: "Suporte Básico de Vida", descricao: "Curso completo de suporte básico de vida com técnicas de RCP", categoria: "enfermagem", modalidade: "presencial", duracao: 2, duracaoUnidade: "dias", cargaHoraria: 16, vagas: 30, vagasDisponiveis: 15, preco: 350, dataInicio: "2024-02-01", dataFim: "2024-02-02", local: "Laboratório Térreo", status: "ativo", observacoes: "Material didático incluído", notaMedia: 4.5, totalAvaliacoes: 20, custoInstrutor: 1500, custoHospedagem: 0, custoAlimentacao: 250, custoCombustivel: 50, custoCoffeeBreak: 150, custoDesgasteEquipamento: 100, outrosCustos: [] },
+          { id: "2", nome: "Ventilação Mecânica", descricao: "Curso avançado de ventilação mecânica", categoria: "medicina", modalidade: "híbrido", duracao: 1, duracaoUnidade: "meses", cargaHoraria: 40, vagas: 20, vagasDisponiveis: 8, preco: 1200, dataInicio: "2024-03-01", dataFim: "2024-03-31", local: "Laboratório 1º Andar", status: "ativo", observacoes: "Aulas teóricas online e práticas presenciais", notaMedia: 4.8, totalAvaliacoes: 15, custoInstrutor: 2500, custoHospedagem: 800, custoAlimentacao: 500, custoCombustivel: 150, custoCoffeeBreak: 300, custoDesgasteEquipamento: 500, outrosCustos: [{id: '1', descricao: 'Licença Software', valor: 200}] }
         ];
         setCursos(cursosMock);
         localStorage.setItem('simlab_cursos', JSON.stringify(cursosMock));
@@ -105,14 +112,6 @@ const CursosTab = () => {
       default: return 0;
     }
   });
-
-  const estatisticas = {
-    total: cursos.length,
-    ativos: cursos.filter(c => c.status === "ativo").length,
-    vagasTotais: cursos.reduce((acc, c) => acc + c.vagas, 0),
-    vagasDisponiveis: cursos.reduce((acc, c) => acc + c.vagasDisponiveis, 0),
-    notaMedia: cursos.length > 0 ? cursos.reduce((acc, c) => acc + c.notaMedia, 0) / cursos.length : 0
-  };
 
   const handleSalvarCurso = () => {
     if (!cursoEditando || !cursoEditando.nome || !cursoEditando.descricao || !cursoEditando.categoria) {
@@ -149,6 +148,23 @@ const CursosTab = () => {
     }
   };
 
+  const handleDuplicarCurso = (id: string) => {
+    const cursoOriginal = cursos.find(c => c.id === id);
+    if (cursoOriginal) {
+      const novoCurso = {
+        ...cursoOriginal,
+        id: Date.now().toString(),
+        nome: `${cursoOriginal.nome} (Cópia)`,
+        status: "inativo" as const,
+        vagasDisponiveis: cursoOriginal.vagas,
+      };
+      const cursosAtualizados = [...cursos, novoCurso];
+      setCursos(cursosAtualizados);
+      localStorage.setItem('simlab_cursos', JSON.stringify(cursosAtualizados));
+      showSuccess("Curso duplicado com sucesso!");
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants = { ativo: "bg-green-100 text-green-800", inativo: "bg-gray-100 text-gray-800", suspenso: "bg-yellow-100 text-yellow-800", encerrado: "bg-red-100 text-red-800" };
     return variants[status as keyof typeof variants] || "bg-gray-100 text-gray-800";
@@ -163,59 +179,6 @@ const CursosTab = () => {
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total de Cursos</CardTitle>
-            <Users className="h-4 w-4 text-blue-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{estatisticas.total}</div>
-            <p className="text-xs text-gray-500">Cursos cadastrados</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Cursos Ativos</CardTitle>
-            <Users className="h-4 w-4 text-green-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-600">{estatisticas.ativos}</div>
-            <p className="text-xs text-gray-500">Em andamento</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Vagas Totais</CardTitle>
-            <Users className="h-4 w-4 text-purple-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{estatisticas.vagasTotais}</div>
-            <p className="text-xs text-gray-500">Total de vagas</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Vagas Disponíveis</CardTitle>
-            <Users className="h-4 w-4 text-orange-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-orange-600">{estatisticas.vagasDisponiveis}</div>
-            <p className="text-xs text-gray-500">Vagas abertas</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Nota Média</CardTitle>
-            <Star className="h-4 w-4 text-yellow-600" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-yellow-600">{estatisticas.notaMedia.toFixed(1)}</div>
-            <p className="text-xs text-gray-500">Avaliação geral</p>
-          </CardContent>
-        </Card>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Filtros e Ações</CardTitle>
@@ -231,19 +194,11 @@ const CursosTab = () => {
               <SelectTrigger className="w-full lg:w-48"><SelectValue placeholder="Categoria" /></SelectTrigger>
               <SelectContent><SelectItem value="todas">Todas as categorias</SelectItem>{categorias.map(cat => (<SelectItem key={cat.id} value={cat.id}>{cat.nome}</SelectItem>))}</SelectContent>
             </Select>
-            <Select value={modalidadeFiltro} onValueChange={setModalidadeFiltro}>
-              <SelectTrigger className="w-full lg:w-40"><SelectValue placeholder="Modalidade" /></SelectTrigger>
-              <SelectContent><SelectItem value="todas">Todas</SelectItem><SelectItem value="presencial">Presencial</SelectItem><SelectItem value="online">Online</SelectItem><SelectItem value="híbrido">Híbrido</SelectItem></SelectContent>
-            </Select>
             <Select value={statusFiltro} onValueChange={setStatusFiltro}>
               <SelectTrigger className="w-full lg:w-40"><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent><SelectItem value="todos">Todos</SelectItem><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem><SelectItem value="suspenso">Suspenso</SelectItem><SelectItem value="encerrado">Encerrado</SelectItem></SelectContent>
             </Select>
-            <Select value={ordenacao} onValueChange={setOrdenacao}>
-              <SelectTrigger className="w-full lg:w-40"><SelectValue placeholder="Ordenar por" /></SelectTrigger>
-              <SelectContent><SelectItem value="nome">Nome</SelectItem><SelectItem value="vagas">Vagas</SelectItem><SelectItem value="preco">Preço</SelectItem><SelectItem value="nota">Nota Média</SelectItem><SelectItem value="status">Status</SelectItem></SelectContent>
-            </Select>
-            <Button onClick={() => { setCursoEditando(null); setIsDialogOpen(true); }}>
+            <Button onClick={() => { setCursoEditando({ id: '', nome: '', descricao: '', categoria: '', modalidade: 'presencial', duracao: 0, duracaoUnidade: 'horas', cargaHoraria: 0, vagas: 0, vagasDisponiveis: 0, preco: 0, dataInicio: '', dataFim: '', local: '', status: 'inativo', observacoes: '', notaMedia: 0, totalAvaliacoes: 0, custoInstrutor: 0, custoHospedagem: 0, custoAlimentacao: 0, custoCombustivel: 0, custoCoffeeBreak: 0, custoDesgasteEquipamento: 0, outrosCustos: [] }); setIsDialogOpen(true); }}>
               <Plus className="h-4 w-4 mr-2" />Novo Curso
             </Button>
           </div>
@@ -261,9 +216,6 @@ const CursosTab = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead>Nome</TableHead>
-                  <TableHead>Categoria</TableHead>
-                  <TableHead>Modalidade</TableHead>
-                  <TableHead>Duração</TableHead>
                   <TableHead>Vagas</TableHead>
                   <TableHead>Preço</TableHead>
                   <TableHead>Status</TableHead>
@@ -279,14 +231,12 @@ const CursosTab = () => {
                         <div className="text-sm text-gray-500 truncate max-w-xs">{curso.descricao}</div>
                       </div>
                     </TableCell>
-                    <TableCell><Badge variant="outline" className={categorias.find(c => c.id === curso.categoria)?.cor || 'bg-gray-100'}>{categorias.find(cat => cat.id === curso.categoria)?.nome || curso.categoria}</Badge></TableCell>
-                    <TableCell><Badge variant="outline">{curso.modalidade}</Badge></TableCell>
-                    <TableCell><div className="flex items-center gap-1"><Clock className="h-4 w-4 text-gray-500" /><span>{curso.duracao} {curso.duracaoUnidade}</span></div></TableCell>
                     <TableCell><div className="flex items-center gap-2"><Users className="h-4 w-4 text-gray-500" /><span>{curso.vagasDisponiveis}/{curso.vagas}</span></div></TableCell>
                     <TableCell><div className="flex items-center gap-1"><DollarSign className="h-4 w-4 text-gray-500" /><span>R$ {curso.preco.toFixed(2)}</span></div></TableCell>
                     <TableCell><Badge className={getStatusBadge(curso.status)}>{getStatusText(curso.status)}</Badge></TableCell>
                     <TableCell>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1">
+                        <Button variant="ghost" size="icon" onClick={() => handleDuplicarCurso(curso.id)}><Copy className="h-4 w-4" /></Button>
                         <Button variant="ghost" size="icon" onClick={() => { setCursoEditando(curso); setIsDialogOpen(true); }}><Edit className="h-4 w-4" /></Button>
                         <Button variant="ghost" size="icon" onClick={() => handleExcluirCurso(curso.id)} className="text-red-600"><Trash2 className="h-4 w-4" /></Button>
                       </div>
@@ -300,36 +250,65 @@ const CursosTab = () => {
       </Card>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{cursoEditando?.id ? "Editar Curso" : "Novo Curso"}</DialogTitle>
-            <DialogDescription>{cursoEditando?.id ? "Edite as informações do curso existente" : "Cadastre um novo curso"}</DialogDescription>
+            <DialogDescription>{cursoEditando?.id ? "Edite as informações do curso" : "Cadastre um novo curso com seus custos"}</DialogDescription>
           </DialogHeader>
           <div className="space-y-6 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2"><Label htmlFor="nome">Nome do Curso *</Label><Input id="nome" value={cursoEditando?.nome || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, nome: e.target.value } : null)} placeholder="Ex: Suporte Básico de Vida" /></div>
-              <div className="space-y-2"><Label htmlFor="categoria">Categoria *</Label><Select value={cursoEditando?.categoria || ""} onValueChange={(value) => setCursoEditando(prev => prev ? { ...prev, categoria: value } : null)}><SelectTrigger><SelectValue placeholder="Selecione a categoria" /></SelectTrigger><SelectContent>{categorias.map(cat => (<SelectItem key={cat.id} value={cat.id}>{cat.nome}</SelectItem>))}</SelectContent></Select></div>
-            </div>
-            <div className="space-y-2"><Label htmlFor="descricao">Descrição *</Label><Textarea id="descricao" value={cursoEditando?.descricao || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, descricao: e.target.value } : null)} placeholder="Descreva o curso" rows={3} /></div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2"><Label htmlFor="modalidade">Modalidade *</Label><Select value={cursoEditando?.modalidade || ""} onValueChange={(value) => setCursoEditando(prev => prev ? { ...prev, modalidade: value as any } : null)}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent><SelectItem value="presencial">Presencial</SelectItem><SelectItem value="online">Online</SelectItem><SelectItem value="híbrido">Híbrido</SelectItem></SelectContent></Select></div>
-              <div className="space-y-2"><Label htmlFor="duracao">Duração *</Label><Input id="duracao" type="number" value={cursoEditando?.duracao || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, duracao: parseInt(e.target.value) || 0 } : null)} placeholder="0" /></div>
-              <div className="space-y-2"><Label htmlFor="duracaoUnidade">Unidade *</Label><Select value={cursoEditando?.duracaoUnidade || ""} onValueChange={(value) => setCursoEditando(prev => prev ? { ...prev, duracaoUnidade: value as any } : null)}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent><SelectItem value="horas">Horas</SelectItem><SelectItem value="dias">Dias</SelectItem><SelectItem value="semanas">Semanas</SelectItem><SelectItem value="meses">Meses</SelectItem></SelectContent></Select></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2"><Label htmlFor="vagas">Vagas Totais *</Label><Input id="vagas" type="number" value={cursoEditando?.vagas || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, vagas: parseInt(e.target.value) || 0 } : null)} placeholder="0" /></div>
-              <div className="space-y-2"><Label htmlFor="vagasDisponiveis">Vagas Disponíveis *</Label><Input id="vagasDisponiveis" type="number" value={cursoEditando?.vagasDisponiveis || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, vagasDisponiveis: parseInt(e.target.value) || 0 } : null)} placeholder="0" /></div>
-              <div className="space-y-2"><Label htmlFor="preco">Preço (R$) *</Label><Input id="preco" type="number" value={cursoEditando?.preco || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, preco: parseFloat(e.target.value) || 0 } : null)} placeholder="0.00" /></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2"><Label htmlFor="dataInicio">Data Início *</Label><Input id="dataInicio" type="date" value={cursoEditando?.dataInicio || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, dataInicio: e.target.value } : null)} /></div>
-              <div className="space-y-2"><Label htmlFor="dataFim">Data Fim *</Label><Input id="dataFim" type="date" value={cursoEditando?.dataFim || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, dataFim: e.target.value } : null)} /></div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2"><Label htmlFor="local">Local</Label><Input id="local" value={cursoEditando?.local || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, local: e.target.value } : null)} placeholder="Ex: Laboratório Térreo" /></div>
-              <div className="space-y-2"><Label htmlFor="status">Status</Label><Select value={cursoEditando?.status || ""} onValueChange={(value) => setCursoEditando(prev => prev ? { ...prev, status: value as any } : null)}><SelectTrigger><SelectValue placeholder="Selecione o status" /></SelectTrigger><SelectContent><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem><SelectItem value="suspenso">Suspenso</SelectItem><SelectItem value="encerrado">Encerrado</SelectItem></SelectContent></Select></div>
-            </div>
-            <div className="space-y-2"><Label htmlFor="observacoes">Observações</Label><Textarea id="observacoes" value={cursoEditando?.observacoes || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, observacoes: e.target.value } : null)} placeholder="Observações adicionais sobre o curso" rows={3} /></div>
+            <Card>
+              <CardHeader><CardTitle>Informações Gerais</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2"><Label htmlFor="nome">Nome do Curso *</Label><Input id="nome" value={cursoEditando?.nome || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, nome: e.target.value } : null)} /></div>
+                  <div className="space-y-2"><Label htmlFor="categoria">Categoria *</Label><Select value={cursoEditando?.categoria || ""} onValueChange={(value) => setCursoEditando(prev => prev ? { ...prev, categoria: value } : null)}><SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger><SelectContent>{categorias.map(cat => (<SelectItem key={cat.id} value={cat.id}>{cat.nome}</SelectItem>))}</SelectContent></Select></div>
+                </div>
+                <div className="space-y-2"><Label htmlFor="descricao">Descrição *</Label><Textarea id="descricao" value={cursoEditando?.descricao || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, descricao: e.target.value } : null)} rows={2} /></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2"><Label htmlFor="vagas">Vagas Totais *</Label><Input id="vagas" type="number" value={cursoEditando?.vagas || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, vagas: parseInt(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label htmlFor="preco">Preço (R$) *</Label><Input id="preco" type="number" value={cursoEditando?.preco || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, preco: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label htmlFor="status">Status</Label><Select value={cursoEditando?.status || ""} onValueChange={(value) => setCursoEditando(prev => prev ? { ...prev, status: value as any } : null)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem><SelectItem value="suspenso">Suspenso</SelectItem><SelectItem value="encerrado">Encerrado</SelectItem></SelectContent></Select></div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader><CardTitle>Custos Fixos e Variáveis</CardTitle></CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2"><Label>Pagamento Instrutor(es)</Label><Input type="number" value={cursoEditando?.custoInstrutor || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoInstrutor: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Hospedagem</Label><Input type="number" value={cursoEditando?.custoHospedagem || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoHospedagem: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Alimentação</Label><Input type="number" value={cursoEditando?.custoAlimentacao || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoAlimentacao: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Combustível</Label><Input type="number" value={cursoEditando?.custoCombustivel || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCombustivel: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Coffee Break</Label><Input type="number" value={cursoEditando?.custoCoffeeBreak || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCoffeeBreak: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2"><Label>Desgaste Equipamento</Label><Input type="number" value={cursoEditando?.custoDesgasteEquipamento || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoDesgasteEquipamento: parseFloat(e.target.value) || 0 } : null)} /></div>
+                </div>
+                <div>
+                  <Label>Outros Custos (Materiais, etc.)</Label>
+                  {cursoEditando?.outrosCustos.map((custo, index) => (
+                    <div key={custo.id} className="flex gap-2 items-center mt-2">
+                      <Input placeholder="Descrição (Ex: Sangue simulado)" value={custo.descricao} onChange={(e) => {
+                        const novosCustos = [...cursoEditando.outrosCustos];
+                        novosCustos[index].descricao = e.target.value;
+                        setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
+                      }} />
+                      <Input type="number" placeholder="Valor" value={custo.valor} className="w-32" onChange={(e) => {
+                        const novosCustos = [...cursoEditando.outrosCustos];
+                        novosCustos[index].valor = parseFloat(e.target.value) || 0;
+                        setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
+                      }} />
+                      <Button variant="ghost" size="icon" onClick={() => {
+                        const novosCustos = cursoEditando.outrosCustos.filter(c => c.id !== custo.id);
+                        setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
+                      }}><Trash2 className="h-4 w-4 text-red-500" /></Button>
+                    </div>
+                  ))}
+                  <Button variant="outline" size="sm" className="mt-2" onClick={() => {
+                    const novoCusto = { id: Date.now().toString(), descricao: '', valor: 0 };
+                    setCursoEditando(prev => prev ? { ...prev, outrosCustos: [...prev.outrosCustos, novoCusto] } : null);
+                  }}><Plus className="h-4 w-4 mr-2" />Adicionar Custo</Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setIsDialogOpen(false); setCursoEditando(null); }}>Cancelar</Button>
