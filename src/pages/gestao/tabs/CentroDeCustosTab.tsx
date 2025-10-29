@@ -32,37 +32,48 @@ const CentroDeCustosTab = () => {
   const [materialCostsData, setMaterialCostsData] = useState<Material[]>([]);
 
   useEffect(() => {
-    // Carregar dados de cursos do localStorage
-    const cursosSalvos = localStorage.getItem('simlab_cursos');
-    if (cursosSalvos) {
-      setCourseCostsData(JSON.parse(cursosSalvos));
+    try {
+      const cursosSalvos = localStorage.getItem('simlab_cursos');
+      if (cursosSalvos) {
+        const parsedCursos = JSON.parse(cursosSalvos);
+        if (Array.isArray(parsedCursos)) {
+          setCourseCostsData(parsedCursos);
+        }
+      }
+    } catch (e) {
+      console.error("Falha ao carregar dados dos cursos:", e);
     }
 
-    // Carregar dados de materiais do localStorage
-    const materiaisSalvos = localStorage.getItem('simlab_estoque_itens');
-    if (materiaisSalvos) {
+    try {
+      const materiaisSalvos = localStorage.getItem('simlab_estoque_itens');
+      if (materiaisSalvos) {
         const itensEstoque = JSON.parse(materiaisSalvos);
-        setMaterialCostsData(itensEstoque.map((item: any) => ({
-            id: item.id,
-            nome: item.nome,
-            categoria: item.categoria,
-            valorTotal: item.valorTotal || (item.quantidade * item.valorUnitario)
-        })));
+        if (Array.isArray(itensEstoque)) {
+          setMaterialCostsData(itensEstoque.map((item: any) => ({
+              id: item.id || `item-${Math.random()}`,
+              nome: item.nome || "Item sem nome",
+              categoria: item.categoria || "Sem categoria",
+              valorTotal: Number(item.valorTotal) || (Number(item.quantidade) * Number(item.valorUnitario)) || 0
+          })));
+        }
+      }
+    } catch (e) {
+      console.error("Falha ao carregar dados dos materiais:", e);
     }
   }, []);
 
   const calculateCourseTotals = (course: Curso) => {
-    const outrosCustosTotal = course.outrosCustos.reduce((acc, custo) => acc + custo.valor, 0);
+    const outrosCustosTotal = (course.outrosCustos || []).reduce((acc, custo) => acc + (custo.valor || 0), 0);
     const totalCost = 
-      course.custoInstrutor + 
-      course.custoHospedagem + 
-      course.custoAlimentacao + 
-      course.custoCombustivel + 
-      course.custoCoffeeBreak + 
-      course.custoDesgasteEquipamento +
+      (course.custoInstrutor || 0) + 
+      (course.custoHospedagem || 0) + 
+      (course.custoAlimentacao || 0) + 
+      (course.custoCombustivel || 0) + 
+      (course.custoCoffeeBreak || 0) + 
+      (course.custoDesgasteEquipamento || 0) +
       outrosCustosTotal;
       
-    const totalRevenue = course.preco * course.vagas;
+    const totalRevenue = (course.preco || 0) * (course.vagas || 0);
     const netResult = totalRevenue - totalCost;
     return { totalCost, totalRevenue, netResult };
   };
@@ -70,15 +81,15 @@ const CentroDeCustosTab = () => {
   const overallTotals = courseCostsData.reduce(
     (acc, course) => {
       const { totalCost, totalRevenue, netResult } = calculateCourseTotals(course);
-      acc.totalCost += totalCost;
-      acc.totalRevenue += totalRevenue;
-      acc.netResult += netResult;
+      acc.totalCost += totalCost || 0;
+      acc.totalRevenue += totalRevenue || 0;
+      acc.netResult += netResult || 0;
       return acc;
     },
     { totalCost: 0, totalRevenue: 0, netResult: 0 }
   );
 
-  const totalMaterialCost = materialCostsData.reduce((acc, item) => acc + item.valorTotal, 0);
+  const totalMaterialCost = materialCostsData.reduce((acc, item) => acc + (item.valorTotal || 0), 0);
   const grandTotalCost = overallTotals.totalCost + totalMaterialCost;
   const grandNetResult = overallTotals.totalRevenue - grandTotalCost;
 
