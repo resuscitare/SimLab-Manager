@@ -79,7 +79,7 @@ export const EstoqueTable = ({
                     )}
                   </div>
                 </TableCell>
-                <TableCell className="font-medium">R$ {item.valorTotal.toFixed(2)}</TableCell>
+                <TableCell className="font-medium">R$ {item.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                 <TableCell className="max-w-xs truncate" title={item.local}>
                   {item.local}
                 </TableCell>

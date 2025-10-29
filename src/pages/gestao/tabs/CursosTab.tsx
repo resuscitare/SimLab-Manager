@@ -232,7 +232,7 @@ const CursosTab = () => {
                       </div>
                     </TableCell>
                     <TableCell><div className="flex items-center gap-2"><Users className="h-4 w-4 text-gray-500" /><span>{curso.vagasDisponiveis}/{curso.vagas}</span></div></TableCell>
-                    <TableCell><div className="flex items-center gap-1"><DollarSign className="h-4 w-4 text-gray-500" /><span>R$ {curso.preco.toFixed(2)}</span></div></TableCell>
+                    <TableCell><div className="flex items-center gap-1"><DollarSign className="h-4 w-4 text-gray-500" /><span>R$ {curso.preco.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></div></TableCell>
                     <TableCell><Badge className={getStatusBadge(curso.status)}>{getStatusText(curso.status)}</Badge></TableCell>
                     <TableCell>
                       <div className="flex items-center gap-1">

@@ -151,7 +151,7 @@ export const ItemDialog = ({
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium">Valor Total:</span>
-                <div className="text-lg font-bold">R$ {formData.valorTotal.toFixed(2)}</div>
+                <div className="text-lg font-bold">R$ {formData.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</div>
               </div>
               <div>
                 <span className="font-medium">Status:</span>
