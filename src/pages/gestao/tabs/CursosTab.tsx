@@ -20,6 +20,15 @@ interface CategoriaCurso {
   cor: string;
 }
 
+interface CustoInstrutor {
+  id: string;
+  nome: string;
+  pagamento: number;
+  hospedagem: number;
+  alimentacao: number;
+  transporte: number;
+}
+
 interface Curso {
   id: string;
   nome: string;
@@ -40,10 +49,7 @@ interface Curso {
   notaMedia: number;
   totalAvaliacoes: number;
   // Campos de Custo
-  custoInstrutor: number;
-  custoHospedagem: number;
-  custoAlimentacao: number;
-  custoCombustivel: number;
+  custosInstrutores: CustoInstrutor[];
   custoCoffeeBreak: number;
   custoDesgasteEquipamento: number;
   outrosCustos: Array<{ id: string; descricao: string; valor: number }>;
@@ -80,8 +86,8 @@ const CursosTab = () => {
         setCursos(JSON.parse(cursosSalvos));
       } else {
         const cursosMock: Curso[] = [
-          { id: "1", nome: "Suporte Básico de Vida", descricao: "Curso completo de suporte básico de vida com técnicas de RCP", categoria: "enfermagem", modalidade: "presencial", duracao: 2, duracaoUnidade: "dias", cargaHoraria: 16, vagas: 30, vagasDisponiveis: 15, preco: 350, dataInicio: "2024-02-01", dataFim: "2024-02-02", local: "Laboratório Térreo", status: "ativo", observacoes: "Material didático incluído", notaMedia: 4.5, totalAvaliacoes: 20, custoInstrutor: 1500, custoHospedagem: 0, custoAlimentacao: 250, custoCombustivel: 50, custoCoffeeBreak: 150, custoDesgasteEquipamento: 100, outrosCustos: [] },
-          { id: "2", nome: "Ventilação Mecânica", descricao: "Curso avançado de ventilação mecânica", categoria: "medicina", modalidade: "híbrido", duracao: 1, duracaoUnidade: "meses", cargaHoraria: 40, vagas: 20, vagasDisponiveis: 8, preco: 1200, dataInicio: "2024-03-01", dataFim: "2024-03-31", local: "Laboratório 1º Andar", status: "ativo", observacoes: "Aulas teóricas online e práticas presenciais", notaMedia: 4.8, totalAvaliacoes: 15, custoInstrutor: 2500, custoHospedagem: 800, custoAlimentacao: 500, custoCombustivel: 150, custoCoffeeBreak: 300, custoDesgasteEquipamento: 500, outrosCustos: [{id: '1', descricao: 'Licença Software', valor: 200}] }
+          { id: "1", nome: "Suporte Básico de Vida", descricao: "Curso completo de suporte básico de vida com técnicas de RCP", categoria: "enfermagem", modalidade: "presencial", duracao: 2, duracaoUnidade: "dias", cargaHoraria: 16, vagas: 30, vagasDisponiveis: 15, preco: 350, dataInicio: "2024-02-01", dataFim: "2024-02-02", local: "Laboratório Térreo", status: "ativo", observacoes: "Material didático incluído", notaMedia: 4.5, totalAvaliacoes: 20, custosInstrutores: [{id: '1', nome: 'Dr. Carlos', pagamento: 1500, hospedagem: 0, alimentacao: 50, transporte: 50}], custoCoffeeBreak: 150, custoDesgasteEquipamento: 100, outrosCustos: [] },
+          { id: "2", nome: "Ventilação Mecânica", descricao: "Curso avançado de ventilação mecânica", categoria: "medicina", modalidade: "híbrido", duracao: 1, duracaoUnidade: "meses", cargaHoraria: 40, vagas: 20, vagasDisponiveis: 8, preco: 1200, dataInicio: "2024-03-01", dataFim: "2024-03-31", local: "Laboratório 1º Andar", status: "ativo", observacoes: "Aulas teóricas online e práticas presenciais", notaMedia: 4.8, totalAvaliacoes: 15, custosInstrutores: [{id: '1', nome: 'Dra. Ana', pagamento: 2500, hospedagem: 800, alimentacao: 300, transporte: 150}], custoCoffeeBreak: 300, custoDesgasteEquipamento: 500, outrosCustos: [{id: '1', descricao: 'Licença Software', valor: 200}] }
         ];
         setCursos(cursosMock);
         localStorage.setItem('simlab_cursos', JSON.stringify(cursosMock));
@@ -94,14 +100,11 @@ const CursosTab = () => {
     }
   };
 
-  // Função para formatar valor para exibição no input
   const formatarValorParaInput = (valor: number): string => {
     return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   };
 
-  // Função para converter valor do input para número
   const converterInputParaNumero = (valor: string): number => {
-    // Remove pontos (separadores de milhares) e substitui vírgula por ponto
     const numeroLimpo = valor.replace(/\./g, '').replace(',', '.');
     return parseFloat(numeroLimpo) || 0;
   };
@@ -187,6 +190,41 @@ const CursosTab = () => {
     return textos[status as keyof typeof textos] || status;
   };
 
+  const handleAdicionarCustoInstrutor = () => {
+    if (!cursoEditando) return;
+    const novoCusto: CustoInstrutor = {
+      id: Date.now().toString(),
+      nome: '',
+      pagamento: 0,
+      hospedagem: 0,
+      alimentacao: 0,
+      transporte: 0,
+    };
+    setCursoEditando({
+      ...cursoEditando,
+      custosInstrutores: [...cursoEditando.custosInstrutores, novoCusto]
+    });
+  };
+
+  const handleRemoverCustoInstrutor = (id: string) => {
+    if (!cursoEditando) return;
+    setCursoEditando({
+      ...cursoEditando,
+      custosInstrutores: cursoEditando.custosInstrutores.filter(c => c.id !== id)
+    });
+  };
+
+  const handleAtualizarCustoInstrutor = (id: string, campo: keyof CustoInstrutor, valor: string | number) => {
+    if (!cursoEditando) return;
+    const novosCustos = cursoEditando.custosInstrutores.map(c => {
+      if (c.id === id) {
+        return { ...c, [campo]: valor };
+      }
+      return c;
+    });
+    setCursoEditando({ ...cursoEditando, custosInstrutores: novosCustos });
+  };
+
   if (loading) return <p>Carregando...</p>;
 
   return (
@@ -210,7 +248,7 @@ const CursosTab = () => {
               <SelectTrigger className="w-full lg:w-40"><SelectValue placeholder="Status" /></SelectTrigger>
               <SelectContent><SelectItem value="todos">Todos</SelectItem><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem><SelectItem value="suspenso">Suspenso</SelectItem><SelectItem value="encerrado">Encerrado</SelectItem></SelectContent>
             </Select>
-            <Button onClick={() => { setCursoEditando({ id: '', nome: '', descricao: '', categoria: '', modalidade: 'presencial', duracao: 0, duracaoUnidade: 'horas', cargaHoraria: 0, vagas: 0, vagasDisponiveis: 0, preco: 0, dataInicio: '', dataFim: '', local: '', status: 'inativo', observacoes: '', notaMedia: 0, totalAvaliacoes: 0, custoInstrutor: 0, custoHospedagem: 0, custoAlimentacao: 0, custoCombustivel: 0, custoCoffeeBreak: 0, custoDesgasteEquipamento: 0, outrosCustos: [] }); setIsDialogOpen(true); }}>
+            <Button onClick={() => { setCursoEditando({ id: '', nome: '', descricao: '', categoria: '', modalidade: 'presencial', duracao: 0, duracaoUnidade: 'horas', cargaHoraria: 0, vagas: 0, vagasDisponiveis: 0, preco: 0, dataInicio: '', dataFim: '', local: '', status: 'inativo', observacoes: '', notaMedia: 0, totalAvaliacoes: 0, custosInstrutores: [], custoCoffeeBreak: 0, custoDesgasteEquipamento: 0, outrosCustos: [] }); setIsDialogOpen(true); }}>
               <Plus className="h-4 w-4 mr-2" />Novo Curso
             </Button>
           </div>
@@ -294,54 +332,57 @@ const CursosTab = () => {
             <Card>
               <CardHeader><CardTitle>Custos Fixos e Variáveis</CardTitle></CardHeader>
               <CardContent className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2">
-                    <Label>Pagamento Instrutor(es) (R$)</Label>
-                    <Input 
-                      value={cursoEditando?.custoInstrutor ? formatarValorParaInput(cursoEditando.custoInstrutor) : ""} 
-                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoInstrutor: converterInputParaNumero(e.target.value) } : null)} 
-                      placeholder="0,00"
-                    />
+                <div>
+                  <Label className="font-semibold">Custos por Instrutor</Label>
+                  <div className="space-y-4 mt-2">
+                    {cursoEditando?.custosInstrutores.map((custo, index) => (
+                      <Card key={custo.id} className="p-4 bg-muted/50">
+                        <div className="flex justify-between items-center mb-4">
+                          <h4 className="font-medium">Instrutor {index + 1}</h4>
+                          <Button variant="ghost" size="icon" onClick={() => handleRemoverCustoInstrutor(custo.id)}>
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div className="space-y-2 md:col-span-3">
+                            <Label>Nome do Instrutor</Label>
+                            <Input value={custo.nome} onChange={(e) => handleAtualizarCustoInstrutor(custo.id, 'nome', e.target.value)} placeholder="Nome do Instrutor" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Pagamento (R$)</Label>
+                            <Input value={formatarValorParaInput(custo.pagamento)} onChange={(e) => handleAtualizarCustoInstrutor(custo.id, 'pagamento', converterInputParaNumero(e.target.value))} placeholder="0,00" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Hospedagem (R$)</Label>
+                            <Input value={formatarValorParaInput(custo.hospedagem)} onChange={(e) => handleAtualizarCustoInstrutor(custo.id, 'hospedagem', converterInputParaNumero(e.target.value))} placeholder="0,00" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Alimentação (R$)</Label>
+                            <Input value={formatarValorParaInput(custo.alimentacao)} onChange={(e) => handleAtualizarCustoInstrutor(custo.id, 'alimentacao', converterInputParaNumero(e.target.value))} placeholder="0,00" />
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Transporte (R$)</Label>
+                            <Input value={formatarValorParaInput(custo.transporte)} onChange={(e) => handleAtualizarCustoInstrutor(custo.id, 'transporte', converterInputParaNumero(e.target.value))} placeholder="0,00" />
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                    <Button variant="outline" size="sm" className="mt-4" onClick={handleAdicionarCustoInstrutor}>
+                      <Plus className="h-4 w-4 mr-2" />Adicionar Instrutor/Custo
+                    </Button>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Hospedagem (R$)</Label>
-                    <Input 
-                      value={cursoEditando?.custoHospedagem ? formatarValorParaInput(cursoEditando.custoHospedagem) : ""} 
-                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoHospedagem: converterInputParaNumero(e.target.value) } : null)} 
-                      placeholder="0,00"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Alimentação (R$)</Label>
-                    <Input 
-                      value={cursoEditando?.custoAlimentacao ? formatarValorParaInput(cursoEditando.custoAlimentacao) : ""} 
-                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoAlimentacao: converterInputParaNumero(e.target.value) } : null)} 
-                      placeholder="0,00"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Combustível (R$)</Label>
-                    <Input 
-                      value={cursoEditando?.custoCombustivel ? formatarValorParaInput(cursoEditando.custoCombustivel) : ""} 
-                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCombustivel: converterInputParaNumero(e.target.value) } : null)} 
-                      placeholder="0,00"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Coffee Break (R$)</Label>
-                    <Input 
-                      value={cursoEditando?.custoCoffeeBreak ? formatarValorParaInput(cursoEditando.custoCoffeeBreak) : ""} 
-                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCoffeeBreak: converterInputParaNumero(e.target.value) } : null)} 
-                      placeholder="0,00"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Desgaste Equipamento (R$)</Label>
-                    <Input 
-                      value={cursoEditando?.custoDesgasteEquipamento ? formatarValorParaInput(cursoEditando.custoDesgasteEquipamento) : ""} 
-                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoDesgasteEquipamento: converterInputParaNumero(e.target.value) } : null)} 
-                      placeholder="0,00"
-                    />
+                </div>
+                <div className="pt-4 border-t">
+                  <Label className="font-semibold">Custos Gerais do Curso</Label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                    <div className="space-y-2">
+                      <Label>Coffee Break (R$)</Label>
+                      <Input value={cursoEditando?.custoCoffeeBreak ? formatarValorParaInput(cursoEditando.custoCoffeeBreak) : ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCoffeeBreak: converterInputParaNumero(e.target.value) } : null)} placeholder="0,00" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Desgaste Equipamento (R$)</Label>
+                      <Input value={cursoEditando?.custoDesgasteEquipamento ? formatarValorParaInput(cursoEditando.custoDesgasteEquipamento) : ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoDesgasteEquipamento: converterInputParaNumero(e.target.value) } : null)} placeholder="0,00" />
+                    </div>
                   </div>
                 </div>
                 <div>
@@ -353,16 +394,11 @@ const CursosTab = () => {
                         novosCustos[index].descricao = e.target.value;
                         setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
                       }} />
-                      <Input 
-                        placeholder="Valor (R$) - Ex: 150,00" 
-                        value={custo.valor ? formatarValorParaInput(custo.valor) : ""} 
-                        className="w-40" 
-                        onChange={(e) => {
-                          const novosCustos = [...cursoEditando.outrosCustos];
-                          novosCustos[index].valor = converterInputParaNumero(e.target.value);
-                          setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
-                        }} 
-                      />
+                      <Input placeholder="Valor (R$)" value={custo.valor ? formatarValorParaInput(custo.valor) : ""} className="w-40" onChange={(e) => {
+                        const novosCustos = [...cursoEditando.outrosCustos];
+                        novosCustos[index].valor = converterInputParaNumero(e.target.value);
+                        setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
+                      }} />
                       <Button variant="ghost" size="icon" onClick={() => {
                         const novosCustos = cursoEditando.outrosCustos.filter(c => c.id !== custo.id);
                         setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);

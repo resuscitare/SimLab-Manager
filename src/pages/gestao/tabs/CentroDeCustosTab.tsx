@@ -6,15 +6,21 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { DollarSign, TrendingUp, TrendingDown, Package, BookOpen } from "lucide-react";
 
+interface CustoInstrutor {
+  id: string;
+  nome: string;
+  pagamento: number;
+  hospedagem: number;
+  alimentacao: number;
+  transporte: number;
+}
+
 interface Curso {
   id: string;
   nome: string;
   preco: number;
   vagas: number;
-  custoInstrutor: number;
-  custoHospedagem: number;
-  custoAlimentacao: number;
-  custoCombustivel: number;
+  custosInstrutores: CustoInstrutor[];
   custoCoffeeBreak: number;
   custoDesgasteEquipamento: number;
   outrosCustos: Array<{ id: string; descricao: string; valor: number }>;
@@ -64,11 +70,12 @@ const CentroDeCustosTab = () => {
 
   const calculateCourseTotals = (course: Curso) => {
     const outrosCustosTotal = (course.outrosCustos || []).reduce((acc, custo) => acc + (custo.valor || 0), 0);
+    const custosInstrutoresTotal = (course.custosInstrutores || []).reduce((acc, instrutor) => {
+      return acc + (instrutor.pagamento || 0) + (instrutor.hospedagem || 0) + (instrutor.alimentacao || 0) + (instrutor.transporte || 0);
+    }, 0);
+
     const totalCost = 
-      (course.custoInstrutor || 0) + 
-      (course.custoHospedagem || 0) + 
-      (course.custoAlimentacao || 0) + 
-      (course.custoCombustivel || 0) + 
+      custosInstrutoresTotal +
       (course.custoCoffeeBreak || 0) + 
       (course.custoDesgasteEquipamento || 0) +
       outrosCustosTotal;
