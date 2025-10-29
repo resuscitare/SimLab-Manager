@@ -385,10 +385,10 @@ const CursosTab = () => {
                     </div>
                   </div>
                 </div>
-                <div>
-                  <Label>Outros Custos (Materiais, etc.)</Label>
+                <div className="space-y-4">
+                  <Label className="font-semibold">Outros Custos (Materiais, etc.)</Label>
                   {cursoEditando?.outrosCustos.map((custo, index) => (
-                    <div key={custo.id} className="flex gap-2 items-center mt-2">
+                    <div key={custo.id} className="flex gap-2 items-center">
                       <Input placeholder="Descrição (Ex: Sangue simulado)" value={custo.descricao} onChange={(e) => {
                         const novosCustos = [...cursoEditando.outrosCustos];
                         novosCustos[index].descricao = e.target.value;
@@ -405,7 +405,7 @@ const CursosTab = () => {
                       }}><Trash2 className="h-4 w-4 text-red-500" /></Button>
                     </div>
                   ))}
-                  <Button variant="outline" size="sm" className="mt-2" onClick={() => {
+                  <Button variant="outline" size="sm" onClick={() => {
                     const novoCusto = { id: Date.now().toString(), descricao: '', valor: 0 };
                     setCursoEditando(prev => prev ? { ...prev, outrosCustos: [...prev.outrosCustos, novoCusto] } : null);
                   }}><Plus className="h-4 w-4 mr-2" />Adicionar Custo</Button>
