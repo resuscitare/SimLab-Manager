@@ -34,6 +34,18 @@ export const ItemDialog = ({
 
   const { calcularStatus, getStatusBadge, getStatusIcon, getStatusText } = useEstoqueUtils();
 
+  // Função para formatar valor para exibição no input
+  const formatarValorParaInput = (valor: number): string => {
+    return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  // Função para converter valor do input para número
+  const converterInputParaNumero = (valor: string): number => {
+    // Remove pontos (separadores de milhares) e substitui vírgula por ponto
+    const numeroLimpo = valor.replace(/\./g, '').replace(',', '.');
+    return parseFloat(numeroLimpo) || 0;
+  };
+
   useEffect(() => {
     if (isOpen) {
       setFormData(item || {
@@ -72,6 +84,11 @@ export const ItemDialog = ({
       
       return updated;
     });
+  };
+
+  const handleValorUnitarioChange = (valor: string) => {
+    const numeroConvertido = converterInputParaNumero(valor);
+    handleInputChange("valorUnitario", numeroConvertido);
   };
 
   const handleSave = () => {
@@ -130,7 +147,12 @@ export const ItemDialog = ({
             </div>
             <div className="space-y-2">
               <Label htmlFor="valorUnitario">Valor Unitário (R$) *</Label>
-              <Input id="valorUnitario" type="number" step="0.01" value={formData.valorUnitario} onChange={(e) => handleInputChange("valorUnitario", parseFloat(e.target.value) || 0)} placeholder="0.00" />
+              <Input 
+                id="valorUnitario" 
+                value={formData.valorUnitario ? formatarValorParaInput(formData.valorUnitario) : ""} 
+                onChange={(e) => handleValorUnitarioChange(e.target.value)} 
+                placeholder="0,00" 
+              />
             </div>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

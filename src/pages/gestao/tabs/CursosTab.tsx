@@ -94,6 +94,18 @@ const CursosTab = () => {
     }
   };
 
+  // Função para formatar valor para exibição no input
+  const formatarValorParaInput = (valor: number): string => {
+    return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  // Função para converter valor do input para número
+  const converterInputParaNumero = (valor: string): number => {
+    // Remove pontos (separadores de milhares) e substitui vírgula por ponto
+    const numeroLimpo = valor.replace(/\./g, '').replace(',', '.');
+    return parseFloat(numeroLimpo) || 0;
+  };
+
   const cursosFiltrados = cursos.filter(curso => {
     const matchSearch = curso.nome.toLowerCase().includes(searchTerm.toLowerCase()) || curso.descricao.toLowerCase().includes(searchTerm.toLowerCase());
     const matchCategoria = categoriaFiltro === "todas" || curso.categoria === categoriaFiltro;
@@ -266,7 +278,15 @@ const CursosTab = () => {
                 <div className="space-y-2"><Label htmlFor="descricao">Descrição *</Label><Textarea id="descricao" value={cursoEditando?.descricao || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, descricao: e.target.value } : null)} rows={2} /></div>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="space-y-2"><Label htmlFor="vagas">Vagas Totais *</Label><Input id="vagas" type="number" value={cursoEditando?.vagas || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, vagas: parseInt(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label htmlFor="preco">Preço (R$) *</Label><Input id="preco" type="number" value={cursoEditando?.preco || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, preco: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2">
+                    <Label htmlFor="preco">Preço (R$) *</Label>
+                    <Input 
+                      id="preco" 
+                      value={cursoEditando?.preco ? formatarValorParaInput(cursoEditando.preco) : ""} 
+                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, preco: converterInputParaNumero(e.target.value) } : null)} 
+                      placeholder="0,00"
+                    />
+                  </div>
                   <div className="space-y-2"><Label htmlFor="status">Status</Label><Select value={cursoEditando?.status || ""} onValueChange={(value) => setCursoEditando(prev => prev ? { ...prev, status: value as any } : null)}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="ativo">Ativo</SelectItem><SelectItem value="inativo">Inativo</SelectItem><SelectItem value="suspenso">Suspenso</SelectItem><SelectItem value="encerrado">Encerrado</SelectItem></SelectContent></Select></div>
                 </div>
               </CardContent>
@@ -275,12 +295,54 @@ const CursosTab = () => {
               <CardHeader><CardTitle>Custos Fixos e Variáveis</CardTitle></CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="space-y-2"><Label>Pagamento Instrutor(es) (R$)</Label><Input type="number" value={cursoEditando?.custoInstrutor || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoInstrutor: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Hospedagem (R$)</Label><Input type="number" value={cursoEditando?.custoHospedagem || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoHospedagem: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Alimentação (R$)</Label><Input type="number" value={cursoEditando?.custoAlimentacao || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoAlimentacao: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Combustível (R$)</Label><Input type="number" value={cursoEditando?.custoCombustivel || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCombustivel: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Coffee Break (R$)</Label><Input type="number" value={cursoEditando?.custoCoffeeBreak || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCoffeeBreak: parseFloat(e.target.value) || 0 } : null)} /></div>
-                  <div className="space-y-2"><Label>Desgaste Equipamento (R$)</Label><Input type="number" value={cursoEditando?.custoDesgasteEquipamento || ""} onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoDesgasteEquipamento: parseFloat(e.target.value) || 0 } : null)} /></div>
+                  <div className="space-y-2">
+                    <Label>Pagamento Instrutor(es) (R$)</Label>
+                    <Input 
+                      value={cursoEditando?.custoInstrutor ? formatarValorParaInput(cursoEditando.custoInstrutor) : ""} 
+                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoInstrutor: converterInputParaNumero(e.target.value) } : null)} 
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Hospedagem (R$)</Label>
+                    <Input 
+                      value={cursoEditando?.custoHospedagem ? formatarValorParaInput(cursoEditando.custoHospedagem) : ""} 
+                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoHospedagem: converterInputParaNumero(e.target.value) } : null)} 
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Alimentação (R$)</Label>
+                    <Input 
+                      value={cursoEditando?.custoAlimentacao ? formatarValorParaInput(cursoEditando.custoAlimentacao) : ""} 
+                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoAlimentacao: converterInputParaNumero(e.target.value) } : null)} 
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Combustível (R$)</Label>
+                    <Input 
+                      value={cursoEditando?.custoCombustivel ? formatarValorParaInput(cursoEditando.custoCombustivel) : ""} 
+                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCombustivel: converterInputParaNumero(e.target.value) } : null)} 
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Coffee Break (R$)</Label>
+                    <Input 
+                      value={cursoEditando?.custoCoffeeBreak ? formatarValorParaInput(cursoEditando.custoCoffeeBreak) : ""} 
+                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoCoffeeBreak: converterInputParaNumero(e.target.value) } : null)} 
+                      placeholder="0,00"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Desgaste Equipamento (R$)</Label>
+                    <Input 
+                      value={cursoEditando?.custoDesgasteEquipamento ? formatarValorParaInput(cursoEditando.custoDesgasteEquipamento) : ""} 
+                      onChange={(e) => setCursoEditando(prev => prev ? { ...prev, custoDesgasteEquipamento: converterInputParaNumero(e.target.value) } : null)} 
+                      placeholder="0,00"
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label>Outros Custos (Materiais, etc.)</Label>
@@ -291,11 +353,16 @@ const CursosTab = () => {
                         novosCustos[index].descricao = e.target.value;
                         setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
                       }} />
-                      <Input type="number" placeholder="Valor (R$)" value={custo.valor} className="w-32" onChange={(e) => {
-                        const novosCustos = [...cursoEditando.outrosCustos];
-                        novosCustos[index].valor = parseFloat(e.target.value) || 0;
-                        setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
-                      }} />
+                      <Input 
+                        placeholder="Valor (R$) - Ex: 150,00" 
+                        value={custo.valor ? formatarValorParaInput(custo.valor) : ""} 
+                        className="w-40" 
+                        onChange={(e) => {
+                          const novosCustos = [...cursoEditando.outrosCustos];
+                          novosCustos[index].valor = converterInputParaNumero(e.target.value);
+                          setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
+                        }} 
+                      />
                       <Button variant="ghost" size="icon" onClick={() => {
                         const novosCustos = cursoEditando.outrosCustos.filter(c => c.id !== custo.id);
                         setCursoEditando(prev => prev ? { ...prev, outrosCustos: novosCustos } : null);
