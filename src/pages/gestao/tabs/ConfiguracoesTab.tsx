@@ -22,9 +22,16 @@ import {
   Users,
   FileText,
   AlertTriangle,
-  CheckCircle
+  CheckCircle,
+  Sparkles,
+  Brain,
+  MessageSquare,
+  Zap,
+  Target,
+  DollarSign
 } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
+import { cn } from "@/lib/utils";
 
 interface Configuracao {
   id: string;
@@ -35,84 +42,103 @@ interface Configuracao {
   opcoes?: string[];
 }
 
+interface AgenteIA {
+  id: string;
+  nome: string;
+  descricao: string;
+  icone: any;
+  ativo: boolean;
+  limiteDiario: number;
+  custoPorUso: number;
+  modelo: string;
+  parametros: Record<string, any>;
+}
+
 const ConfiguracoesTab = () => {
   const [configuracoes, setConfiguracoes] = useState<Configuracao[]>([]);
+  const [agentesIA, setAgentesIA] = useState<AgenteIA[]>([]);
   const [loading, setLoading] = useState(true);
   const [salvando, setSalvando] = useState(false);
 
   useEffect(() => {
-    carregarConfiguracoes();
+    carregarDados();
   }, []);
 
-  const carregarConfiguracoes = () => {
+  const carregarDados = () => {
     try {
-      // Carregar configurações do localStorage
       const configSalvas = localStorage.getItem('configuracoes_centro_custos');
       if (configSalvas) {
-        const configParseadas = JSON.parse(configSalvas);
-        setConfiguracoes(configParseadas);
+        setConfiguracoes(JSON.parse(configSalvas));
+      }
+
+      const agentesSalvos = localStorage.getItem('configuracoes_agentes_ia');
+      if (agentesSalvos) {
+        setAgentesIA(JSON.parse(agentesSalvos));
       } else {
-        // Configurações padrão
-        const configPadrao: Configuracao[] = [
+        // Agentes IA padrão
+        const agentesPadrao: AgenteIA[] = [
           {
-            id: "nome_centro_custos",
-            nome: "Nome do Centro de Custos",
-            valor: "Centro de Custos Principal",
-            descricao: "Nome identificador do centro de custos",
-            tipo: "texto"
+            id: "assistente-cenarios",
+            nome: "Assistente de Cenários",
+            descricao: "Gera sugestões para criação de cenários de simulação",
+            icone: Brain,
+            ativo: true,
+            limiteDiario: 50,
+            custoPorUso: 0.08,
+            modelo: "gpt-4o-mini",
+            parametros: {
+              temperatura: 0.7,
+              maxTokens: 1000,
+              contexto: "cenarios_simulacao"
+            }
           },
           {
-            id: "email_responsavel",
-            nome: "Email do Responsável",
-            valor: "responsavel@exemplo.com",
-            descricao: "Email para notificações importantes",
-            tipo: "texto"
+            id: "assistente-debriefing",
+            nome: "Assistente de Debriefing",
+            descricao: "Gera scripts e sugestões para sessões de debriefing",
+            icone: MessageSquare,
+            ativo: true,
+            limiteDiario: 30,
+            custoPorUso: 0.12,
+            modelo: "gpt-4o",
+            parametros: {
+              temperatura: 0.6,
+              maxTokens: 1500,
+              contexto: "debriefing_medico"
+            }
           },
           {
-            id: "alerta_estoque_baixo",
-            nome: "Alerta de Estoque Baixo",
-            valor: true,
-            descricao: "Ativar alertas quando estoque estiver abaixo do mínimo",
-            tipo: "boolean"
+            id: "analisador-performance",
+            nome: "Analisador de Performance",
+            descricao: "Analisa dados de performance e gera relatórios",
+            icone: Target,
+            ativo: false,
+            limiteDiario: 20,
+            custoPorUso: 0.15,
+            modelo: "gpt-4o",
+            parametros: {
+              temperatura: 0.5,
+              maxTokens: 2000,
+              contexto: "analise_performance"
+            }
           },
           {
-            id: "dias_alerta_vencimento",
-            nome: "Dias para Alerta de Vencimento",
-            valor: 30,
-            descricao: "Número de dias antes do vencimento para alertar",
-            tipo: "numero"
-          },
-          {
-            id: "moeda_padrao",
-            nome: "Moeda Padrão",
-            valor: "BRL",
-            descricao: "Moeda utilizada nos relatórios financeiros",
-            tipo: "select",
-            opcoes: ["BRL", "USD", "EUR"]
-          },
-          {
-            id: "backup_automatico",
-            nome: "Backup Automático",
-            valor: true,
-            descricao: "Realizar backup automático dos dados",
-            tipo: "boolean"
-          },
-          {
-            id: "relatorio_mensal",
-            nome: "Relatório Mensal Automático",
-            valor: true,
-            descricao: "Gerar relatório mensal automaticamente",
-            tipo: "boolean"
-          },
-          {
-            id: "limite_itens_pagina",
-            nome: "Limite de Itens por Página",
-            valor: 20,
-            descricao: "Número máximo de itens exibidos por página nas tabelas",
-            tipo: "numero"
+            id: "gerador-relatorios",
+            nome: "Gerador de Relatórios",
+            descricao: "Cria relatórios automatizados e insights",
+            icone: FileText,
+            ativo: true,
+            limiteDiario: 10,
+            custoPorUso: 0.20,
+            modelo: "gpt-4o",
+            parametros: {
+              temperatura: 0.4,
+              maxTokens: 3000,
+              contexto: "relatorios_gerenciais"
+            }
           }
         ];
-        setConfiguracoes(configPadrao);
+        setAgentesIA(agentesPadrao);
       }
       setLoading(false);
     } catch (error) {
@@ -122,18 +148,11 @@ const ConfiguracoesTab = () => {
     }
   };
 
-  const handleConfigChange = (id: string, valor: string | boolean | number) => {
-    setConfiguracoes(prev => 
-      prev.map(config => 
-        config.id === id ? { ...config, valor } : config
-      )
-    );
-  };
-
   const handleSalvarConfiguracoes = async () => {
     setSalvando(true);
     try {
       localStorage.setItem('configuracoes_centro_custos', JSON.stringify(configuracoes));
+      localStorage.setItem('configuracoes_agentes_ia', JSON.stringify(agentesIA));
       showSuccess("Configurações salvas com sucesso!");
     } catch (error) {
       showError("Erro ao salvar configurações");
@@ -181,7 +200,7 @@ const ConfiguracoesTab = () => {
 
   const handleExportarConfiguracoes = () => {
     try {
-      const dataStr = JSON.stringify(configuracoes, null, 2);
+      const dataStr = JSON.stringify({ configuracoes, agentesIA }, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
       
       const exportFileDefaultName = `configuracoes_centro_custos_${new Date().toISOString().split('T')[0]}.json`;
@@ -206,7 +225,12 @@ const ConfiguracoesTab = () => {
       try {
         const text = e.target?.result as string;
         const configImportadas = JSON.parse(text);
-        setConfiguracoes(configImportadas);
+        if (configImportadas.configuracoes) {
+          setConfiguracoes(configImportadas.configuracoes);
+        }
+        if (configImportadas.agentesIA) {
+          setAgentesIA(configImportadas.agentesIA);
+        }
         showSuccess("Configurações importadas com sucesso!");
       } catch (error) {
         showError("Erro ao importar configurações. Verifique o formato do arquivo.");
@@ -215,56 +239,31 @@ const ConfiguracoesTab = () => {
     reader.readAsText(file);
   };
 
-  const renderCampoConfiguracao = (config: Configuracao) => {
-    switch (config.tipo) {
-      case "texto":
-        return (
-          <Input
-            value={config.valor as string}
-            onChange={(e) => handleConfigChange(config.id, e.target.value)}
-            placeholder={config.descricao}
-          />
-        );
-      case "numero":
-        return (
-          <Input
-            type="number"
-            value={config.valor as number}
-            onChange={(e) => handleConfigChange(config.id, parseInt(e.target.value) || 0)}
-            placeholder={config.descricao}
-          />
-        );
-      case "boolean":
-        return (
-          <Switch
-            checked={config.valor as boolean}
-            onCheckedChange={(checked) => handleConfigChange(config.id, checked)}
-          />
-        );
-      case "select":
-        return (
-          <Select value={config.valor as string} onValueChange={(value) => handleConfigChange(config.id, value)}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecione uma opção" />
-            </SelectTrigger>
-            <SelectContent>
-              {config.opcoes?.map(opcao => (
-                <SelectItem key={opcao} value={opcao}>
-                  {opcao}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-      default:
-        return (
-          <Input
-            value={config.valor as string}
-            onChange={(e) => handleConfigChange(config.id, e.target.value)}
-            placeholder={config.descricao}
-          />
-        );
-    }
+  const handleAgenteChange = (id: string, campo: keyof AgenteIA, valor: any) => {
+    setAgentesIA(prev => 
+      prev.map(agente => 
+        agente.id === id ? { ...agente, [campo]: valor } : agente
+      )
+    );
+  };
+
+  const handleParametroChange = (agenteId: string, parametro: string, valor: any) => {
+    setAgentesIA(prev => 
+      prev.map(agente => 
+        agente.id === agenteId 
+          ? { ...agente, parametros: { ...agente.parametros, [parametro]: valor } }
+          : agente
+      )
+    );
+  };
+
+  const formatarValorParaInput = (valor: number): string => {
+    return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  const converterInputParaNumero = (valor: string): number => {
+    const numeroLimpo = valor.replace(/\./g, '').replace(',', '.');
+    return parseFloat(numeroLimpo) || 0;
   };
 
   if (loading) {
@@ -313,7 +312,7 @@ const ConfiguracoesTab = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           {configuracoes.filter(config => 
-            ["nome_centro_custos", "email_responsavel", "moeda_padrao"].includes(config.id)
+            ["nome_centro_custos", "email_responsavel", "alerta_estoque_baixo", "dias_alerta_vencimento"].includes(config.id)
           ).map(config => (
             <div key={config.id} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -321,66 +320,165 @@ const ConfiguracoesTab = () => {
                 <p className="text-sm text-gray-500">{config.descricao}</p>
               </div>
               <div>
-                {renderCampoConfiguracao(config)}
+                {config.tipo === "boolean" ? (
+                  <Switch
+                    checked={config.valor as boolean}
+                    onCheckedChange={(checked) => setConfiguracoes(prev => 
+                      prev.map(c => c.id === config.id ? { ...c, valor: checked } : c)
+                    )}
+                  />
+                ) : config.tipo === "numero" ? (
+                  <Input
+                    type="number"
+                    value={config.valor as number}
+                    onChange={(e) => setConfiguracoes(prev => 
+                      prev.map(c => c.id === config.id ? { ...c, valor: parseInt(e.target.value) || 0 } : c)
+                    )}
+                  />
+                ) : config.tipo === "select" ? (
+                  <Select value={config.valor as string} onValueChange={(value) => setConfiguracoes(prev => 
+                    prev.map(c => c.id === config.id ? { ...c, valor: value } : c)
+                  )}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {config.opcoes?.map(opcao => (
+                        <SelectItem key={opcao} value={opcao}>
+                          {opcao}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    value={config.valor as string}
+                    onChange={(e) => setConfiguracoes(prev => 
+                      prev.map(c => c.id === config.id ? { ...c, valor: e.target.value } : c)
+                    )}
+                  />
+                )}
               </div>
             </div>
           ))}
         </CardContent>
       </Card>
 
-      {/* Configurações de Alertas */}
+      {/* Configurações de Agentes IA */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Bell className="h-5 w-5" />
-            Configurações de Alertas
+            <Sparkles className="h-5 w-5" />
+            Agentes de IA
           </CardTitle>
           <CardDescription>
-            Configure como e quando receber alertas
+            Configure os agentes de inteligência artificial disponíveis no sistema
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          {configuracoes.filter(config => 
-            ["alerta_estoque_baixo", "dias_alerta_vencimento"].includes(config.id)
-          ).map(config => (
-            <div key={config.id} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor={config.id}>{config.nome}</Label>
-                <p className="text-sm text-gray-500">{config.descricao}</p>
-              </div>
-              <div>
-                {renderCampoConfiguracao(config)}
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+          {agentesIA.map((agente) => {
+            const IconComponent = agente.icone;
+            return (
+              <Card key={agente.id} className="border-l-4 border-l-blue-500">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "p-2 rounded-lg",
+                        agente.ativo ? "bg-blue-100" : "bg-gray-100"
+                      )}>
+                        <IconComponent className={cn(
+                          "h-5 w-5",
+                          agente.ativo ? "text-blue-600" : "text-gray-400"
+                        )} />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold">{agente.nome}</h4>
+                        <p className="text-sm text-gray-600">{agente.descricao}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={agente.ativo ? "default" : "secondary"}>
+                        {agente.ativo ? "Ativo" : "Inativo"}
+                      </Badge>
+                      <Switch
+                        checked={agente.ativo}
+                        onCheckedChange={(checked) => handleAgenteChange(agente.id, 'ativo', checked)}
+                      />
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Limite Diário</Label>
+                      <Input
+                        type="number"
+                        value={agente.limiteDiario}
+                        onChange={(e) => handleAgenteChange(agente.id, 'limiteDiario', parseInt(e.target.value) || 0)}
+                        placeholder="50"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Custo por Uso (R$)</Label>
+                      <Input
+                        value={formatarValorParaInput(agente.custoPorUso)}
+                        onChange={(e) => handleAgenteChange(agente.id, 'custoPorUso', converterInputParaNumero(e.target.value))}
+                        placeholder="0,08"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Modelo</Label>
+                      <Select value={agente.modelo} onValueChange={(value) => handleAgenteChange(agente.id, 'modelo', value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                          <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
+                          <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                          <SelectItem value="claude-3">Claude 3</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
 
-      {/* Configurações de Sistema */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Database className="h-5 w-5" />
-            Configurações de Sistema
-          </CardTitle>
-          <CardDescription>
-            Configurações avançadas do sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {configuracoes.filter(config => 
-            ["backup_automatico", "relatorio_mensal", "limite_itens_pagina"].includes(config.id)
-          ).map(config => (
-            <div key={config.id} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor={config.id}>{config.nome}</Label>
-                <p className="text-sm text-gray-500">{config.descricao}</p>
-              </div>
-              <div>
-                {renderCampoConfiguracao(config)}
-              </div>
-            </div>
-          ))}
+                  <div className="border-t pt-4">
+                    <h5 className="font-medium mb-3">Parâmetros Avançados</h5>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-2">
+                        <Label>Temperatura</Label>
+                        <Input
+                          type="number"
+                          step="0.1"
+                          min="0"
+                          max="2"
+                          value={agente.parametros.temperatura}
+                          onChange={(e) => handleParametroChange(agente.id, 'temperatura', parseFloat(e.target.value) || 0.7)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Max Tokens</Label>
+                        <Input
+                          type="number"
+                          value={agente.parametros.maxTokens}
+                          onChange={(e) => handleParametroChange(agente.id, 'maxTokens', parseInt(e.target.value) || 1000)}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Contexto</Label>
+                        <Input
+                          value={agente.parametros.contexto}
+                          onChange={(e) => handleParametroChange(agente.id, 'contexto', e.target.value)}
+                          placeholder="cenarios_simulacao"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </CardContent>
       </Card>
 
