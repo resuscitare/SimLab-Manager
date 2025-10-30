@@ -5,7 +5,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -15,20 +14,7 @@ import {
   RefreshCw, 
   Download, 
   Upload,
-  Bell,
-  Shield,
-  Database,
-  Mail,
-  Users,
-  FileText,
-  AlertTriangle,
-  CheckCircle,
-  Sparkles,
-  Brain,
-  MessageSquare,
-  Zap,
-  Target,
-  DollarSign
+  Sparkles
 } from "lucide-react";
 import { showSuccess, showError } from "@/utils/toast";
 import { cn } from "@/lib/utils";
@@ -53,6 +39,244 @@ interface AgenteIA {
   modelo: string;
   parametros: Record<string, any>;
 }
+
+interface GeneralConfigSectionProps {
+  configuracoes: Configuracao[];
+  onConfigChange: (id: string, valor: any) => void;
+}
+
+const GeneralConfigSection = ({ configuracoes, onConfigChange }: GeneralConfigSectionProps) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Settings className="h-5 w-5" />
+          Configurações Gerais
+        </CardTitle>
+        <CardDescription>
+          Configurações básicas do sistema
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {configuracoes.filter(config => 
+          ["nome_centro_custos", "email_responsavel", "alerta_estoque_baixo", "dias_alerta_vencimento"].includes(config.id)
+        ).map(config => (
+          <div key={config.id} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor={config.id}>{config.nome}</Label>
+              <p className="text-sm text-gray-500">{config.descricao}</p>
+            </div>
+            <div>
+              {config.tipo === "boolean" ? (
+                <Switch
+                  checked={config.valor as boolean}
+                  onCheckedChange={(checked) => onConfigChange(config.id, checked)}
+                />
+              ) : config.tipo === "numero" ? (
+                <Input
+                  type="number"
+                  value={config.valor as number}
+                  onChange={(e) => onConfigChange(config.id, parseInt(e.target.value) || 0)}
+                />
+              ) : config.tipo === "select" ? (
+                <Select value={config.valor as string} onValueChange={(value) => onConfigChange(config.id, value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {config.opcoes?.map(opcao => (
+                      <SelectItem key={opcao} value={opcao}>
+                        {opcao}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  value={config.valor as string}
+                  onChange={(e) => onConfigChange(config.id, e.target.value)}
+                />
+              )}
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+};
+
+interface AIAgentsSectionProps {
+  agentesIA: AgenteIA[];
+  onAgenteChange: (id: string, campo: keyof AgenteIA, valor: any) => void;
+  onParametroChange: (agenteId: string, parametro: string, valor: any) => void;
+}
+
+const AIAgentsSection = ({ agentesIA, onAgenteChange, onParametroChange }: AIAgentsSectionProps) => {
+  const formatarValorParaInput = (valor: number): string => {
+    return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  const converterInputParaNumero = (valor: string): number => {
+    const numeroLimpo = valor.replace(/\./g, '').replace(',', '.');
+    return parseFloat(numeroLimpo) || 0;
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Sparkles className="h-5 w-5" />
+          Agentes de IA
+        </CardTitle>
+        <CardDescription>
+          Configure os agentes de inteligência artificial disponíveis no sistema
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {agentesIA.map((agente) => {
+          const IconComponent = agente.icone;
+          return (
+            <Card key={agente.id} className="border-l-4 border-l-blue-500">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className={cn(
+                      "p-2 rounded-lg",
+                      agente.ativo ? "bg-blue-100" : "bg-gray-100"
+                    )}>
+                      <IconComponent className={cn(
+                        "h-5 w-5",
+                        agente.ativo ? "text-blue-600" : "text-gray-400"
+                      )} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold">{agente.nome}</h4>
+                      <p className="text-sm text-gray-600">{agente.descricao}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge variant={agente.ativo ? "default" : "secondary"}>
+                      {agente.ativo ? "Ativo" : "Inativo"}
+                    </Badge>
+                    <Switch
+                      checked={agente.ativo}
+                      onCheckedChange={(checked) => onAgenteChange(agente.id, 'ativo', checked)}
+                    />
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="space-y-2">
+                    <Label>Limite Diário</Label>
+                    <Input
+                      type="number"
+                      value={agente.limiteDiario}
+                      onChange={(e) => onAgenteChange(agente.id, 'limiteDiario', parseInt(e.target.value) || 0)}
+                      placeholder="50"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Custo por Uso (R$)</Label>
+                    <Input
+                      value={formatarValorParaInput(agente.custoPorUso)}
+                      onChange={(e) => onAgenteChange(agente.id, 'custoPorUso', converterInputParaNumero(e.target.value))}
+                      placeholder="0,08"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Modelo</Label>
+                    <Select value={agente.modelo} onValueChange={(value) => onAgenteChange(agente.id, 'modelo', value)}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="gpt-4o">GPT-4o</SelectItem>
+                        <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
+                        <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                        <SelectItem value="claude-3">Claude 3</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <h5 className="font-medium mb-3">Parâmetros Avançados</h5>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                      <Label>Temperatura</Label>
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        max="2"
+                        value={agente.parametros.temperatura}
+                        onChange={(e) => onParametroChange(agente.id, 'temperatura', parseFloat(e.target.value) || 0.7)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Max Tokens</Label>
+                      <Input
+                        type="number"
+                        value={agente.parametros.maxTokens}
+                        onChange={(e) => onParametroChange(agente.id, 'maxTokens', parseInt(e.target.value) || 1000)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Contexto</Label>
+                      <Input
+                        value={agente.parametros.contexto}
+                        onChange={(e) => onParametroChange(agente.id, 'contexto', e.target.value)}
+                        placeholder="cenarios_simulacao"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </CardContent>
+    </Card>
+  );
+};
+
+interface ImportSectionProps {
+  onImport: (event: React.ChangeEvent<HTMLInputElement>) => void;
+}
+
+const ImportSection = ({ onImport }: ImportSectionProps) => {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Upload className="h-5 w-5" />
+          Importar Configurações
+        </CardTitle>
+        <CardDescription>
+          Importe configurações de um arquivo JSON
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="configFile">Selecione o arquivo de configurações</Label>
+            <Input
+              id="configFile"
+              type="file"
+              accept=".json"
+              onChange={onImport}
+              className="cursor-pointer"
+            />
+          </div>
+          <p className="text-sm text-gray-500">
+            O arquivo deve estar no formato JSON e conter todas as configurações necessárias.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 const ConfiguracoesTab = () => {
   const [configuracoes, setConfiguracoes] = useState<Configuracao[]>([]);
@@ -81,7 +305,7 @@ const ConfiguracoesTab = () => {
             id: "assistente-cenarios",
             nome: "Assistente de Cenários",
             descricao: "Gera sugestões para criação de cenários de simulação",
-            icone: Brain,
+            icone: () => null, // Placeholder, será substituído pelos ícones reais
             ativo: true,
             limiteDiario: 50,
             custoPorUso: 0.08,
@@ -96,7 +320,7 @@ const ConfiguracoesTab = () => {
             id: "assistente-debriefing",
             nome: "Assistente de Debriefing",
             descricao: "Gera scripts e sugestões para sessões de debriefing",
-            icone: MessageSquare,
+            icone: () => null,
             ativo: true,
             limiteDiario: 30,
             custoPorUso: 0.12,
@@ -111,7 +335,7 @@ const ConfiguracoesTab = () => {
             id: "analisador-performance",
             nome: "Analisador de Performance",
             descricao: "Analisa dados de performance e gera relatórios",
-            icone: Target,
+            icone: () => null,
             ativo: false,
             limiteDiario: 20,
             custoPorUso: 0.15,
@@ -126,7 +350,7 @@ const ConfiguracoesTab = () => {
             id: "gerador-relatorios",
             nome: "Gerador de Relatórios",
             descricao: "Cria relatórios automatizados e insights",
-            icone: FileText,
+            icone: () => null,
             ativo: true,
             limiteDiario: 10,
             custoPorUso: 0.20,
@@ -239,6 +463,12 @@ const ConfiguracoesTab = () => {
     reader.readAsText(file);
   };
 
+  const handleConfigChange = (id: string, valor: any) => {
+    setConfiguracoes(prev => 
+      prev.map(config => config.id === id ? { ...config, valor } : config)
+    );
+  };
+
   const handleAgenteChange = (id: string, campo: keyof AgenteIA, valor: any) => {
     setAgentesIA(prev => 
       prev.map(agente => 
@@ -255,15 +485,6 @@ const ConfiguracoesTab = () => {
           : agente
       )
     );
-  };
-
-  const formatarValorParaInput = (valor: number): string => {
-    return valor.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  };
-
-  const converterInputParaNumero = (valor: string): number => {
-    const numeroLimpo = valor.replace(/\./g, '').replace(',', '.');
-    return parseFloat(numeroLimpo) || 0;
   };
 
   if (loading) {
@@ -299,218 +520,18 @@ const ConfiguracoesTab = () => {
         </div>
       </div>
 
-      {/* Configurações Gerais */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Settings className="h-5 w-5" />
-            Configurações Gerais
-          </CardTitle>
-          <CardDescription>
-            Configurações básicas do sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {configuracoes.filter(config => 
-            ["nome_centro_custos", "email_responsavel", "alerta_estoque_baixo", "dias_alerta_vencimento"].includes(config.id)
-          ).map(config => (
-            <div key={config.id} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor={config.id}>{config.nome}</Label>
-                <p className="text-sm text-gray-500">{config.descricao}</p>
-              </div>
-              <div>
-                {config.tipo === "boolean" ? (
-                  <Switch
-                    checked={config.valor as boolean}
-                    onCheckedChange={(checked) => setConfiguracoes(prev => 
-                      prev.map(c => c.id === config.id ? { ...c, valor: checked } : c)
-                    )}
-                  />
-                ) : config.tipo === "numero" ? (
-                  <Input
-                    type="number"
-                    value={config.valor as number}
-                    onChange={(e) => setConfiguracoes(prev => 
-                      prev.map(c => c.id === config.id ? { ...c, valor: parseInt(e.target.value) || 0 } : c)
-                    )}
-                  />
-                ) : config.tipo === "select" ? (
-                  <Select value={config.valor as string} onValueChange={(value) => setConfiguracoes(prev => 
-                    prev.map(c => c.id === config.id ? { ...c, valor: value } : c)
-                  )}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {config.opcoes?.map(opcao => (
-                        <SelectItem key={opcao} value={opcao}>
-                          {opcao}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <Input
-                    value={config.valor as string}
-                    onChange={(e) => setConfiguracoes(prev => 
-                      prev.map(c => c.id === config.id ? { ...c, valor: e.target.value } : c)
-                    )}
-                  />
-                )}
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
+      <GeneralConfigSection 
+        configuracoes={configuracoes} 
+        onConfigChange={handleConfigChange} 
+      />
 
-      {/* Configurações de Agentes IA */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5" />
-            Agentes de IA
-          </CardTitle>
-          <CardDescription>
-            Configure os agentes de inteligência artificial disponíveis no sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {agentesIA.map((agente) => {
-            const IconComponent = agente.icone;
-            return (
-              <Card key={agente.id} className="border-l-4 border-l-blue-500">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className={cn(
-                        "p-2 rounded-lg",
-                        agente.ativo ? "bg-blue-100" : "bg-gray-100"
-                      )}>
-                        <IconComponent className={cn(
-                          "h-5 w-5",
-                          agente.ativo ? "text-blue-600" : "text-gray-400"
-                        )} />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold">{agente.nome}</h4>
-                        <p className="text-sm text-gray-600">{agente.descricao}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={agente.ativo ? "default" : "secondary"}>
-                        {agente.ativo ? "Ativo" : "Inativo"}
-                      </Badge>
-                      <Switch
-                        checked={agente.ativo}
-                        onCheckedChange={(checked) => handleAgenteChange(agente.id, 'ativo', checked)}
-                      />
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <Label>Limite Diário</Label>
-                      <Input
-                        type="number"
-                        value={agente.limiteDiario}
-                        onChange={(e) => handleAgenteChange(agente.id, 'limiteDiario', parseInt(e.target.value) || 0)}
-                        placeholder="50"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Custo por Uso (R$)</Label>
-                      <Input
-                        value={formatarValorParaInput(agente.custoPorUso)}
-                        onChange={(e) => handleAgenteChange(agente.id, 'custoPorUso', converterInputParaNumero(e.target.value))}
-                        placeholder="0,08"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label>Modelo</Label>
-                      <Select value={agente.modelo} onValueChange={(value) => handleAgenteChange(agente.id, 'modelo', value)}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="gpt-4o">GPT-4o</SelectItem>
-                          <SelectItem value="gpt-4o-mini">GPT-4o Mini</SelectItem>
-                          <SelectItem value="gpt-3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                          <SelectItem value="claude-3">Claude 3</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
+      <AIAgentsSection 
+        agentesIA={agentesIA} 
+        onAgenteChange={handleAgenteChange}
+        onParametroChange={handleParametroChange}
+      />
 
-                  <div className="border-t pt-4">
-                    <h5 className="font-medium mb-3">Parâmetros Avançados</h5>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-2">
-                        <Label>Temperatura</Label>
-                        <Input
-                          type="number"
-                          step="0.1"
-                          min="0"
-                          max="2"
-                          value={agente.parametros.temperatura}
-                          onChange={(e) => handleParametroChange(agente.id, 'temperatura', parseFloat(e.target.value) || 0.7)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Max Tokens</Label>
-                        <Input
-                          type="number"
-                          value={agente.parametros.maxTokens}
-                          onChange={(e) => handleParametroChange(agente.id, 'maxTokens', parseInt(e.target.value) || 1000)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Contexto</Label>
-                        <Input
-                          value={agente.parametros.contexto}
-                          onChange={(e) => handleParametroChange(agente.id, 'contexto', e.target.value)}
-                          placeholder="cenarios_simulacao"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </CardContent>
-      </Card>
-
-      {/* Importar Configurações */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Upload className="h-5 w-5" />
-            Importar Configurações
-          </CardTitle>
-          <CardDescription>
-            Importe configurações de um arquivo JSON
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="configFile">Selecione o arquivo de configurações</Label>
-              <Input
-                id="configFile"
-                type="file"
-                accept=".json"
-                onChange={handleImportarConfiguracoes}
-                className="cursor-pointer"
-              />
-            </div>
-            <p className="text-sm text-gray-500">
-              O arquivo deve estar no formato JSON e conter todas as configurações necessárias.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <ImportSection onImport={handleImportarConfiguracoes} />
     </div>
   );
 };
