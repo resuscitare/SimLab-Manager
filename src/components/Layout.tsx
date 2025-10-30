@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -196,10 +196,19 @@ interface SidebarContentProps {
 }
 
 const SidebarContent = ({ onClose }: SidebarContentProps) => {
+  const location = useLocation();
+
   const handleNavigation = () => {
     if (onClose) {
       onClose();
     }
+  };
+
+  const isActive = (href: string) => {
+    if (href === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(href);
   };
 
   return (
@@ -220,7 +229,7 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
       {/* Navigation */}
       <ScrollArea className="flex-1">
         <nav className="p-4 space-y-1">
-          {sidebarItems.map((item) => 
+          {sidebarItems.map((item) =>
             item.subItems ? (
               <CollapsibleItem key={item.title} item={item} onClose={onClose} />
             ) : (
@@ -230,10 +239,10 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
                 onClick={handleNavigation}
                 className={cn(
                   "flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
-                  location.pathname === item.href
+                  isActive(item.href)
                     ? "bg-green-600 text-white font-semibold"
                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  location.pathname !== item.href && "hover:translate-x-1"
+                  !isActive(item.href) && "hover:translate-x-1"
                 )}
               >
                 <item.icon className="h-4 w-4" />
@@ -257,8 +266,15 @@ const SidebarContent = ({ onClose }: SidebarContentProps) => {
 
 const CollapsibleItem = ({ item, onClose }: { item: any, onClose?: () => void }) => {
   const location = useLocation();
-  const isGroupActive = item.subItems.some((sub: any) => location.pathname.startsWith(sub.href));
+  const isGroupActive = item.subItems.some((sub: any) => location.pathname.startsWith(sub.href.split('?')[0]));
+  
   const [isOpen, setIsOpen] = useState(isGroupActive);
+
+  useEffect(() => {
+    if (isGroupActive) {
+      setIsOpen(true);
+    }
+  }, [isGroupActive]);
 
   const handleNavigation = () => {
     if (onClose) {
@@ -283,7 +299,7 @@ const CollapsibleItem = ({ item, onClose }: { item: any, onClose?: () => void })
       </CollapsibleTrigger>
       <CollapsibleContent className="pl-7 pt-1 space-y-1">
         {item.subItems.map((subItem: any) => {
-          const isSubActive = location.pathname === subItem.href;
+          const isSubActive = location.pathname === subItem.href.split('?')[0] && location.search === (subItem.href.split('?')[1] ? `?${subItem.href.split('?')[1]}` : '');
           return (
             <Link
               key={subItem.href}
