@@ -5,6 +5,7 @@ export interface DebriefingTemplate {
   titulo: string;
   tipo: "debriefing";
   modelo: DebriefingModelType;
+  cenariosAssociados?: number;
   dados: {
     descricao?: string;
     duracao?: string;
