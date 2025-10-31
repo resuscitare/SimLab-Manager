@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Save, Eye } from "lucide-react";
+import { ArrowLeft, Save, Eye, Activity, User, Clock, Package, MessageSquare, CheckCircle } from "lucide-react";
 import { useScenarioForm } from "@/hooks/useScenarioForm";
 import { showSuccess, showError } from "@/utils/toast";
 
@@ -120,23 +120,39 @@ const NovoCenario = () => {
         </CardHeader>
         <CardContent>
           <div className="flex items-center space-x-2 mb-4">
-            {tabs.map((tab, index) => (
-              <div key={tab.value} className="flex items-center">
-                <Badge
-                  variant={activeTab === tab.value ? "default" : tab.status === "ativo" ? "default" : "secondary"}
-                  className={`cursor-pointer ${
-                    activeTab === tab.value ? "bg-primary" : 
-                    tab.status === "ativo" ? "bg-green-500" : ""
-                  }`}
-                  onClick={() => handleTabChange(tab.value)}
-                >
-                  {tab.label}
-                </Badge>
-                {index < tabs.length - 1 && (
-                  <div className="w-8 h-0.5 bg-gray-300 mx-2" />
-                )}
-              </div>
-            ))}
+            {tabs.map((tab, index) => {
+              const getTabIcon = () => {
+                switch (tab.value) {
+                  case "identificacao": return <Eye className="h-3 w-3" />;
+                  case "objetivos": return <Activity className="h-3 w-3" />;
+                  case "paciente": return <User className="h-3 w-3" />;
+                  case "frames": return <Clock className="h-3 w-3" />;
+                  case "materiais": return <Package className="h-3 w-3" />;
+                  case "debriefing": return <MessageSquare className="h-3 w-3" />;
+                  case "revisao": return <CheckCircle className="h-3 w-3" />;
+                  default: return null;
+                }
+              };
+
+              return (
+                <div key={tab.value} className="flex items-center">
+                  <Badge
+                    variant={activeTab === tab.value ? "default" : tab.status === "ativo" ? "default" : "secondary"}
+                    className={`cursor-pointer flex items-center gap-1 ${
+                      activeTab === tab.value ? "bg-primary" : 
+                      tab.status === "ativo" ? "bg-green-500" : ""
+                    }`}
+                    onClick={() => handleTabChange(tab.value)}
+                  >
+                    {getTabIcon()}
+                    {tab.label}
+                  </Badge>
+                  {index < tabs.length - 1 && (
+                    <div className="w-8 h-0.5 bg-gray-300 mx-2" />
+                  )}
+                </div>
+              );
+            })}
           </div>
         </CardContent>
       </Card>
