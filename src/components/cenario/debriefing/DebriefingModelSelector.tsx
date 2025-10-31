@@ -42,7 +42,7 @@ const ModelCard = ({ title, recommendation, features, bestFor, onSelect }: Model
 );
 
 interface DebriefingModelSelectorProps {
-  onSelectModel: (model: "PEARLS" | "TeamGAINS" | "3D" | "GAS") => void;
+  onSelectModel: (model: "PEARLS" | "TeamGAINS" | "3D" | "GAS" | "ChecklistClinico") => void;
 }
 
 const DebriefingModelSelector = ({ onSelectModel }: DebriefingModelSelectorProps) => {
@@ -94,6 +94,18 @@ const DebriefingModelSelector = ({ onSelectModel }: DebriefingModelSelectorProps
       ],
       bestFor: "Cursos de suporte de vida (BLS, ACLS, PALS), sessões com tempo limitado, facilitadores iniciantes.",
       onSelect: () => onSelectModel("GAS"),
+    },
+    {
+      title: "Checklist Clínico",
+      recommendation: "Debriefing estruturado baseado em competências clínicas (25-35 minutos)",
+      features: [
+        "6 fases sistemáticas baseadas no checklist de simulação clínica",
+        "Avaliação abrangente de competências técnicas e não-técnicas",
+        "Foco em segurança do paciente e trabalho em equipe",
+        "Estrutura validada para formação médica continuada",
+      ],
+      bestFor: "Instituições de saúde, programas de residência médica, avaliação de competências clínicas completas.",
+      onSelect: () => onSelectModel("ChecklistClinico"),
     },
   ];
 

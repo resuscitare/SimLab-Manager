@@ -1,4 +1,4 @@
-export type DebriefingModelType = "PEARLS" | "TeamGAINS" | "3D" | "GAS";
+export type DebriefingModelType = "PEARLS" | "TeamGAINS" | "3D" | "GAS" | "ChecklistClinico";
 
 export interface DebriefingTemplate {
   id: string;
@@ -10,37 +10,14 @@ export interface DebriefingTemplate {
     duracao?: string;
     nivelParticipantes?: string;
     objetivos?: string[];
-    momentosCriticos?: Array<{
-      descricao: string;
-      acaoEsperada: string;
-      lacunaPossivel: string;
-    }>;
+    momentosCriticos?: { descricao: string; acaoEsperada: string; lacunaPossivel: string; }[];
     fasePreparacao?: string;
     faseReacao?: string;
     faseDescricao?: string;
     faseAnalise?: string;
     faseResumo?: string;
-    perguntasCirculares?: string[];
-    recursosApoio?: Array<{
-      nome: string;
-      link: string;
-    }>;
+    recursosApoio?: { titulo: string; tipo: string; url: string; }[];
   };
   autor: string;
   dataCriacao: string;
-  cenariosAssociados?: number;
-  itens?: number;
-}
-
-export interface DebriefingSession {
-  id: string;
-  cenarioId: string;
-  templateId: string;
-  data: string;
-  duracao: number;
-  participantes: string[];
-  pontosPositivos: string[];
-  pontosMelhoria: string[];
-  acoesFuturas: string[];
-  feedbackFacilitador: string;
 }

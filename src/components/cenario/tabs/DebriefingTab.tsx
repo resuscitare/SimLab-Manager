@@ -4,9 +4,8 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, MessageSquare, Edit, Save, X, Trash2, ArrowRight, CheckCircle, Copy } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Plus, MessageSquare, Edit, Save, X, Trash2, Copy } from "lucide-react";
 import { DebriefingTemplate, DebriefingModelType } from "@/types/debriefing";
 import { ScenarioFormData } from "@/types/prisma";
 import { Label } from "@/components/ui/label";
@@ -17,12 +16,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PearlsForm from "../debriefing/PearlsForm";
 import TeamGainsForm from "../debriefing/TeamGainsForm";
 import ThreeDForm from "../debriefing/ThreeDForm";
 import GasForm from "../debriefing/GasForm";
+import ChecklistClinicoForm from "../debriefing/ChecklistClinicoForm";
 
 interface DebriefingTabProps {
   scenarioData: ScenarioFormData;
@@ -260,7 +258,8 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
     PEARLS: "Debriefings abrangentes com tempo adequado (20-30 minutos). 5 fases estruturadas com 3 opções de análise.",
     TeamGAINS: "Focado em trabalho em equipe e dinâmica interprofissional. 6 fases incluindo prebriefing.",
     "3D": "Para cenários emocionalmente intensos. 3 fases focadas em processamento emocional e cognitivo.",
-    GAS: "Debriefings rápidos e objetivos (10-15 minutos). Modelo oficial da American Heart Association."
+    GAS: "Debriefings rápidos e objetivos (10-15 minutos). Modelo oficial da American Heart Association.",
+    ChecklistClinico: "Debriefing estruturado baseado em competências clínicas (25-35 minutos). 6 fases sistemáticas com foco em segurança do paciente."
   };
 
   const renderModelForm = () => {
@@ -273,6 +272,8 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
         return <ThreeDForm scenarioData={scenarioData} />;
       case "GAS":
         return <GasForm scenarioData={scenarioData} />;
+      case "ChecklistClinico":
+        return <ChecklistClinicoForm scenarioData={scenarioData} />;
       default:
         return <PearlsForm scenarioData={scenarioData} />;
     }
@@ -308,6 +309,7 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
                     <SelectItem value="TeamGAINS">TeamGAINS</SelectItem>
                     <SelectItem value="3D">3D</SelectItem>
                     <SelectItem value="GAS">GAS</SelectItem>
+                    <SelectItem value="ChecklistClinico">Checklist Clínico</SelectItem>
                   </SelectContent>
                 </Select>
                 <Button onClick={handleStartCreating} className="bg-blue-600 hover:bg-blue-700">
@@ -428,11 +430,12 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="template-title">Título do Template *</Label>
-                  <Input
+                  <input
                     id="template-title"
                     value={newTemplate.titulo || ""}
                     onChange={(e) => handleTemplateFieldChange('titulo', e.target.value)}
                     placeholder="Ex: Debriefing Padrão para RCP"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div className="space-y-2">
@@ -449,35 +452,15 @@ const DebriefingTab = ({ scenarioData }: DebriefingTabProps) => {
                       <SelectItem value="TeamGAINS">TeamGAINS</SelectItem>
                       <SelectItem value="3D">3D</SelectItem>
                       <SelectItem value="GAS">GAS</SelectItem>
+                      <SelectItem value="ChecklistClinico">Checklist Clínico</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="template-description">Descrição</Label>
-                <Textarea
-                  id="template-description"
-                  value={newTemplate.dados?.descricao || ""}
-                  onChange={(e) => handleDataFieldChange('descricao', e.target.value)}
-                  placeholder="Descreva o propósito deste template de debriefing..."
-                  rows={3}
-                />
-              </div>
-
-              <div className="p-4 bg-white rounded-lg">
-                <h5 className="font-medium mb-3">Modelo Selecionado: {selectedModel}</h5>
-                <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-gray-700">{modelDescriptions[selectedModel]}</p>
-                </div>
-              </div>
-
-              {/* Formulário específico do modelo */}
-              <div className="pt-4 border-t">
-                <h5 className="font-medium mb-4">Configurações do Modelo {selectedModel}</h5>
-                {renderModelForm()}
-              </div>
+            </div>
+            
+            <div className="mt-6">
+              {renderModelForm()}
             </div>
           </div>
         )}
