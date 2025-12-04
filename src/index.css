@@ -1,9 +1,6 @@
 /* src/index.css - Global Styles for SimLab Manager */
 
-/* Tailwind CSS Directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* Basic Reset and Styles */
 * {
