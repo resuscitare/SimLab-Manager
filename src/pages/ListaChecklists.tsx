@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -49,24 +50,25 @@ const useChecklists = (toast: any) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['checklists'] });
-      toast({ description: 'Checklist salvo com sucesso!' }); // Fixed: Use passed toast
+      toast({ description: 'Checklist salvo com sucesso!' });
     },
     onError: () => {
-      toast({ description: 'Erro ao salvar checklist. Tente novamente.' }); // Fixed: Use passed toast
+      toast({ description: 'Erro ao salvar checklist. Tente novamente.' });
     },
   });
 
   const deleteChecklistMutation = useMutation({
-    mutationFn: async (id: string, options?: { reason?: string }) => {
+    mutationFn: async (variables: { id: string; reason?: string }) => {
+      const { id, reason } = variables;
       const response = await fetch(`/api/checklists/${id}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Erro ao deletar checklist');
       return response.json();
     },
-    onMutate: async (id: string) => {
+    onMutate: async (variables: { id: string; reason?: string }) => {
       await queryClient.cancelQueries({ queryKey: ['checklists'] });
       const previousChecklists = queryClient.getQueryData(['checklists']);
       queryClient.setQueryData(['checklists'], (old: any[]) =>
-        old?.filter((c: any) => c.id !== id) || []
+        old?.filter((c: any) => c.id !== variables.id) || []
       );
       return { previousChecklists };
     },
@@ -74,11 +76,11 @@ const useChecklists = (toast: any) => {
       if (context?.previousChecklists) {
         queryClient.setQueryData(['checklists'], context.previousChecklists);
       }
-      toast({ description: 'Erro ao deletar. Checklist restaurado.' }); // Fixed: Use passed toast
+      toast({ description: 'Erro ao deletar. Checklist restaurado.' });
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: ['checklists'] });
-      toast({ description: 'Checklist deletado com sucesso!' }); // Fixed: Use passed toast
+      toast({ description: 'Checklist deletado com sucesso!' });
     },
   });
 
@@ -95,8 +97,8 @@ const useChecklists = (toast: any) => {
 
 const ListaChecklists = () => {
   const navigate = useNavigate();
-  const toast = useToast(); // Fixed: Call useToast inside the component
-  const { checklists, isLoading, error, saveChecklist, deleteChecklist, isSaving, isDeleting } = useChecklists(toast); // Fixed: Pass toast to hook
+  const toast = useToast();
+  const { checklists, isLoading, error, saveChecklist, deleteChecklist, isSaving, isDeleting } = useChecklists(toast);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -111,7 +113,7 @@ const ListaChecklists = () => {
   // Handler for delete confirmation
   const handleDeleteConfirm = () => {
     if (deletingId) {
-      deleteChecklist(deletingId, { reason: deleteReason });
+      deleteChecklist({ id: deletingId, reason: deleteReason });
       setDeleteDialogOpen(false);
       setDeletingId(null);
       setDeleteReason('');
@@ -165,7 +167,7 @@ const ListaChecklists = () => {
             className="w-64"
           />
           <Button onClick={() => setEditingId('new')} disabled={isSaving}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="w-4 h-4 mr-2" />
             Novo Checklist
           </Button>
         </div>
@@ -231,8 +233,13 @@ const ListaChecklists = () => {
                             Cancelar
                           </Button>
                         </DialogClose>
-                        <Button type="button" onClick={handleDeleteConfirm} variant="destructive">
-                          Deletar Checklist
+                        <Button
+                          type="button"
+                          onClick={handleDeleteConfirm}
+                          disabled={isDeleting || !deletingId}
+                          variant="destructive"
+                        >
+                          {isDeleting ? 'Deletando...' : 'Deletar Checklist'}
                         </Button>
                       </DialogFooter>
                     </DialogContent>
