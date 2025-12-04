@@ -7,6 +7,18 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Trash2, Plus, Edit2, Save, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  Dialog,
+  DialogClose, // Fixed: Import DialogClose
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 
 // Definição do esquema de validação com Zod, incluindo 'id' obrigatório
 const itemSchema = z.object({
@@ -27,7 +39,7 @@ interface ChecklistEditorProps {
   className?: string; // Classe CSS opcional
 }
 
-// Subcomponente para renderizar um item da lista
+// ChecklistItem component - receives props from parent
 const ChecklistItem: React.FC<{
   item: z.infer<typeof itemSchema>;
   index: number;
@@ -35,7 +47,8 @@ const ChecklistItem: React.FC<{
   onDelete: (index: number) => void;
   isEditing: boolean;
   onToggleEdit: (index: number) => void;
-}> = ({ item, index, onUpdate, onDelete, isEditing, onToggleEdit }) => {
+  onOpenDeleteDialog: (index: number) => void;
+}> = ({ item, index, onUpdate, onDelete, isEditing, onToggleEdit, onOpenDeleteDialog }) => {
   return (
     <div className="flex items-center justify-between p-4 border rounded-lg bg-card space-x-4">
       <div className="flex-1 space-y-2">
@@ -95,22 +108,14 @@ const ChecklistItem: React.FC<{
               type="button"
               variant="destructive"
               size="sm"
-              onClick={() => onDelete(index)}
-              title="Cancelar"
+              onClick={() => onOpenDeleteDialog(index)}
+              title="Deletar"
             >
-              <X className="h-4 w-4" />
+              <Trash2 className="h-4 w-4 mr-1" />
+              Deletar
             </Button>
           </>
         )}
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon"
-          onClick={() => onDelete(index)}
-          title="Remover"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
       </div>
     </div>
   );
@@ -126,6 +131,7 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ initialItems = [], on
     control,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<ChecklistFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: { 
@@ -142,6 +148,9 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ initialItems = [], on
   });
 
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deletingIndex, setDeletingIndex] = useState<number | null>(null);
+  const [deleteReason, setDeleteReason] = useState(''); // For audit trail
 
   // Função para adicionar um novo item
   const addItem = () => {
@@ -156,10 +165,7 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ initialItems = [], on
 
   // Função para atualizar um item
   const updateItem = (index: number, field: keyof z.infer<typeof itemSchema>, value: string | number) => {
-    const currentItems = fields as z.infer<typeof itemSchema>[];
-    const updatedItems = [...currentItems];
-    updatedItems[index] = { ...updatedItems[index], [field]: value };
-    // Não é necessário setValue aqui, pois useFieldArray gerencia o estado
+    setValue(`items.${index}.${field}`, value, { shouldValidate: true });
   };
 
   // Função para remover um item
@@ -175,6 +181,27 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ initialItems = [], on
     setEditingIndex(editingIndex === index ? null : index);
   };
 
+  // Função para abrir o diálogo de deleção
+  const openDeleteDialog = (index: number) => {
+    setDeletingIndex(index);
+    setDeleteReason('');
+    setDeleteDialogOpen(true);
+  };
+
+  // Handler for delete confirmation
+  const handleDeleteConfirm = () => {
+    if (deletingIndex !== null) {
+      deleteItem(deletingIndex);
+      setDeleteDialogOpen(false);
+      setDeletingIndex(null);
+      setDeleteReason('');
+    }
+  };
+
+  // Cálculo de totais
+  const totalItems = fields.length;
+  const totalValue = fields.reduce((sum, item: any) => sum + (item.quantity || 0) * (item.price || 0), 0);
+
   // Função para salvar (calcula totais e chama callback)
   const onSubmit = (data: ChecklistFormData) => {
     const totalItems = data.items.length;
@@ -182,10 +209,6 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ initialItems = [], on
     console.log('Salvando checklist:', { totalItems, totalValue, items: data.items });
     onSave?.(data);
   };
-
-  // Cálculo de totais
-  const totalItems = fields.length;
-  const totalValue = fields.reduce((sum, item: any) => sum + (item.quantity || 0) * (item.price || 0), 0);
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -208,16 +231,12 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ initialItems = [], on
               onDelete={deleteItem}
               isEditing={editingIndex === index}
               onToggleEdit={toggleEdit}
+              onOpenDeleteDialog={openDeleteDialog}
             />
           ))}
         </div>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={addItem}
-          className="w-full sm:w-auto"
-        >
+        <Button type="button" variant="outline" onClick={addItem} className="w-full sm:w-auto">
           <Plus className="h-4 w-4 mr-2" />
           Adicionar Item
         </Button>
@@ -235,11 +254,42 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ initialItems = [], on
           </Button>
         </div>
       </form>
+
+      {/* Modal de Confirmação de Deleção */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirmar Deleção</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja deletar este item? Esta ação não pode ser desfeita.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="delete-reason">Motivo da Deleção (opcional, para auditoria)</Label>
+              <Textarea
+                id="delete-reason"
+                value={deleteReason}
+                onChange={(e) => setDeleteReason(e.target.value)}
+                placeholder="Ex: Item obsoleto, duplicado, etc."
+                className="w-full"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button type="button" variant="outline">
+                Cancelar
+              </Button>
+            </DialogClose>
+            <Button type="button" onClick={handleDeleteConfirm} variant="destructive">
+              Deletar Item
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
-export default ChecklistEditor; // Exporta como default para importação padrão
-
-// Exporta tipos para uso em outros arquivos (opcional, mas recomendado para TypeScript)
-export type { ChecklistFormData };
+export default ChecklistEditor;
