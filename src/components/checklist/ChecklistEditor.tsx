@@ -9,7 +9,7 @@ import { Trash2, Plus, Edit2, Save, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   Dialog,
-  DialogClose, // Fixed: Import DialogClose
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogHeader,
@@ -163,9 +163,9 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ initialItems = [], on
     append(newItem);
   };
 
-  // Função para atualizar um item
+  // Função para atualizar um item - Fixed TypeScript error with String() conversion
   const updateItem = (index: number, field: keyof z.infer<typeof itemSchema>, value: string | number) => {
-    setValue(`items.${index}.${field}`, value, { shouldValidate: true });
+    setValue(`items.${index}.${String(field)}` as any, value, { shouldValidate: true });
   };
 
   // Função para remover um item
