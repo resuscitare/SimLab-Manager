@@ -1,10 +1,3 @@
 import { createRoot } from "react-dom/client";
-import App from "./App.tsx";
+import App from "./App.tsx"; // Garante casing correto (ajuste se o arquivo for 'app.tsx')
 import "./globals.css";
-import { AuthProvider } from "./contexts/AuthContext";
-
-createRoot(document.getElementById("root")!).render(
-  <AuthProvider>
-    <App />
-  </AuthProvider>
-);
