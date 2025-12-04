@@ -1,4 +1,20 @@
-// No início do componente, destruture 'onUpdate' também
+import React, { useState } from 'react';
+import { cn } from '@/lib/utils';
+
+// Defina o tipo Item (ajuste conforme seu modelo real)
+interface Item {
+  id: string;
+  name: string;
+  quantity: number;
+  price: number;
+  // Adicione outros campos conforme necessário
+}
+
+interface ChecklistEditorProps {
+  items?: Item[]; // Torne opcional
+  onUpdate?: (items: Item[]) => void; // Callback opcional para atualizar itens
+}
+
 const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ items: initialItems = [], onUpdate }) => {
   const [items, setItems] = useState<Item[]>(initialItems); // Estado com fallback
 
@@ -38,3 +54,9 @@ const ChecklistEditor: React.FC<ChecklistEditorProps> = ({ items: initialItems =
     </div>
   );
 };
+
+// Exporta como default para importação padrão
+export default ChecklistEditor;
+
+// Exporta tipos para uso em outros arquivos (opcional, mas recomendado para TypeScript)
+export type { Item, ChecklistEditorProps };
