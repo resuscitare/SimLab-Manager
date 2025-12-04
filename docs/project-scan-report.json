@@ -1,0 +1,22 @@
+{
+"workflow_version": "1.2.0",
+"timestamps": {"started": "2025-11-12T16:36:12.582Z", "last_updated": "2025-11-12T16:36:12.582Z"},
+"mode": "initial_scan",
+"scan_level": "deep",
+"project_root": "C:/Users/danil/dyad-apps/SimLab Manager",
+"output_folder": "docs",
+"completed_steps": [
+    {"step": "step_1", "status": "completed", "timestamp": "2025-11-12T16:36:12.582Z", "summary": "Classified as monolith with 1 part"},
+    {"step": "step_2", "status": "completed", "timestamp": "2025-11-12T16:36:12.582Z", "summary": "Found 5 existing docs"},
+    {"step": "step_3", "status": "completed", "timestamp": "2025-11-12T16:36:12.582Z", "summary": "Tech stack: React on TypeScript"}
+],
+"current_step": "step_4",
+"findings": {
+    "project_classification": "Monolith Web Application",
+    "existing_documentation_inventory": "5 docs found",
+    "technology_stack": "React on TypeScript"
+},
+"outputs_generated": ["project-scan-report.json"],
+"project_types": [{"part_id": "main", "project_type_id": "web", "display_name": "Web Application"}],
+"resume_instructions": "Starting from step 4"
+}
