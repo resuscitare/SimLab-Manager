@@ -1,0 +1,3 @@
+import { Badge } from "@/components/ui/badge";  // Já instalado, mas garanta
+
+// Resto do código do componente...

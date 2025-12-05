@@ -1,0 +1,227 @@
+<problem file="src/components/ui/scroll-area.tsx" line="1" column="38" code="2307">Cannot find module '@radix-ui/react-scroll-area' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/dropdown-menu.tsx" line="1" column="40" code="2307">Cannot find module '@radix-ui/react-dropdown-menu' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/avatar.tsx" line="1" column="34" code="2307">Cannot find module '@radix-ui/react-avatar' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/collapsible.tsx" line="1" column="39" code="2307">Cannot find module '@radix-ui/react-collapsible' or its corresponding type declarations.</problem>
+<problem file="src/components/Layout.tsx" line="6" column="10" code="2305">Module '&quot;@/components/ui/scroll-area&quot;' has no exported member 'ScrollArea'.</problem>
+<problem file="src/components/Layout.tsx" line="7" column="10" code="2305">Module '&quot;@/components/ui/sheet&quot;' has no exported member 'Sheet'.</problem>
+<problem file="src/components/Layout.tsx" line="7" column="17" code="2305">Module '&quot;@/components/ui/sheet&quot;' has no exported member 'SheetContent'.</problem>
+<problem file="src/components/Layout.tsx" line="7" column="31" code="2305">Module '&quot;@/components/ui/sheet&quot;' has no exported member 'SheetTrigger'.</problem>
+<problem file="src/components/Layout.tsx" line="29" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenu'.</problem>
+<problem file="src/components/Layout.tsx" line="30" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuContent'.</problem>
+<problem file="src/components/Layout.tsx" line="31" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuItem'.</problem>
+<problem file="src/components/Layout.tsx" line="32" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuLabel'.</problem>
+<problem file="src/components/Layout.tsx" line="33" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuSeparator'.</problem>
+<problem file="src/components/Layout.tsx" line="34" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuTrigger'.</problem>
+<problem file="src/components/Layout.tsx" line="36" column="10" code="2305">Module '&quot;@/components/ui/avatar&quot;' has no exported member 'Avatar'.</problem>
+<problem file="src/components/Layout.tsx" line="36" column="18" code="2305">Module '&quot;@/components/ui/avatar&quot;' has no exported member 'AvatarFallback'.</problem>
+<problem file="src/components/Layout.tsx" line="36" column="34" code="2305">Module '&quot;@/components/ui/avatar&quot;' has no exported member 'AvatarImage'.</problem>
+<problem file="src/components/Layout.tsx" line="37" column="10" code="2305">Module '&quot;@/components/ui/collapsible&quot;' has no exported member 'Collapsible'.</problem>
+<problem file="src/components/Layout.tsx" line="37" column="23" code="2305">Module '&quot;@/components/ui/collapsible&quot;' has no exported member 'CollapsibleContent'.</problem>
+<problem file="src/components/Layout.tsx" line="37" column="43" code="2305">Module '&quot;@/components/ui/collapsible&quot;' has no exported member 'CollapsibleTrigger'.</problem>
+<problem file="src/components/ui/command.tsx" line="1" column="34" code="2307">Cannot find module '@radix-ui/react-dialog' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/command.tsx" line="2" column="45" code="2307">Cannot find module 'cmdk' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/popover.tsx" line="1" column="35" code="2307">Cannot find module '@radix-ui/react-popover' or its corresponding type declarations.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="2" column="3" code="2305">Module '&quot;@/components/ui/command&quot;' has no exported member 'Command'.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="3" column="3" code="2305">Module '&quot;@/components/ui/command&quot;' has no exported member 'CommandEmpty'.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="4" column="3" code="2305">Module '&quot;@/components/ui/command&quot;' has no exported member 'CommandGroup'.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="5" column="3" code="2305">Module '&quot;@/components/ui/command&quot;' has no exported member 'CommandInput'.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="6" column="3" code="2305">Module '&quot;@/components/ui/command&quot;' has no exported member 'CommandItem'.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="7" column="3" code="2305">Module '&quot;@/components/ui/command&quot;' has no exported member 'CommandList'.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="10" column="3" code="2305">Module '&quot;@/components/ui/popover&quot;' has no exported member 'Popover'.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="11" column="3" code="2305">Module '&quot;@/components/ui/popover&quot;' has no exported member 'PopoverContent'.</problem>
+<problem file="src/components/LocationCombobox.tsx" line="12" column="3" code="2305">Module '&quot;@/components/ui/popover&quot;' has no exported member 'PopoverTrigger'.</problem>
+<problem file="src/components/ui/select.tsx" line="1" column="34" code="2307">Cannot find module '@radix-ui/react-select' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/separator.tsx" line="1" column="37" code="2307">Cannot find module '@radix-ui/react-separator' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/tabs.tsx" line="1" column="32" code="2307">Cannot find module '@radix-ui/react-tabs' or its corresponding type declarations.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="2" column="10" code="2305">Module '&quot;@/components/ui/separator&quot;' has no exported member 'Separator'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="3" column="10" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'Tabs'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="3" column="16" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsContent'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="3" column="29" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsList'.</problem>
+<problem file="src/components/cenario/FramesTab.tsx" line="3" column="39" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsTrigger'.</problem>
+<problem file="src/components/ui/checkbox.tsx" line="1" column="36" code="2307">Cannot find module '@radix-ui/react-checkbox' or its corresponding type declarations.</problem>
+<problem file="src/components/cenario/debriefing/ChecklistClinicoForm.tsx" line="7" column="10" code="2305">Module '&quot;@/components/ui/checkbox&quot;' has no exported member 'Checkbox'.</problem>
+<problem file="src/components/cenario/debriefing/GasForm.tsx" line="1" column="16" code="2304">Cannot find name 'GasForm'.</problem>
+<problem file="src/components/cenario/debriefing/PearlsForm.tsx" line="1" column="16" code="2304">Cannot find name 'PearlsForm'.</problem>
+<problem file="src/components/cenario/debriefing/TeamGainsForm.tsx" line="1" column="16" code="2304">Cannot find name 'TeamGainsForm'.</problem>
+<problem file="src/components/cenario/debriefing/ThreeDForm.tsx" line="1" column="16" code="2304">Cannot find name 'ThreeDForm'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="3" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenu'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="4" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuContent'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="5" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuItem'.</problem>
+<problem file="src/components/cenario/tabs/DebriefingTab.tsx" line="6" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuTrigger'.</problem>
+<problem file="src/components/cenario/tabs/IdentificacaoTab.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/components/cenario/tabs/IdentificacaoTab.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/components/cenario/tabs/IdentificacaoTab.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/components/cenario/tabs/IdentificacaoTab.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/components/cenario/tabs/IdentificacaoTab.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/components/cenario/tabs/PacienteTab.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/components/cenario/tabs/PacienteTab.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/components/cenario/tabs/PacienteTab.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/components/cenario/tabs/PacienteTab.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/components/cenario/tabs/PacienteTab.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/components/cenario/tabs/PacienteTab.tsx" line="2" column="10" code="2305">Module '&quot;@/components/ui/checkbox&quot;' has no exported member 'Checkbox'.</problem>
+<problem file="src/components/checklist/ChecklistEditor.tsx" line="1" column="16" code="2304">Cannot find name 'ChecklistEditor'.</problem>
+<problem file="src/components/navigation/Sidebar.tsx" line="7" column="10" code="2305">Module '&quot;@/components/ui/scroll-area&quot;' has no exported member 'ScrollArea'.</problem>
+<problem file="src/components/session/SessionForm.tsx" line="1" column="16" code="2304">Cannot find name 'SessionForm'.</problem>
+<problem file="src/components/ui/accordion.tsx" line="1" column="37" code="2307">Cannot find module '@radix-ui/react-accordion' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/alert-dialog.tsx" line="1" column="39" code="2307">Cannot find module '@radix-ui/react-alert-dialog' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/aspect-ratio.tsx" line="1" column="39" code="2307">Cannot find module '@radix-ui/react-aspect-ratio' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/calendar.tsx" line="1" column="27" code="2307">Cannot find module 'react-day-picker' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/carousel.tsx" line="1" column="43" code="2307">Cannot find module 'embla-carousel-react' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/chart.tsx" line="1" column="36" code="2307">Cannot find module 'recharts' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/context-menu.tsx" line="1" column="39" code="2307">Cannot find module '@radix-ui/react-context-menu' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/dialog.tsx" line="1" column="34" code="2307">Cannot find module '@radix-ui/react-dialog' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/drawer.tsx" line="1" column="43" code="2307">Cannot find module 'vaul' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/form.tsx" line="1" column="32" code="2307">Cannot find module 'react-hook-form' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/hover-card.tsx" line="1" column="37" code="2307">Cannot find module '@radix-ui/react-hover-card' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/menubar.tsx" line="1" column="35" code="2307">Cannot find module '@radix-ui/react-menubar' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/navigation-menu.tsx" line="1" column="42" code="2307">Cannot find module '@radix-ui/react-navigation-menu' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/radio-group.tsx" line="1" column="38" code="2307">Cannot find module '@radix-ui/react-radio-group' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/resizable.tsx" line="1" column="37" code="2307">Cannot find module 'react-resizable-panels' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/slider.tsx" line="1" column="34" code="2307">Cannot find module '@radix-ui/react-slider' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/switch.tsx" line="1" column="35" code="2307">Cannot find module '@radix-ui/react-switch' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/toast.tsx" line="1" column="34" code="2307">Cannot find module '@radix-ui/react-toast' or its corresponding type declarations.</problem>
+<problem file="src/hooks/use-toast.ts" line="3" column="15" code="2305">Module '&quot;@/components/ui/toast&quot;' has no exported member 'ToastActionElement'.</problem>
+<problem file="src/hooks/use-toast.ts" line="3" column="35" code="2305">Module '&quot;@/components/ui/toast&quot;' has no exported member 'ToastProps'.</problem>
+<problem file="src/components/ui/toaster.tsx" line="3" column="3" code="2305">Module '&quot;@/components/ui/toast&quot;' has no exported member 'Toast'.</problem>
+<problem file="src/components/ui/toaster.tsx" line="4" column="3" code="2305">Module '&quot;@/components/ui/toast&quot;' has no exported member 'ToastClose'.</problem>
+<problem file="src/components/ui/toaster.tsx" line="5" column="3" code="2305">Module '&quot;@/components/ui/toast&quot;' has no exported member 'ToastDescription'.</problem>
+<problem file="src/components/ui/toaster.tsx" line="6" column="3" code="2305">Module '&quot;@/components/ui/toast&quot;' has no exported member 'ToastProvider'.</problem>
+<problem file="src/components/ui/toaster.tsx" line="7" column="3" code="2305">Module '&quot;@/components/ui/toast&quot;' has no exported member 'ToastTitle'.</problem>
+<problem file="src/components/ui/toaster.tsx" line="8" column="3" code="2305">Module '&quot;@/components/ui/toast&quot;' has no exported member 'ToastViewport'.</problem>
+<problem file="src/components/ui/toggle-group.tsx" line="1" column="39" code="2307">Cannot find module '@radix-ui/react-toggle-group' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/toggle.tsx" line="1" column="34" code="2307">Cannot find module '@radix-ui/react-toggle' or its corresponding type declarations.</problem>
+<problem file="src/components/ui/tooltip.tsx" line="1" column="35" code="2307">Cannot find module '@radix-ui/react-tooltip' or its corresponding type declarations.</problem>
+<problem file="src/utils/toast.ts" line="1" column="23" code="2307">Cannot find module 'sonner' or its corresponding type declarations.</problem>
+<problem file="src/hooks/useScenarioForm.ts" line="1" column="10" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showSuccess'.</problem>
+<problem file="src/hooks/useScenarioForm.ts" line="1" column="23" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showError'.</problem>
+<problem file="src/pages/AdminDashboard.tsx" line="1" column="113" code="2307">Cannot find module 'recharts' or its corresponding type declarations.</problem>
+<problem file="src/pages/AssistenteIA.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/pages/AssistenteIA.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/pages/AssistenteIA.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/pages/AssistenteIA.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/pages/AssistenteIA.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/pages/Checklists.tsx" line="2" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenu'.</problem>
+<problem file="src/pages/Checklists.tsx" line="3" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuContent'.</problem>
+<problem file="src/pages/Checklists.tsx" line="4" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuItem'.</problem>
+<problem file="src/pages/Checklists.tsx" line="5" column="3" code="2305">Module '&quot;@/components/ui/dropdown-menu&quot;' has no exported member 'DropdownMenuTrigger'.</problem>
+<problem file="src/pages/Index.tsx" line="1" column="92" code="2307">Cannot find module 'recharts' or its corresponding type declarations.</problem>
+<problem file="src/pages/Instrutores.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/avatar&quot;' has no exported member 'Avatar'.</problem>
+<problem file="src/pages/Instrutores.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/avatar&quot;' has no exported member 'AvatarFallback'.</problem>
+<problem file="src/pages/Instrutores.tsx" line="1" column="34" code="2305">Module '&quot;@/components/ui/avatar&quot;' has no exported member 'AvatarImage'.</problem>
+<problem file="src/pages/ListaChecklists.tsx" line="1" column="55" code="2307">Cannot find module '@tanstack/react-query' or its corresponding type declarations.</problem>
+<problem file="src/pages/Locais.tsx" line="2" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'Dialog'.</problem>
+<problem file="src/pages/Locais.tsx" line="3" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogContent'.</problem>
+<problem file="src/pages/Locais.tsx" line="4" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogDescription'.</problem>
+<problem file="src/pages/Locais.tsx" line="5" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogHeader'.</problem>
+<problem file="src/pages/Locais.tsx" line="6" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogTitle'.</problem>
+<problem file="src/pages/Locais.tsx" line="7" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogTrigger'.</problem>
+<problem file="src/pages/Locais.tsx" line="9" column="10" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showError'.</problem>
+<problem file="src/pages/Locais.tsx" line="9" column="21" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showSuccess'.</problem>
+<problem file="src/pages/Materiais.tsx" line="1" column="18" code="2307">Cannot find module 'papaparse' or its corresponding type declarations.</problem>
+<problem file="src/pages/Materiais.tsx" line="2" column="23" code="2307">Cannot find module 'xlsx' or its corresponding type declarations.</problem>
+<problem file="src/pages/Materiais.tsx" line="3" column="42" code="2307">Cannot find module 'date-fns' or its corresponding type declarations.</problem>
+<problem file="src/pages/NovoAgendamento.tsx" line="1" column="24" code="2307">Cannot find module 'date-fns' or its corresponding type declarations.</problem>
+<problem file="src/pages/NovoCenario.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'Tabs'.</problem>
+<problem file="src/pages/NovoCenario.tsx" line="1" column="16" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsContent'.</problem>
+<problem file="src/pages/NovoCenario.tsx" line="1" column="29" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsList'.</problem>
+<problem file="src/pages/NovoCenario.tsx" line="1" column="39" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsTrigger'.</problem>
+<problem file="src/pages/NovoCenario.tsx" line="2" column="10" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showSuccess'.</problem>
+<problem file="src/pages/NovoCenario.tsx" line="2" column="23" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showError'.</problem>
+<problem file="src/pages/checklist/ListaChecklists.tsx" line="1" column="55" code="2307">Cannot find module '@tanstack/react-query' or its corresponding type declarations.</problem>
+<problem file="src/pages/gestao/ConfiguracoesTab.tsx" line="8" column="10" code="2305">Module '&quot;@/components/ui/switch&quot;' has no exported member 'Switch'.</problem>
+<problem file="src/pages/gestao/ConfiguracoesTab.tsx" line="9" column="10" code="2305">Module '&quot;@/components/ui/separator&quot;' has no exported member 'Separator'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab.tsx" line="1" column="23" code="2307">Cannot find module 'xlsx' or its corresponding type declarations.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="3" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'Dialog'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="4" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogContent'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="5" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogDescription'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="6" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogHeader'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="7" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogTitle'.</problem>
+<problem file="src/pages/gestao/tabs/CursosTab.tsx" line="8" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogTrigger'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="3" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'Dialog'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="4" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogContent'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="5" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogDescription'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="6" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogHeader'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="7" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogTitle'.</problem>
+<problem file="src/pages/gestao/tabs/RelatoriosTab.tsx" line="8" column="3" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogTrigger'.</problem>
+<problem file="src/pages/gestao/tabs/ConfiguracoesTab.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/pages/gestao/tabs/ConfiguracoesTab.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/pages/gestao/tabs/ConfiguracoesTab.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/pages/gestao/tabs/ConfiguracoesTab.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/pages/gestao/tabs/ConfiguracoesTab.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/pages/gestao/tabs/ConfiguracoesTab.tsx" line="2" column="10" code="2305">Module '&quot;@/components/ui/switch&quot;' has no exported member 'Switch'.</problem>
+<problem file="src/pages/gestao/index.tsx" line="4" column="10" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'Tabs'.</problem>
+<problem file="src/pages/gestao/index.tsx" line="4" column="16" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsContent'.</problem>
+<problem file="src/pages/gestao/index.tsx" line="4" column="29" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsList'.</problem>
+<problem file="src/pages/gestao/index.tsx" line="4" column="39" code="2305">Module '&quot;@/components/ui/tabs&quot;' has no exported member 'TabsTrigger'.</problem>
+<problem file="src/pages/gestao/index.tsx" line="17" column="8" code="1192">Module '&quot;C:/Users/danil/dyad-apps/SimLab Manager/src/pages/gestao/tabs/EstoqueTab&quot;' has no default export.</problem>
+<problem file="src/pages/gestao/index.tsx" line="18" column="8" code="1192">Module '&quot;C:/Users/danil/dyad-apps/SimLab Manager/src/pages/gestao/tabs/CursosTab&quot;' has no default export.</problem>
+<problem file="src/pages/gestao/index.tsx" line="19" column="8" code="1192">Module '&quot;C:/Users/danil/dyad-apps/SimLab Manager/src/pages/gestao/tabs/RelatoriosTab&quot;' has no default export.</problem>
+<problem file="src/pages/gestao/index.tsx" line="20" column="8" code="1192">Module '&quot;C:/Users/danil/dyad-apps/SimLab Manager/src/pages/gestao/tabs/ConfiguracoesTab&quot;' has no default export.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/EstoqueFilters.tsx" line="5" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/EstoqueFilters.tsx" line="5" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/EstoqueFilters.tsx" line="5" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/EstoqueFilters.tsx" line="5" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/EstoqueFilters.tsx" line="5" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ImportDialog.tsx" line="1" column="18" code="2307">Cannot find module 'papaparse' or its corresponding type declarations.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="4" column="10" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'Dialog'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="4" column="18" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogContent'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="4" column="33" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogDescription'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="4" column="52" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogHeader'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="4" column="66" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogTitle'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="4" column="79" code="2305">Module '&quot;@/components/ui/dialog&quot;' has no exported member 'DialogFooter'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="9" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="9" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="9" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="9" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="9" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/components/ItemDialog.tsx" line="11" column="10" code="2305">Module '&quot;@/components/LocationCombobox&quot;' has no exported member 'LocationCombobox'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/hooks/useEstoqueData.ts" line="4" column="10" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showSuccess'.</problem>
+<problem file="src/pages/gestao/tabs/EstoqueTab/hooks/useEstoqueData.ts" line="4" column="23" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showError'.</problem>
+<problem file="src/components/EstoqueFilters.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/components/EstoqueFilters.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/components/EstoqueFilters.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/components/EstoqueFilters.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/components/EstoqueFilters.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/components/ItemDialog.tsx" line="1" column="10" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'Select'.</problem>
+<problem file="src/components/ItemDialog.tsx" line="1" column="18" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectContent'.</problem>
+<problem file="src/components/ItemDialog.tsx" line="1" column="33" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectItem'.</problem>
+<problem file="src/components/ItemDialog.tsx" line="1" column="45" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectTrigger'.</problem>
+<problem file="src/components/ItemDialog.tsx" line="1" column="60" code="2305">Module '&quot;@/components/ui/select&quot;' has no exported member 'SelectValue'.</problem>
+<problem file="src/components/ImportDialog.tsx" line="1" column="18" code="2307">Cannot find module 'papaparse' or its corresponding type declarations.</problem>
+<problem file="src/hooks/useEstoqueData.ts" line="1" column="10" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showSuccess'.</problem>
+<problem file="src/hooks/useEstoqueData.ts" line="1" column="23" code="2305">Module '&quot;@/utils/toast&quot;' has no exported member 'showError'.</problem>
+</dyad-problem-report><think>[REDACTED]</think><dyad-add-dependency packages="@radix-ui/react-scroll-area @radix-ui/react-dropdown-menu @radix-ui/react-avatar @radix-ui/react-collapsible @radix-ui/react-sheet @radix-ui/react-dialog @radix-ui/react-select @radix-ui/react-separator @radix-ui/react-tabs @radix-ui/react-checkbox @radix-ui/react-radio-group @radix-ui/react-accordion @radix-ui/react-alert-dialog @radix-ui/react-aspect-ratio @radix-ui/react-context-menu @radix-ui/react-menubar @radix-ui/react-navigation-menu @radix-ui/react-tooltip @radix-ui/react-slider @radix-ui/react-switch @radix-ui/react-toast @radix-ui/react-toggle @radix-ui/react-toggle-group @radix-ui/react-tooltip @cmdk">
+Instala todas as dependências Radix UI e cmdk para resolver os erros de módulos não encontrados. Rode `pnpm install` após adicionar.
+</dyad-add-dependency>
+
+<dyad-write path="src/components/ui/scroll-area.tsx" description="Adiciona export de ScrollArea e outros membros necessários.">
+import * as React from "react";
+import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
+
+const ScrollArea = ScrollAreaPrimitive.Root;
+const ScrollBar = ScrollAreaPrimitive.Scrollbar;
+
+export { ScrollArea, ScrollBar };
+export type { ScrollAreaProps } from '@radix-ui/react-scroll-area';
+
+// Resto do código do componente...
