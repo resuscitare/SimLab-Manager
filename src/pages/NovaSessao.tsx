@@ -1,3 +1,0 @@
-import SessionForm from '@/components/session/SessionForm';  // Agora com default export
-
-// Resto do código do componente...

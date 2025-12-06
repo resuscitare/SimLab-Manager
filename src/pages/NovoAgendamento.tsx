@@ -1,3 +1,0 @@
-import { format } from 'date-fns';  // Agora instalado
-
-// Resto do código do componente...

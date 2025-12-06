@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -11,38 +12,48 @@ interface AuthState {
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
-  isAuthenticated: false,
-  user: null,
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      isAuthenticated: false,
+      user: null,
 
-  login: async (credentials) => {
-    // Simulate API call - replace with your actual auth API
-    try {
-      // const response = await fetch('/api/auth/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(credentials),
-      // });
-      // if (!response.ok) throw new Error('Login failed');
-      // const data = await response.json();
+      login: async (credentials) => {
+        // Simulate API call - replace with your actual auth API
+        try {
+          // const response = await fetch('/api/auth/login', {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify(credentials),
+          // });
+          // if (!response.ok) throw new Error('Login failed');
+          // const data = await response.json();
 
-      // Mock successful login
-      const mockUser = {
-        id: '1',
-        name: 'Admin User',
-        email: credentials.email,
-      };
+          // Mock successful login
+          const mockUser = {
+            id: '1',
+            name: 'Admin User',
+            email: credentials.email,
+          };
 
-      set({ isAuthenticated: true, user: mockUser });
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+          set({ isAuthenticated: true, user: mockUser });
+        } catch (error) {
+          console.error('Login error:', error);
+          throw error;
+        }
+      },
+
+      logout: () => {
+        set({ isAuthenticated: false, user: null });
+        // Clear any tokens, etc.
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('token'); // Example
+        }
+      },
+    }),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : {} as Storage)),
     }
-  },
-
-  logout: () => {
-    set({ isAuthenticated: false, user: null });
-    // Clear any tokens, etc.
-    localStorage.removeItem('token'); // Example
-  },
-}));
+  )
+);

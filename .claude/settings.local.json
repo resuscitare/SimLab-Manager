@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for component in sheet collapsible dropdown-menu avatar)",
+      "Bash(do if [ ! -f \"src/components/ui/$component.tsx\" ])",
+      "Bash(then echo \"Missing: $component.tsx\")",
+      "Bash(cat:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(src/pages_backup/Agendamentos.tsx)",
+      "Bash(src/pages_backup/Cenarios.tsx)",
+      "Bash(src/pages_backup/Checklists.tsx)",
+      "Bash(src/pages_backup/Equipamentos.tsx)",
+      "Bash(src/pages_backup/Materiais.tsx)",
+      "Bash(src/pages_backup/Instrutores.tsx)",
+      "Bash(npm run build:*)",
+      "Bash(src/components/cenario/FramesTab.tsx)",
+      "Bash(src/components/cenario/tabs/DebriefingTab.tsx)",
+      "Bash(src/components/cenario/debriefing/PearlsForm.tsx)",
+      "Bash(src/components/cenario/debriefing/GasForm.tsx)",
+      "Bash(src/components/cenario/debriefing/TeamGainsForm.tsx)",
+      "Bash(src/components/cenario/debriefing/ThreeDForm.tsx)",
+      "Bash(taskkill:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

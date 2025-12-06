@@ -1,3 +1,0 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';  // Agora instalado
-
-// Resto do código do componente...

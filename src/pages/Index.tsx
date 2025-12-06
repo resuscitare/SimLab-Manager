@@ -1,3 +1,0 @@
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';  // Agora instalado
-
-// Resto do código do componente...

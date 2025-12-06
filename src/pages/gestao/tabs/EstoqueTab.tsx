@@ -1,3 +1,0 @@
-import * as XLSX from 'xlsx';  // Agora instalado
-
-// Resto do código do componente...

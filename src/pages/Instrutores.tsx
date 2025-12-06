@@ -1,3 +1,0 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";  // Agora instalado
-
-// Resto do código do componente...

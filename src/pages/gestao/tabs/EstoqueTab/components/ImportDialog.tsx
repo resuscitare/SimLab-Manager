@@ -1,3 +1,0 @@
-import Papa from 'papaparse';  // Agora instalado
-
-// Resto do código do componente...

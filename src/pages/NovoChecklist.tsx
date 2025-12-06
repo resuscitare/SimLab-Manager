@@ -1,3 +1,0 @@
-import ChecklistEditor from "@/components/checklist/ChecklistEditor";  // Agora com default export
-
-// Resto do código do componente...

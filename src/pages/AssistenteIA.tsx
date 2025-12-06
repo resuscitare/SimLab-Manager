@@ -1,3 +1,0 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";  // Agora instalado
-
-// Resto do código do componente...
